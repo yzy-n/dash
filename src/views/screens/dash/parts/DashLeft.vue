@@ -15,7 +15,19 @@ const greeningTabs: Array<{ key: GreeningTabKey; label: string }> = [
   { key: 'garden', label: '园林绿地面积' },
   { key: 'park', label: '公园占地面积' }
 ]
-
+const greeningTabs2: Array<{ key: GreeningTabKey; label: string }> = [
+  { key: 'cover', label: '人均绿地面积' },
+  { key: 'garden', label: '建成区绿地面积' }
+]
+const greeningTabs3: Array<{ key: GreeningTabKey; label: string }> = [
+  { key: 'cover', label: '清扫道路面积' },
+  { key: 'garden', label: '生活垃圾清运量' },
+  { key: 'park', label: '公厕数' }
+]
+const greeningTabs4: Array<{ key: GreeningTabKey; label: string }> = [
+  { key: 'cover', label: '十佳口袋公园' },
+  { key: 'garden', label: '修建中口袋公园' }
+]
 const activeGreeningTab = ref<GreeningTabKey>('cover')
 
 const pocketParks = [
@@ -52,7 +64,19 @@ const pocketParks = [
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-title">人口密度</div>
+          <div class="tabs">
+            <button
+              v-for="item in greeningTabs2"
+              :key="item.key"
+              type="button"
+              class="tab"
+              :class="{ 'tab--active': activeGreeningTab === item.key }"
+              :style="{ backgroundImage: `url(${tabBgUrl})` }"
+              @click="activeGreeningTab = item.key"
+            >
+              {{ item.label }}
+            </button>
+          </div>
           <div class="panel-chart"><PopulationDensityLineChart /></div>
         </div>
       </div>
@@ -61,6 +85,19 @@ const pocketParks = [
     <div class="col">
       <div class="panel">
         <div class="panel-title">环卫清扫</div>
+        <div class="tabs">
+          <button
+            v-for="item in greeningTabs3"
+            :key="item.key"
+            type="button"
+            class="tab"
+            :class="{ 'tab--active': activeGreeningTab === item.key }"
+            :style="{ backgroundImage: `url(${tabBgUrl})` }"
+            @click="activeGreeningTab = item.key"
+          >
+            {{ item.label }}
+          </button>
+        </div>
         <div class="panel-chart"><SanitationSweepChart /></div>
       </div>
 
@@ -78,6 +115,19 @@ const pocketParks = [
 
       <div class="panel">
         <div class="panel-title">口袋公园</div>
+        <div class="tabs">
+          <button
+            v-for="item in greeningTabs4"
+            :key="item.key"
+            type="button"
+            class="tab"
+            :class="{ 'tab--active': activeGreeningTab === item.key }"
+            :style="{ backgroundImage: `url(${tabBgUrl})` }"
+            @click="activeGreeningTab = item.key"
+          >
+            {{ item.label }}
+          </button>
+        </div>
         <div class="table table--3">
           <div class="table-row head">
             <span>排名</span>
@@ -146,6 +196,8 @@ const pocketParks = [
 
 .panel--full {
   flex: 1;
+  background-size: 100% auto;
+  background-position: top center;
 }
 
 .section {
@@ -195,24 +247,45 @@ const pocketParks = [
   display: flex;
   justify-content: center;
   gap: 22px;
-  margin: 6px 0 10px;
+  margin: 55px 0 20px;
 }
 
 .tab {
-  height: 46px;
-  padding: 0 30px;
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
+  outline: none;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.6);
-  font-size: 18px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 
 .tab--active {
   color: #eaf4ff;
-  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.22));
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 
 .panel-chart {

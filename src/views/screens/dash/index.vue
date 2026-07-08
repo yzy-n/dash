@@ -6,15 +6,19 @@
         :style="{
           width: `${designWidth}px`,
           height: `${designHeight}px`,
-          backgroundImage: `linear-gradient(rgba(4, 14, 42, 0.72), rgba(2, 9, 28, 0.78)), url(${bgUrl})`
+          backgroundImage: `url(${bgUrl})`
         }"
       >
         <header class="header">
-          <div class="header-side header-side-right">
+          <div class="header-side header-side-left">
             <span class="header-chip">{{ timeText }}</span>
+            <span class="header-chip2">{{ weekText }}</span>
           </div>
           <div class="brand">城 市 管 理</div>
-          <div class="header-side"></div>
+          <div class="header-side header-side-right">
+            <span class="header-chip3">北京时间</span>
+            <span class="header-chip4">{{ hmsText }}</span>
+          </div>
         </header>
 
         <section class="body">
@@ -57,9 +61,18 @@ onBeforeUnmount(() => {
 const timeText = computed(() => {
   const d = now.value
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(
-    d.getMinutes()
-  )}:${pad(d.getSeconds())}`
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+})
+
+const weekText = computed(() => {
+  const list = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+  return list[now.value.getDay()]
+})
+
+const hmsText = computed(() => {
+  const d = now.value
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
 })
 </script>
 
@@ -122,13 +135,36 @@ const timeText = computed(() => {
   gap: 16px;
 }
 
+.header-side-left {
+  justify-content: flex-start;
+  margin-top: -100px;
+}
+
 .header-side-right {
   justify-content: flex-end;
+  margin-top: -100px;
 }
 
 .header-chip {
+  width: 140px;
   height: 44px;
   padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(78, 184, 255, 0.3);
+  background: rgba(5, 26, 66, 0.55);
+  box-shadow: inset 0 0 20px rgba(36, 152, 255, 0.18);
+  font-size: 18px;
+  color: rgba(209, 234, 255, 0.88);
+}
+
+.header-chip2 {
+  width: 140px;
+  justify-content: center;
+  margin-left: 92px;
+  height: 44px;
+  padding: 0 40px;
   display: inline-flex;
   align-items: center;
   border: 1px solid rgba(78, 184, 255, 0.3);
@@ -137,20 +173,46 @@ const timeText = computed(() => {
   font-size: 18px;
   color: rgba(209, 234, 255, 0.88);
 }
-
+.header-chip3 {
+  width: 140px;
+  justify-content: center;
+  margin-left: 55px;
+  height: 44px;
+  padding: 0 40px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(78, 184, 255, 0.3);
+  background: rgba(5, 26, 66, 0.55);
+  box-shadow: inset 0 0 20px rgba(36, 152, 255, 0.18);
+  font-size: 18px;
+  color: rgba(209, 234, 255, 0.88);
+}
+.header-chip4 {
+  width: 140px;
+  justify-content: center;
+  margin-left: 55px;
+  height: 44px;
+  padding: 0 40px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(78, 184, 255, 0.3);
+  background: rgba(5, 26, 66, 0.55);
+  box-shadow: inset 0 0 20px rgba(36, 152, 255, 0.18);
+  font-size: 18px;
+  color: rgba(209, 234, 255, 0.88);
+}
 .brand {
   justify-self: center;
   padding: 0 100px;
+  margin-top: -80px;
   height: 66px;
   display: inline-flex;
   align-items: center;
-  font-size: 38px;
-  letter-spacing: 20px;
+  font-size: 88px;
+  letter-spacing: 40px;
   font-weight: 800;
   color: #eef8ff;
   text-shadow: 0 0 20px rgba(57, 170, 255, 0.55);
-  border-top: 2px solid rgba(83, 188, 255, 0.4);
-  border-bottom: 2px solid rgba(83, 188, 255, 0.25);
 }
 
 .body {
