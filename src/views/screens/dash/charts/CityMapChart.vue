@@ -1,66 +1,212 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
+import { computed, onMounted, ref } from 'vue'
+import * as echarts from 'echarts'
+import 'echarts-gl'
 import EChart from '@/components/echarts/EChart.vue'
 
+const mapReady = ref(false)
+const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
+const techTexture = ref<HTMLCanvasElement | null>(null)
+
+const createTechTexture = () => {
+  const size = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return canvas
+
+  ctx.fillStyle = 'rgba(5, 25, 70, 0.2)'
+  ctx.fillRect(0, 0, size, size)
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.10)'
+  ctx.lineWidth = 1
+  const step = 32
+  for (let x = 0; x <= size; x += step) {
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x, size)
+    ctx.stroke()
+  }
+  for (let y = 0; y <= size; y += step) {
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y)
+    ctx.stroke()
+  }
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.08)'
+  for (let i = 0; i < 20; i += 1) {
+    const y = Math.floor((i / 20) * size)
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y + 18)
+    ctx.stroke()
+  }
+
+  ctx.fillStyle = 'rgba(220, 255, 255, 0.12)'
+  for (let i = 0; i < 2600; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    const r = Math.random() * 1.2
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'
+  for (let i = 0; i < 180; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    ctx.fillRect(x, y, 1, 1)
+  }
+
+  return canvas
+}
+
+onMounted(async () => {
+  try {
+    techTexture.value = createTechTexture()
+    const res = await fetch(ANSHAN_GEO_URL)
+    if (!res.ok) throw new Error('地图JSON加载失败')
+    const geoJson = await res.json()
+    // 全局注册鞍山地图，所有图表共享
+    echarts.registerMap('anshan', geoJson)
+    mapReady.value = true
+  } catch (err) {
+    console.error('鞍山地图加载异常', err)
+  }
+})
+
 const option = computed(() => {
-  const polygon = [
-    [18, 22],
-    [36, 10],
-    [60, 16],
-    [78, 30],
-    [86, 52],
-    [74, 72],
-    [56, 86],
-    [34, 88],
-    [18, 78],
-    [10, 58],
-    [12, 36]
+  if (!mapReady.value) return {}
+  // 匹配图里蓝色地块
+  const topColor = 'rgba(20, 140, 220, 0.65)'
+  // hover高亮浅亮蓝
+  const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
+  const detailTexture = techTexture.value as any
+
+  const mapData = [
+    { name: '铁东区', value: 120 },
+    { name: '铁西区', value: 98 },
+    { name: '立山区', value: 145 },
+    { name: '千山区', value: 76 },
+    { name: '台安县', value: 63 },
+    { name: '岫岩满族自治县', value: 52 },
+    { name: '海城市', value: 189 }
+  ]
+
+  const points = [
+    { name: '台安县', value: [122.42, 41.26, 18] },
+    { name: '海城市', value: [122.73, 40.87, 18] },
+    { name: '岫岩满族自治县', value: [123.27, 40.28, 18] }
   ]
 
   return {
     backgroundColor: 'transparent',
-    grid: { left: 0, right: 0, top: 0, bottom: 0 },
-    xAxis: { type: 'value', min: 0, max: 100, show: false },
-    yAxis: { type: 'value', min: 0, max: 100, show: false },
+    tooltip: {
+      trigger: 'item',
+      formatter: (p: any) => {
+        if (Array.isArray(p?.value)) return p?.name ?? ''
+        return `${p?.name ?? ''}<br>数据：${p?.value ?? ''}`
+      },
+      textStyle: { color: '#fff' }
+    },
+    geo3D: {
+      map: 'anshan',
+      regionHeight: 10,
+      shading: 'realistic',
+      realisticMaterial: {
+        detailTexture,
+        textureTiling: 1,
+        roughness: 0.28,
+        metalness: 0.02
+      },
+      groundPlane: { show: false },
+      itemStyle: {
+        color: topColor,
+        borderColor: 'rgba(255, 160, 40, 0.92)',
+        borderWidth: 2,
+        opacity: 1
+      },
+      label: {
+        show: true,
+        color: 'rgba(240, 252, 255, 0.92)',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textShadowBlur: 10,
+        textShadowColor: 'rgba(0, 120, 200, 0.6)'
+      },
+      emphasis: {
+        label: {
+          color: '#ffffff'
+        },
+        itemStyle: {
+          color: topColorEmphasis,
+          borderColor: 'rgba(255, 180, 80, 1)',
+          borderWidth: 2.6
+        }
+      },
+      viewControl: {
+        projection: 'perspective',
+        alpha: 70,
+        beta: -18,
+        distance: 175,
+        minDistance: 80,
+        maxDistance: 170,
+        rotateSensitivity: 0,
+        zoomSensitivity: 0,
+        panSensitivity: 0
+      },
+      light: {
+        main: {
+          intensity: 1.3,
+          alpha: 35,
+          beta: 35,
+          shadow: true,
+          shadowQuality: 'high',
+          color: '#e6f7ff'
+        },
+        ambient: {
+          intensity: 0.35
+        }
+      },
+      regions: mapData.map((r) => ({ name: r.name, value: r.value }))
+    },
+    postEffect: {
+      enable: true,
+      bloom: {
+        enable: true,
+        bloomIntensity: 0.85
+      },
+      SSAO: {
+        enable: true,
+        radius: 6,
+        intensity: 1
+      },
+      FXAA: {
+        enable: true
+      }
+    },
     series: [
       {
-        type: 'custom',
-        coordinateSystem: 'cartesian2d',
-        renderItem: (_: any, api: any) => {
-          const pts = polygon.map((p) => api.coord(p))
-          return {
-            type: 'polygon',
-            shape: { points: pts },
-            style: api.style({
-              fill: 'rgba(76, 210, 255, 0.28)',
-              stroke: 'rgba(255, 226, 122, 0.8)',
-              lineWidth: 3,
-              shadowBlur: 18,
-              shadowColor: 'rgba(80,190,255,0.35)'
-            })
-          }
-        },
-        data: [0]
-      },
-      {
-        type: 'effectScatter',
-        coordinateSystem: 'cartesian2d',
-        data: [
-          { name: '台安', value: [38, 56] },
-          { name: '海城市', value: [52, 74] },
-          { name: '岫岩县', value: [70, 40] }
-        ],
-        symbolSize: 10,
-        rippleEffect: { scale: 2.4, brushType: 'stroke' },
+        type: 'scatter3D',
+        coordinateSystem: 'geo3D',
+        geo3DIndex: 0,
+        data: points,
+        symbolSize: 12,
         label: {
           show: true,
-          formatter: (p: any) => p.name,
-          color: '#eaf4ff',
-          fontSize: 14,
-          position: 'right'
+          formatter: (p: any) => p?.name ?? '',
+          position: 'right',
+          color: '#f2fbff',
+          fontSize: 14
         },
-        itemStyle: { color: '#36e8ff' }
+        itemStyle: {
+          color: '#00ccff',
+          shadowBlur: 18,
+          shadowColor: 'rgba(0, 180, 255, 0.6)'
+        }
       }
     ]
   }
@@ -68,5 +214,5 @@ const option = computed(() => {
 </script>
 
 <template>
-  <EChart :option="option" />
+  <EChart :option="option" style="width: 100%; height: 100%" />
 </template>

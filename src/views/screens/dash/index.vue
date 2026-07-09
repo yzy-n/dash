@@ -176,7 +176,7 @@ const hmsText = computed(() => {
 .header-chip3 {
   width: 140px;
   justify-content: center;
-  margin-left: 55px;
+  margin-right: -10px;
   height: 44px;
   padding: 0 40px;
   display: inline-flex;

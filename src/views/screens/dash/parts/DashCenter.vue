@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import CityMapChart from '../charts/CityMapChart.vue'
-
 const centerKpis = [
   { label: '立案数', value: '559315' },
   { label: '结案数', value: '559297' },
@@ -43,8 +42,14 @@ const centerSideRight = [
           <div v-for="item in centerSideLeft" :key="item.name" class="side-card">
             <div class="side-name">{{ item.name }}</div>
             <div class="side-metrics">
-              <span>本年 {{ item.year }}</span>
-              <span>上月 {{ item.last }}</span>
+              <span class="metric-item">
+                <span class="text-label">本年</span>
+                <span class="text-num">{{ item.year }}</span>
+              </span>
+              <span class="metric-item">
+                <span class="text-label">上月</span>
+                <span class="text-num">{{ item.last }}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -58,8 +63,14 @@ const centerSideRight = [
           <div v-for="item in centerSideRight" :key="item.name" class="side-card">
             <div class="side-name">{{ item.name }}</div>
             <div class="side-metrics">
-              <span>本年 {{ item.year }}</span>
-              <span>上月 {{ item.last }}</span>
+              <span class="metric-item">
+                <span class="text-label">本年</span>
+                <span class="text-num">{{ item.year }}</span>
+              </span>
+              <span class="metric-item">
+                <span class="text-label">上月</span>
+                <span class="text-num">{{ item.last }}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -105,13 +116,15 @@ const centerSideRight = [
 }
 
 .kpi-label {
-  font-size: 18px;
+  font-size: 28px;
+  text-align: center;
   color: rgba(214, 238, 255, 0.75);
 }
 
 .kpi-value {
   padding-top: 10px;
-  font-size: 40px;
+  text-align: center;
+  font-size: 50px;
   font-weight: 800;
   color: #ffe27a;
   text-shadow: 0 0 18px rgba(255, 226, 122, 0.24);
@@ -171,18 +184,49 @@ const centerSideRight = [
 }
 
 .side-name {
-  font-size: 18px;
-  color: rgba(214, 238, 255, 0.88);
-  font-weight: 700;
+  font-size: 28px;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-weight: 900;
+  color: #e0f2ff;
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px #90d8ff,
+    0 0 30px #00a6ff;
 }
 
 .side-metrics {
   display: flex;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: 24px;
   color: rgba(214, 238, 255, 0.75);
+  gap: 60px; /* 两个条目之间间距 */
+  align-items: center;
 }
-
+.metric-item {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+/* 汉字 浅白+蓝光发光 */
+.text-label {
+  color: #d6ecff;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px #80c8ff,
+    0 0 24px #0099ff;
+  margin-right: 16px; /* 文字和数字中间空隙 */
+}
+/* 数字 金色+暖黄光效 */
+.text-num {
+  color: #ffdd99;
+  text-shadow:
+    0 0 4px #fff8cc,
+    0 0 12px #ffcc66,
+    0 0 24px #ffaa22;
+}
 .map-box {
   min-height: 0;
   display: flex;
@@ -190,13 +234,17 @@ const centerSideRight = [
 }
 
 .map-caption {
-  height: 48px;
+  width: 400px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 40px;
   letter-spacing: 6px;
   color: rgba(214, 238, 255, 0.9);
+  background: url('@/assets/img/as.png') no-repeat center center;
+  background-size: 100% 100%;
+  margin: 0 auto;
 }
 
 .map-chart {
