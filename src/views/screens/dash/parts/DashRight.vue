@@ -2,11 +2,18 @@
 import { ref } from 'vue'
 
 import tabBgUrl from '@/assets/img/tabBg.png'
-import CityGreeningChart from '../charts/CityGreeningChart.vue'
-import LandUseAreaChart from '../charts/LandUseAreaChart.vue'
-import PopulationDensityLineChart from '../charts/PopulationDensityLineChart.vue'
-import SanitationSweepChart from '../charts/SanitationSweepChart.vue'
-import StreetLightGaugeChart from '../charts/StreetLightGaugeChart.vue'
+import CaseRingChart from '../charts/CaseRingChart.vue'
+import CategoryProgressChart from '../charts/CategoryProgressChart.vue'
+import ComponentDistributionChart from '../charts/ComponentDistributionChart.vue'
+import CaseCountChart from '../charts/CaseCountChart.vue'
+
+type GreeningTabKey = 'cover' | 'garden' | 'park'
+
+const greeningTabs2: Array<{ key: GreeningTabKey; label: string }> = [
+  { key: 'cover', label: '人均绿地面积' },
+  { key: 'garden', label: '建成区绿地面积' }
+]
+const activeGreeningTab = ref<GreeningTabKey>('cover')
 
 const gridInfoRows = [
   { name: '海城市', town: 26, village: 422, grid: 1415 },
@@ -32,24 +39,45 @@ const appealEvents = [
       <div class="panel">
         <div class="panel-title">网格信息</div>
         <div class="panel-chart">
-          <el-table :data="gridInfoRows" style="width: 100%">
-            <el-table-column prop="name" label="名称" width="180" />
-            <el-table-column prop="town" label="乡镇(街道)数" width="180" />
-            <el-table-column prop="village" label="村居（社区）数" width="180" />
-            <el-table-column prop="grid" label="网格数" width="180" />
-          </el-table>
+          <div class="table">
+            <div class="table-row head">
+              <span class="table-name">名称</span>
+              <span class="table-num table-num--cyan">乡镇(街道)数</span>
+              <span class="table-num table-num--orange">村居（社区）数</span>
+              <span class="table-num table-num--green">网格数</span>
+            </div>
+            <div v-for="row in gridInfoRows" :key="row.name" class="table-row">
+              <span class="table-name">{{ row.name }}</span>
+              <span class="table-num table-num--cyan">{{ row.town }}</span>
+              <span class="table-num table-num--orange">{{ row.village }}</span>
+              <span class="table-num table-num--green">{{ row.grid }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-title">诉求事件</div>
         <div class="panel-chart">
-          <el-table :data="appealEvents" style="width: 100%">
-            <el-table-column prop="date" label="时间" width="180" />
-            <el-table-column prop="name" label="事项名称" width="180" />
-            <el-table-column prop="dep" label="办理部门" width="180" />
-            <el-table-column prop="score" label="办理评价" width="180" />
-          </el-table>
+          <div class="table table--appeal">
+            <div class="table-row head">
+              <span class="table-name">时间</span>
+              <span class="table-name">事项名称</span>
+              <span class="table-name">办理部门</span>
+              <span class="table-name">办理评价</span>
+            </div>
+            <div v-for="row in appealEvents" :key="`${row.date}-${row.name}`" class="table-row">
+              <span class="table-name">{{ row.date }}</span>
+              <span class="table-name">{{ row.name }}</span>
+              <span class="table-name">{{ row.dep || '-' }}</span>
+              <span
+                class="table-num"
+                :class="row.score === '满意' ? 'table-num--green' : 'table-num--red'"
+              >
+                {{ row.score }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -59,11 +87,11 @@ const appealEvents = [
           <div class="panel-head">
             <div class="panel-title">部件分布</div>
           </div>
-          <div class="panel-chart"><CityGreeningChart :metric="activeGreeningTab" /></div>
+          <div class="panel-chart"><ComponentDistributionChart /></div>
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><PopulationDensityLineChart /></div>
+          <div class="panel-chart"><CategoryProgressChart /></div>
         </div>
       </div>
     </div>
@@ -74,24 +102,12 @@ const appealEvents = [
           <div class="panel-head">
             <div class="panel-title">案件数量</div>
           </div>
-          <div class="panel-chart"><CityGreeningChart :metric="activeGreeningTab" /></div>
+          <div class="panel-chart"><CaseCountChart /></div>
         </div>
 
         <div class="section section--bottom">
-          <div class="tabs">
-            <button
-              v-for="item in greeningTabs2"
-              :key="item.key"
-              type="button"
-              class="tab"
-              :class="{ 'tab--active': activeGreeningTab === item.key }"
-              :style="{ backgroundImage: `url(${tabBgUrl})` }"
-              @click="activeGreeningTab = item.key"
-            >
-              {{ item.label }}
-            </button>
-          </div>
-          <div class="panel-chart"><PopulationDensityLineChart /></div>
+
+          <div class="panel-chart"><CaseRingChart /></div>
         </div>
       </div>
     </div>
@@ -251,8 +267,9 @@ const appealEvents = [
   min-height: 0;
   display: grid;
   gap: 12px;
-  font-size: 16px;
+  font-size: 20px;
   color: rgba(214, 238, 255, 0.84);
+  margin-top: 100px;
 }
 
 .table-row {
@@ -271,10 +288,51 @@ const appealEvents = [
   font-weight: 700;
 }
 
+.table-row.head .table-name,
+.table-row.head .table-num {
+  color: rgba(234, 240, 255, 0.95);
+  text-shadow: none;
+}
+
 .table-row span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.table-name {
+  text-align: left;
+  padding-left: 18px;
+}
+
+.table-num {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.table-num--cyan {
+  color: rgba(124, 242, 255, 0.95);
+  text-shadow: 0 0 10px rgba(45, 216, 255, 0.22);
+}
+
+.table-num--orange {
+  color: rgba(255, 190, 94, 0.95);
+  text-shadow: 0 0 10px rgba(255, 169, 60, 0.18);
+}
+
+.table-num--green {
+  color: rgba(92, 255, 178, 0.95);
+  text-shadow: 0 0 10px rgba(34, 255, 154, 0.16);
+}
+
+.table-num--red {
+  color: rgba(255, 120, 120, 0.95);
+  text-shadow: 0 0 10px rgba(255, 70, 90, 0.18);
+}
+
+.table--appeal .table-row {
+  grid-template-columns: 1fr 2.2fr 1.2fr 0.9fr;
 }
 
 .table--3 .table-row {
