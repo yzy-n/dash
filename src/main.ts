@@ -1,7 +1,15 @@
 import { createApp } from 'vue'
 
 import App from './App.vue'
-import router from './router'
+import DashScreen from '@/views/screens/dash/index.vue'
+import createAppRouter from './router'
 import './style.css'
 
-createApp(App).use(router).mount('#app')
+const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
+
+if (isFile) {
+  createApp(DashScreen).mount('#app')
+} else {
+  const router = createAppRouter()
+  createApp(App).use(router).mount('#app')
+}

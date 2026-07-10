@@ -1,63 +1,64 @@
+<template>
+  <EChart :option="chartOption" />
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
-
 import EChart from '@/components/echarts/EChart.vue'
 
-const option = computed(() => {
-  const value = 86.4
+// 图表数据（对应截图 rose1~rose5，数值控制扇区长度）
+const roseData = [
+  { name: '安装路灯道路长度', value: 12, color: '#2563eb' },
+  { name: '道路照明灯盏数', value: 26, color: '#caa822' },
+  { name: '城市照明装灯总功率', value: 35, color: '#10b98c' },
+  { name: '城市照明总用电量', value: 48, color: '#6c42d8' }
+]
 
+const chartOption = computed(() => {
   return {
     backgroundColor: 'transparent',
+    tooltip: { show: false },
     series: [
       {
-        type: 'gauge',
-        startAngle: 210,
-        endAngle: -30,
-        radius: '94%',
-        progress: {
+        type: 'pie',
+        // 空心环形内外半径
+        radius: ['22%', '82%'],
+        center: ['50%', '50%'],
+        // 玫瑰图核心配置：radius 扇区长度随数值变化
+        roseType: 'radius',
+        silent: true,
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 6, // 扇区圆角
+          borderWidth: 2, // 外描边发光线
+          borderColor: 'auto',
+          shadowBlur: 18, // 外发光效果
+          shadowColor: 'auto'
+        },
+        // 外侧文字引导线
+        label: {
           show: true,
-          width: 16,
-          itemStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 1,
-              y2: 0,
-              colorStops: [
-                { offset: 0, color: '#36e8ff' },
-                { offset: 0.5, color: '#2f7dff' },
-                { offset: 1, color: '#7d5dff' }
-              ]
-            }
-          }
+          position: 'outside',
+          formatter: '{b}',
+          fontSize: 14,
+          color: '#fff'
         },
-        axisLine: {
+        labelLine: {
+          show: true,
+          length: 15,
+          length2: 30,
           lineStyle: {
-            width: 16,
-            color: [[1, 'rgba(30,80,180,0.22)']]
+            color: 'auto',
+            width: 1
           }
         },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: { show: false },
-        pointer: { show: false },
-        anchor: { show: false },
-        title: { show: false },
-        detail: {
-          valueAnimation: true,
-          formatter: `{value}%\n路灯亮灯率`,
-          color: '#eaf4ff',
-          fontSize: 22,
-          offsetCenter: [0, 10]
-        },
-        data: [{ value }]
+        data: roseData.map((item) => ({
+          name: item.name,
+          value: item.value,
+          itemStyle: { color: item.color }
+        }))
       }
     ]
   }
 })
 </script>
-
-<template>
-  <EChart :option="option" />
-</template>

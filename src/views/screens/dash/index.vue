@@ -42,7 +42,8 @@ import DashRight from './parts/DashRight.vue'
 const designWidth = 11520
 const designHeight = 2160
 
-const isDev = import.meta.env.DEV
+const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
+const isDev = import.meta.env.DEV || isFile
 
 const now = ref(new Date())
 

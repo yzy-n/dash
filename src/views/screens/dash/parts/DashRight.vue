@@ -1,19 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
-import tabBgUrl from '@/assets/img/tabBg.png'
 import CaseRingChart from '../charts/CaseRingChart.vue'
 import CategoryProgressChart from '../charts/CategoryProgressChart.vue'
 import ComponentDistributionChart from '../charts/ComponentDistributionChart.vue'
 import CaseCountChart from '../charts/CaseCountChart.vue'
-
-type GreeningTabKey = 'cover' | 'garden' | 'park'
-
-const greeningTabs2: Array<{ key: GreeningTabKey; label: string }> = [
-  { key: 'cover', label: '人均绿地面积' },
-  { key: 'garden', label: '建成区绿地面积' }
-]
-const activeGreeningTab = ref<GreeningTabKey>('cover')
 
 const gridInfoRows = [
   { name: '海城市', town: 26, village: 422, grid: 1415 },
@@ -106,7 +95,6 @@ const appealEvents = [
         </div>
 
         <div class="section section--bottom">
-
           <div class="panel-chart"><CaseRingChart /></div>
         </div>
       </div>
