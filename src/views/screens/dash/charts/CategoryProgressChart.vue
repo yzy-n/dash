@@ -30,13 +30,13 @@ const option = computed(() => {
       data: data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 12 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 20 }
     },
     series: [
       {
         type: 'bar',
         data: data.map((d) => d.value),
-        barWidth: 12,
+        barWidth: 24,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {

@@ -109,7 +109,7 @@ const pocketParks = [
 
     <div class="col">
       <div class="panel">
-        <div class="panel-title">城市现状建设用地面积</div>
+        <div class="panel-title">建设用地面积</div>
         <div class="panel-chart"><LandUseAreaChart /></div>
       </div>
 

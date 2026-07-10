@@ -10,12 +10,12 @@ const option = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
-    grid: { left: 40, right: 18, top: 18, bottom: 34 },
+    grid: { left: 40, right: 18, top: 48, bottom: 44 },
     xAxis: {
       type: 'category',
       data: categories,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12, rotate: 18 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 20, rotate: 18 }
     },
     yAxis: {
       type: 'value',
@@ -25,7 +25,7 @@ const option = computed(() => {
     series: [
       {
         type: 'bar',
-        barWidth: 22,
+        barWidth: 24,
         data: values,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],

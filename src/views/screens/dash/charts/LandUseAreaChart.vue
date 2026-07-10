@@ -28,13 +28,13 @@ const option = computed(() => {
       data: data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 12 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 20 }
     },
     series: [
       {
         type: 'bar',
         data: data.map((d) => d.value),
-        barWidth: 14,
+        barWidth: 30,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {
@@ -42,7 +42,7 @@ const option = computed(() => {
           position: 'right',
           formatter: (p: any) => `${Number(p.value).toFixed(2)}%`,
           color: '#dff3ff',
-          fontSize: 12
+          fontSize: 20
         },
         itemStyle: {
           borderRadius: 8,
