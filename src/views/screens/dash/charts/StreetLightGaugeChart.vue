@@ -40,13 +40,13 @@ const chartOption = computed(() => {
           show: true,
           position: 'outside',
           formatter: '{b}：{c}',
-          fontSize: 14,
+          fontSize: 20,
           color: '#fff'
         },
         labelLine: {
           show: true,
           length: 15,
-          length2: 30,
+          length2: 5,
           lineStyle: {
             color: 'auto',
             width: 1
