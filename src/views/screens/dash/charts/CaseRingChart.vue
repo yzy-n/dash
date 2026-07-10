@@ -40,7 +40,7 @@ const chartOption = computed(() => {
           alignTo: 'labelLine',
           formatter: (params) => `${params.name}: ${params.value}`,
           color: '#ffffff',
-          fontSize: 14
+          fontSize: 20
         },
         labelLine: {
           show: true,

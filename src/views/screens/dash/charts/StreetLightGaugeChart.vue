@@ -39,7 +39,7 @@ const chartOption = computed(() => {
         label: {
           show: true,
           position: 'outside',
-          formatter: '{b}',
+          formatter: '{b}：{c}',
           fontSize: 14,
           color: '#fff'
         },

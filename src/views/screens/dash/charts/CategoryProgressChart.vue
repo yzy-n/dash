@@ -1,6 +1,9 @@
+<template>
+  <EChart :option="option" />
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
-
 import EChart from '@/components/echarts/EChart.vue'
 
 const option = computed(() => {
@@ -12,11 +15,13 @@ const option = computed(() => {
     { name: '其他部件', value: 292 }
   ]
 
+  // 计算总值
+  const total = data.reduce((sum, item) => sum + item.value, 0)
   const max = Math.max(...data.map((d) => d.value)) || 1
 
   return {
     backgroundColor: 'transparent',
-    grid: { left: 120, right: 24, top: 12, bottom: 10 },
+    grid: { left: 120, right: 80, top: 12, bottom: 10 },
     xAxis: {
       type: 'value',
       max,
@@ -36,15 +41,19 @@ const option = computed(() => {
       {
         type: 'bar',
         data: data.map((d) => d.value),
-        barWidth: 24,
+        barWidth: 40,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {
           show: true,
           position: 'right',
-          formatter: (p: any) => `${p.value}个`,
+          formatter: (p: any) => {
+            // p.data 是当前条原始数值
+            const percent = ((p.data / total) * 100).toFixed(1)
+            return `${percent}%`
+          },
           color: '#dff3ff',
-          fontSize: 12
+          fontSize: 20
         },
         itemStyle: {
           borderRadius: 8,
@@ -66,7 +75,3 @@ const option = computed(() => {
   }
 })
 </script>
-
-<template>
-  <EChart :option="option" />
-</template>

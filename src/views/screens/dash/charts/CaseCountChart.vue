@@ -25,7 +25,7 @@ const option = computed(() => {
     series: [
       {
         type: 'bar',
-        barWidth: 18,
+        barWidth: 40,
         data: y,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
