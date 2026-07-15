@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ParkingBarChart from '../charts/ParkingBarChart.vue'
+import ProgressBarChart from '../charts/ProgressBarChart.vue'
+// 标签切换
 // 标签切换
 const parkingTab = ref<'ratio' | 'plan'>('ratio')
+
+// 柱状图数据（父页面维护，传给子组件）
+const barXData = [
+  '总计',
+  '配建停车位(住宅类)',
+  '配建停车位(非住宅类)',
+  '路内停车位',
+  '路外公共停车位'
+]
+const barYData = [19, 17, 9, 4, 0.2]
 
 // 道路封闭预警数据
 const roadCloseList = [
@@ -47,24 +59,32 @@ const congestionList = [
         <ParkingBarChart :x-data="barXData" :y-data="barYData" />
       </div>
       <!-- 需求进度条 -->
+      <!-- 需求模块区域 -->
       <div class="demand-wrap">
+        <!-- 左侧竖排文字需求 -->
         <div class="demand-title">需求</div>
-        <div class="progress-item">
-          <div class="progress-label">
-            <span>理想水平(1.2车位/车)</span>
-            <span>38.8 %</span>
+        <div class="progress-list">
+          <!-- 理想水平 -->
+          <div class="progress-item">
+            <div class="progress-text">
+              <div>理想水平</div>
+              <div>(1.2车位/车)</div>
+            </div>
+            <div class="progress-bar">
+              <ProgressBarChart :percent="38.8" color-type="green" />
+            </div>
+            <div class="progress-percent">38.8 %</div>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill green" style="width: 38.8%"></div>
-          </div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-label">
-            <span>2025年目标(0.6车位/车)</span>
-            <span>77.6 %</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill blue" style="width: 77.6%"></div>
+          <!-- 2025目标 -->
+          <div class="progress-item">
+            <div class="progress-text">
+              <div>2025年目标</div>
+              <div>(0.6车位/车)</div>
+            </div>
+            <div class="progress-bar">
+              <ProgressBarChart :percent="77.6" color-type="blue" />
+            </div>
+            <div class="progress-percent">77.6 %</div>
           </div>
         </div>
       </div>
@@ -273,42 +293,61 @@ const congestionList = [
 }
 
 /* 需求进度条 */
+/* 需求外层横向容器 */
 .demand-wrap {
-  margin-top: 20px;
-}
-.demand-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  border-left: 4px solid #00a8ff;
-  padding-left: 10px;
-}
-.progress-item {
-  margin-bottom: 14px;
-}
-.progress-label {
   display: flex;
-  justify-content: space-between;
-  font-size: 20px;
-  margin-bottom: 6px;
+  align-items: center;
+  gap: 26px;
+  margin-top: 24px;
 }
+
+/* 左侧竖排大字 需求 */
+.demand-title {
+  font-size: 52px;
+  font-weight: bold;
+  color: rgba(236, 242, 255, 0.96);
+  writing-mode: vertical-lr;
+  letter-spacing: 6px;
+  text-shadow: 0 0 14px rgba(0, 162, 255, 0.65);
+  flex-shrink: 0;
+}
+
+/* 右侧两行进度列表 */
+.progress-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+/* 单行三栏布局：文字 + 进度条 + 百分比 */
+.progress-item {
+  display: grid;
+  grid-template-columns: 230px 1fr 130px;
+  align-items: center;
+  gap: 24px;
+}
+
+/* 左侧两行描述文字 */
+.progress-text {
+  font-size: 38px;
+  color: rgba(234, 240, 255, 0.93);
+  line-height: 1.45;
+}
+
+/* 进度条容器，高度交给子组件控制 */
 .progress-bar {
   width: 100%;
-  height: 24px;
-  background: rgba(0, 30, 70, 0.6);
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid rgba(90, 200, 255, 0.15);
+  height: 26px;
 }
-.progress-fill {
-  height: 100%;
-  transition: width 0.6s ease;
-}
-.progress-fill.green {
-  background: linear-gradient(90deg, #00b894, #00e0b0);
-}
-.progress-fill.blue {
-  background: linear-gradient(90deg, #0099dd, #36e8ff);
+
+/* 右侧百分比发光文字 */
+.progress-percent {
+  font-size: 42px;
+  font-weight: bold;
+  color: #46e2f1;
+  text-shadow: 0 0 14px rgba(70, 226, 241, 0.65);
+  text-align: right;
 }
 
 /* 顶部统计行 */

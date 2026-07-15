@@ -53,7 +53,7 @@ const renderChart = () => {
         name: '停车位数量',
         type: 'bar',
         data: props.yData,
-        barWidth: 36,
+        barWidth: 80,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#fff266' },
