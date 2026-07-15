@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
+import ParkingBarChart from '../charts/ParkingBarChart.vue'
 // 标签切换
 const parkingTab = ref<'ratio' | 'plan'>('ratio')
 
@@ -44,31 +44,7 @@ const congestionList = [
       </div>
       <!-- 柱状图区域 -->
       <div class="chart-box">
-        <div class="chart-tip">单位：万个</div>
-        <!-- 模拟柱状图区域，可替换ECharts -->
-        <div class="bar-chart-demo">
-          <div class="bar-item">
-            <div class="bar" style="height: 180px"></div>
-            <span class="bar-label">总计</span>
-          </div>
-          <div class="bar-item">
-            <div class="bar" style="height: 160px"></div>
-            <span class="bar-label">配建停车位(住宅类)</span>
-          </div>
-          <div class="bar-item">
-            <div class="bar" style="height: 80px"></div>
-            <span class="bar-label">配建停车位(非住宅类)</span>
-          </div>
-          <div class="bar-item">
-            <div class="bar" style="height: 40px"></div>
-            <span class="bar-label">路内停车位</span>
-          </div>
-          <div class="bar-item">
-            <div class="bar" style="height: 20px"></div>
-            <span class="bar-label">路外公共停车位</span>
-            <div class="hover-tip">路外公共停车位<br />数量 : 0.2</div>
-          </div>
-        </div>
+        <ParkingBarChart :x-data="barXData" :y-data="barYData" />
       </div>
       <!-- 需求进度条 -->
       <div class="demand-wrap">
