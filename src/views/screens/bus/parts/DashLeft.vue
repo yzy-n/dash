@@ -117,7 +117,6 @@ const congestionList = [
     <!-- 左下：拥堵分析 -->
     <div class="panel panel-congestion">
       <div class="panel-title">拥堵分析</div>
-      <div class="sub-tab">拥堵分析统计</div>
       <!-- 拥堵统计 -->
       <div class="stat-row">
         <div class="stat-item">严重拥堵 <span class="num red">30</span>处</div>
@@ -127,12 +126,13 @@ const congestionList = [
       <!-- 拥堵列表 -->
       <div class="congest-list">
         <div class="congest-item" v-for="item in congestionList" :key="item.pos">
-          <span>拥堵位置：{{ item.pos }}</span>
+          <div class="warning-light-icon">🚨</div>
+          <span>· 拥堵位置：{{ item.pos }}</span>
           <span
-            >拥堵级别：<span class="light-yellow">{{ item.level }}</span></span
+            >· 拥堵级别：<span class="level-tag">{{ item.level }}</span></span
           >
-          <span>开始时间：{{ item.start }}</span>
-          <span>预计缓解时间：{{ item.end }}</span>
+          <span>· 开始时间：{{ item.start }}</span>
+          <span>· 预计缓解时间：{{ item.end }}</span>
         </div>
       </div>
     </div>
@@ -303,10 +303,13 @@ const congestionList = [
 
 /* 左侧竖排大字 需求 */
 .demand-title {
+  height: 252px;
+  line-height: 252px;
+  margin-left: 20px;
   font-size: 52px;
+  border-left: 14px solid #00a8ff;
   font-weight: bold;
   color: rgba(236, 242, 255, 0.96);
-  writing-mode: vertical-lr;
   letter-spacing: 6px;
   text-shadow: 0 0 14px rgba(0, 162, 255, 0.65);
   flex-shrink: 0;
@@ -337,17 +340,21 @@ const congestionList = [
 
 /* 进度条容器，高度交给子组件控制 */
 .progress-bar {
-  width: 100%;
+  width: 97%;
   height: 26px;
+  margin-top: -73px;
+  margin-right: -20px;
 }
 
 /* 右侧百分比发光文字 */
 .progress-percent {
-  font-size: 42px;
+  width: 120px;
+  font-size: 33px;
   font-weight: bold;
   color: #46e2f1;
   text-shadow: 0 0 14px rgba(70, 226, 241, 0.65);
-  text-align: right;
+  text-align: center;
+  margin-right: 20px;
 }
 
 /* 顶部统计行 */
@@ -355,10 +362,15 @@ const congestionList = [
   display: flex;
   gap: 60px;
   margin-bottom: 20px;
-  font-size: 24px;
+  font-size: 34px;
+  /* 新增居中 */
+  justify-content: center;
+  width: 100%;
+  margin-top: 80px;
+  margin-bottom: 60px;
 }
 .num {
-  font-size: 28px;
+  font-size: 48px;
   font-weight: bold;
   margin-left: 6px;
 }
@@ -401,27 +413,42 @@ const congestionList = [
 }
 
 /* 拥堵分析 */
-.sub-tab {
-  font-size: 22px;
-  margin-bottom: 12px;
-  padding-left: 10px;
-  border-left: 4px solid #00a8ff;
-}
+/* 拥堵分析列表容器 */
 .congest-list {
   flex: 1;
-  display: grid;
-  gap: 10px;
-}
-.congest-item {
   display: flex;
-  gap: 30px;
-  padding: 12px 14px;
-  background: rgba(6, 18, 48, 0.58);
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  font-size: 18px;
+  flex-direction: column;
+  gap: 8px; /* 缩小行间距，原来12px→8px */
 }
-.light-yellow {
-  color: #ffdd22;
+
+/* 单行布局：压缩图标列宽度，放大字体 */
+.congest-item {
+  display: grid;
+  grid-template-columns: 48px 1fr 1fr 1fr 1fr; /* 图标列60→48px缩小 */
+  align-items: center;
+  padding: 62px 16px; /* 缩小上下内边距 */
+  background: rgba(4, 22, 60, 0.55);
+  border: 1px solid rgba(80, 180, 255, 0.16);
+  font-size: 32px; /* 文字放大 26→32px */
+  color: rgba(220, 240, 255, 0.9);
+  gap: 10px; /* 列之间间距缩小 */
+}
+
+/* 缩小CSS警灯尺寸 */
+.warning-light-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto;
+  position: relative;
+  filter: drop-shadow(0 0 8px rgba(255, 50, 50, 0.7));
+}
+
+
+/* 高亮文字同步放大 */
+.level-tag {
   font-weight: bold;
+  font-size: 34px;
+  color: #ffdd22;
+  text-shadow: 0 0 8px rgba(255, 220, 34, 0.5);
 }
 </style>
