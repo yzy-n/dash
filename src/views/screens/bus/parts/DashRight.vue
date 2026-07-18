@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import CaseRingChart from '../charts/CaseRingChart.vue'
-import CategoryProgressChart from '../charts/CategoryProgressChart.vue'
-import ComponentDistributionChart from '../charts/ComponentDistributionChart.vue'
-import CaseCountChart from '../charts/CaseCountChart.vue'
+import Passenger3DBar from '../charts/Passenger3DBar.vue'
+import LineChart from '../charts/line.vue'
+import TaxiPassengerLine from '../charts/TaxiPassengerLine.vue'
+import PyramidFunnelChart from '../charts/PyramidFunnelChart.vue'
+import CargoMixChart from '../charts/CargoMixChart.vue'
+import VehicleInfoBar from '../charts/VehicleInfoBar.vue'
+import { ref } from 'vue'
+
+const parkingTab = ref('ratio')
 
 const gridInfoRows = [
   { name: '海城市', town: 26, village: 422, grid: 1415 },
@@ -26,47 +31,16 @@ const appealEvents = [
   <aside class="left">
     <div class="col">
       <div class="panel">
-        <div class="panel-title">网格信息</div>
+        <div class="panel-title">公共交通</div>
         <div class="panel-chart">
-          <div class="table">
-            <div class="table-row head">
-              <span class="table-name">名称</span>
-              <span class="table-num table-num--cyan">乡镇(街道)数</span>
-              <span class="table-num table-num--orange">村居（社区）数</span>
-              <span class="table-num table-num--green">网格数</span>
-            </div>
-            <div v-for="row in gridInfoRows" :key="row.name" class="table-row">
-              <span class="table-name">{{ row.name }}</span>
-              <span class="table-num table-num--cyan">{{ row.town }}</span>
-              <span class="table-num table-num--orange">{{ row.village }}</span>
-              <span class="table-num table-num--green">{{ row.grid }}</span>
-            </div>
-          </div>
+          <Passenger3DBar />
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-title">诉求事件</div>
         <div class="panel-chart">
-          <div class="table table--appeal">
-            <div class="table-row head">
-              <span class="table-name">时间</span>
-              <span class="table-name">事项名称</span>
-              <span class="table-name">办理部门</span>
-              <span class="table-name">办理评价</span>
-            </div>
-            <div v-for="row in appealEvents" :key="`${row.date}-${row.name}`" class="table-row">
-              <span class="table-name">{{ row.date }}</span>
-              <span class="table-name">{{ row.name }}</span>
-              <span class="table-name">{{ row.dep || '-' }}</span>
-              <span
-                class="table-num"
-                :class="row.score === '满意' ? 'table-num--green' : 'table-num--red'"
-              >
-                {{ row.score }}
-              </span>
-            </div>
-          </div>
+          <LineChart />
         </div>
       </div>
     </div>
@@ -76,26 +50,59 @@ const appealEvents = [
           <div class="panel-head">
             <div class="panel-title">部件分布</div>
           </div>
-          <div class="panel-chart"><ComponentDistributionChart /></div>
+          <div class="tabs">
+            <button
+              class="tab"
+              :class="{ 'tab--active': parkingTab === 'ratio' }"
+              @click="parkingTab = 'ratio'"
+            >
+              客运量
+            </button>
+            <button
+              class="tab"
+              :class="{ 'tab--active': parkingTab === 'plan' }"
+              @click="parkingTab = 'plan'"
+            >
+              旅客周转量
+            </button>
+          </div>
+          <div class="panel-chart"><TaxiPassengerLine /></div>
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><CategoryProgressChart /></div>
+          <div class="panel-chart"><PyramidFunnelChart /></div>
         </div>
       </div>
     </div>
 
-    <div class="col col-left">
-      <div class="panel panel--full">
-        <div class="section">
-          <div class="panel-head">
-            <div class="panel-title">案件数量</div>
+    <div class="col">
+      <div class="panel">
+        <div class="panel-title">货物运输</div>
+        <div class="tabs">
+            <button
+              class="tab"
+              :class="{ 'tab--active': parkingTab === 'ratio' }"
+              @click="parkingTab = 'ratio'"
+            >
+              货运量
+            </button>
+            <button
+              class="tab"
+              :class="{ 'tab--active': parkingTab === 'plan' }"
+              @click="parkingTab = 'plan'"
+            >
+              货运周转量
+            </button>
           </div>
-          <div class="panel-chart"><CaseCountChart /></div>
+        <div class="panel-chart">
+          <CargoMixChart />
         </div>
+      </div>
 
-        <div class="section section--bottom">
-          <div class="panel-chart"><CaseRingChart /></div>
+      <div class="panel">
+        <div class="panel-title">车辆信息</div>
+        <div class="panel-chart">
+          <VehicleInfoBar />
         </div>
       </div>
     </div>
@@ -203,46 +210,40 @@ const appealEvents = [
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 22px;
-  margin: 55px 0 20px;
+  gap: 18px;
+  margin: 6px 0 18px;
 }
-
 .tab {
-  height: 56px;
-  min-width: 280px;
-  padding: 0 38px;
+  height: 64px;
+  min-width: 300px;
+  padding: 0 26px;
   border: none;
   outline: none;
+  background: url('@/assets/img/tabBg.png') no-repeat center;
+  background-size: 100% 100%;
   background-color: transparent;
   appearance: none;
-  -webkit-appearance: none;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.52);
-  font-size: 28px;
+  color: #ffffff;
+  font-size: 32px;
   font-weight: 700;
-  line-height: 56px;
+  line-height: 64px;
   text-align: center;
   cursor: pointer;
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   font-style: italic;
-  color: #ffffff;
+  letter-spacing: 2px;
   text-shadow:
     0 0 6px #fff,
     0 0 12px #7cf,
     0 0 24px #0cf,
     0 0 40px #00a8ff;
-  letter-spacing: 2px;
 }
-
 .tab--active {
   color: #eaf4ff;
   opacity: 1;
   filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
-  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 
 .panel-chart {
