@@ -12,6 +12,7 @@
     "typecheck": "vue-tsc -b --force"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "echarts": "^5.6.0",
     "echarts-gl": "^2.1.0",
     "maplibre-gl": "^5.24.0",
