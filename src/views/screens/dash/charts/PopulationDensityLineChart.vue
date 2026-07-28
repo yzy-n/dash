@@ -2,15 +2,23 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+import type { LineSeries } from '../useDashData'
+
+const props = withDefaults(
+  defineProps<{
+    x?: string[]
+    series?: LineSeries[]
+  }>(),
+  {
+    x: () => ['2018', '2019', '2020', '2021'],
+    series: () => [
+      { name: '人均绿地面积', data: [14.2, 14.6, 15.1, 15.3], color: '#36e8ff' },
+      { name: '建成区绿地面积', data: [12.1, 12.6, 13.4, 13.9], color: '#7d5dff' }
+    ]
+  }
+)
 
 const option = computed(() => {
-  const x = ['2018', '2019', '2020', '2021']
-  const series = [
-    { name: '主城区', data: [14.2, 14.6, 15.1, 15.3], color: '#36e8ff' },
-    { name: '郊区', data: [12.1, 12.6, 13.4, 13.9], color: '#7d5dff' },
-    { name: '新区', data: [11.3, 11.7, 12.2, 12.8], color: '#ffd15c' }
-  ]
-
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
@@ -24,7 +32,7 @@ const option = computed(() => {
     grid: { left: 40, right: 18, top: 34, bottom: 26 },
     xAxis: {
       type: 'category',
-      data: x,
+      data: props.x,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
       axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12 }
     },
@@ -33,7 +41,7 @@ const option = computed(() => {
       axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
-    series: series.map((s) => ({
+    series: props.series.map((s) => ({
       name: s.name,
       type: 'line',
       smooth: true,

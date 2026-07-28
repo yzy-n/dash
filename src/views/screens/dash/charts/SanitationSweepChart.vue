@@ -2,23 +2,37 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+import type { TimeBarMetric } from '../useDashData'
+
+const props = withDefaults(
+  defineProps<{
+    metric?: TimeBarMetric
+  }>(),
+  {
+    metric: () => ({
+      name: '清扫道路面积',
+      years: ['2018', '2019', '2020', '2021', '2022'],
+      data: [2350, 2680, 2890, 3050, 3320],
+      unit: '万平方米'
+    })
+  }
+)
 
 const option = computed(() => {
-  const years = ['2018', '2019', '2020', '2021', '2022']
-  const values = [2350, 2680, 2890, 3050, 3320]
-
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
     grid: { left: 40, right: 18, top: 18, bottom: 26 },
     xAxis: {
       type: 'category',
-      data: years,
+      data: props.metric.years,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
       axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12 }
     },
     yAxis: {
       type: 'value',
+      name: props.metric.unit ? `单位：${props.metric.unit}` : undefined,
+      nameTextStyle: { color: 'rgba(214,238,255,0.55)', fontSize: 12, padding: [0, 0, 0, 10] },
       axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
@@ -26,7 +40,8 @@ const option = computed(() => {
       {
         type: 'bar',
         barWidth: 18,
-        data: values,
+        name: props.metric.name,
+        data: props.metric.data,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {

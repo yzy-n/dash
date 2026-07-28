@@ -22,9 +22,9 @@
         </header>
 
         <section class="body">
-          <DashLeft />
-          <DashCenter />
-          <DashRight />
+          <DashLeft :data="dashData" />
+          <DashCenter :data="dashData" />
+          <DashRight :data="dashData" />
         </section>
       </div>
     </div>
@@ -35,6 +35,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import bgUrl from '@/assets/img/bg.jpg'
+import { useDashData } from './useDashData'
 import DashCenter from './parts/DashCenter.vue'
 import DashLeft from './parts/DashLeft.vue'
 import DashRight from './parts/DashRight.vue'
@@ -44,6 +45,7 @@ const designHeight = 2160
 
 const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
 const isDev = import.meta.env.DEV || isFile
+const { data: dashData } = useDashData()
 
 const now = ref(new Date())
 

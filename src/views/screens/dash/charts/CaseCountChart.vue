@@ -2,18 +2,25 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+const props = withDefaults(
+  defineProps<{
+    x?: string[]
+    y?: number[]
+  }>(),
+  {
+    x: () => ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06'],
+    y: () => [35210, 26840, 40120, 65420, 52890, 70210]
+  }
+)
 
 const option = computed(() => {
-  const x = ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06']
-  const y = [35210, 26840, 40120, 65420, 52890, 70210]
-
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
     grid: { left: 46, right: 18, top: 18, bottom: 34 },
     xAxis: {
       type: 'category',
-      data: x,
+      data: props.x,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
       axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12, rotate: 25 }
     },
@@ -26,7 +33,7 @@ const option = computed(() => {
       {
         type: 'bar',
         barWidth: 40,
-        data: y,
+        data: props.y,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {

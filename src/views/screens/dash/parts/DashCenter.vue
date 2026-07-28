@@ -1,36 +1,16 @@
 <script setup lang="ts">
+import type { DashScreenData } from '../useDashData'
 import CityMapChart from '../charts/CityMapChart.vue'
-const centerKpis = [
-  { label: '立案数', value: '559315' },
-  { label: '结案数', value: '559297' },
-  { label: '结案率', value: '99.99%' }
-]
 
-const centerSideLeft = [
-  { name: '安全隐患', year: 0, last: 10961 },
-  { name: '便民服务', year: 0, last: 12901 },
-  { name: '矛盾纠纷', year: 0, last: 710 },
-  { name: '办理记录', year: 0, last: 326 },
-  { name: '突发事件', year: 0, last: 297 },
-  { name: '两违线索', year: 0, last: 87 },
-  { name: '关注重点人群', year: 0, last: 436 }
-]
-
-const centerSideRight = [
-  { name: '政务服务', year: 0, last: 7776 },
-  { name: '平安建设', year: 0, last: 6278 },
-  { name: '群防群治', year: 0, last: 403 },
-  { name: '苗头态势', year: 0, last: 306 },
-  { name: '人居环境', year: 0, last: 79 },
-  { name: '应急救援', year: 0, last: 10 },
-  { name: '维护和谐卫生', year: 0, last: 31101 }
-]
+const props = defineProps<{
+  data: DashScreenData
+}>()
 </script>
 
 <template>
   <main class="center">
     <div class="center-kpi">
-      <div v-for="item in centerKpis" :key="item.label" class="kpi-card">
+      <div v-for="item in props.data.centerKpis" :key="item.label" class="kpi-card">
         <div class="kpi-label">{{ item.label }}</div>
         <div class="kpi-value">{{ item.value }}</div>
       </div>
@@ -39,7 +19,7 @@ const centerSideRight = [
     <div class="panel center-map">
       <div class="center-map-grid">
         <div class="side-cards">
-          <div v-for="item in centerSideLeft" :key="item.name" class="side-card">
+          <div v-for="item in props.data.centerSideLeft" :key="item.name" class="side-card">
             <div class="side-name">{{ item.name }}</div>
             <div class="side-metrics">
               <span class="metric-item">
@@ -60,7 +40,7 @@ const centerSideRight = [
         </div>
 
         <div class="side-cards">
-          <div v-for="item in centerSideRight" :key="item.name" class="side-card">
+          <div v-for="item in props.data.centerSideRight" :key="item.name" class="side-card">
             <div class="side-name">{{ item.name }}</div>
             <div class="side-metrics">
               <span class="metric-item">

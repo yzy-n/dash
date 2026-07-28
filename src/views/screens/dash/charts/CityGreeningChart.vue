@@ -2,22 +2,50 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+import type { MetricKey, TimeBarMetric } from '../useDashData'
 
-type Metric = 'cover' | 'garden' | 'park'
-
-const props = withDefaults(defineProps<{ metric?: Metric }>(), {
-  metric: 'cover'
-})
+const props = withDefaults(
+  defineProps<{
+    metric?: MetricKey
+    metrics?: Partial<Record<MetricKey, TimeBarMetric>>
+  }>(),
+  {
+    metric: 'cover'
+  }
+)
 
 const option = computed(() => {
-  const years = ['2020', '2021', '2022', '2023']
-  const metricMap: Record<Metric, { name: string; data: number[]; yMax: number; unit: string }> = {
-    cover: { name: '绿化覆盖面积', data: [7050, 7375.28, 7480, 7360], yMax: 8000, unit: '公顷' },
-    garden: { name: '园林绿地面积', data: [5120, 5360, 5580, 5730], yMax: 6500, unit: '公顷' },
-    park: { name: '公园占地面积', data: [1320, 1410, 1560, 1685], yMax: 2200, unit: '公顷' }
+  const metricMap: Record<MetricKey, TimeBarMetric> = {
+    cover: {
+      name: '绿化覆盖面积',
+      years: ['2020', '2021', '2022', '2023'],
+      data: [7050, 7375.28, 7480, 7360],
+      yMax: 8000,
+      unit: '公顷'
+    },
+    garden: {
+      name: '园林绿地面积',
+      years: ['2020', '2021', '2022', '2023'],
+      data: [5120, 5360, 5580, 5730],
+      yMax: 6500,
+      unit: '公顷'
+    },
+    park: {
+      name: '公园占地面积',
+      data: [1320, 1410, 1560, 1685],
+      yMax: 2200,
+      unit: '公顷',
+      years: ['2020', '2021', '2022', '2023']
+    }
   }
 
-  const selected = metricMap[props.metric]
+  const mergedMap: Record<MetricKey, TimeBarMetric> = {
+    cover: { ...metricMap.cover, ...props.metrics?.cover },
+    garden: { ...metricMap.garden, ...props.metrics?.garden },
+    park: { ...metricMap.park, ...props.metrics?.park }
+  }
+
+  const selected = mergedMap[props.metric]
 
   return {
     backgroundColor: 'transparent',
@@ -25,7 +53,7 @@ const option = computed(() => {
     grid: { left: 56, right: 18, top: 26, bottom: 26 },
     xAxis: {
       type: 'category',
-      data: years,
+      data: selected.years,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
       axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12 }
     },

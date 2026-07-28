@@ -2,16 +2,24 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+import type { NamedValue } from '../useDashData'
+
+const props = withDefaults(
+  defineProps<{
+    data?: NamedValue[]
+  }>(),
+  {
+    data: () => [
+      { name: '居住用地', value: 80.91, total: 106.43 },
+      { name: '工业用地', value: 82.06, total: 68.53 },
+      { name: '道路交通设施用地', value: 61.17, total: 34.5 },
+      { name: '商业服务业设施用地', value: 30.71, total: 14.91 },
+      { name: '绿地与广场用地', value: 60.29, total: 27.65 }
+    ]
+  }
+)
 
 const option = computed(() => {
-  const data = [
-    { name: '居住用地', value: 80.91, total: 106.43 },
-    { name: '工业用地', value: 82.06, total: 68.53 },
-    { name: '道路交通设施用地', value: 61.17, total: 34.5 },
-    { name: '商业服务业设施用地', value: 30.71, total: 14.91 },
-    { name: '绿地与广场用地', value: 60.29, total: 27.65 }
-  ]
-
   return {
     backgroundColor: 'transparent',
     grid: { left: 160, right: 18, top: 12, bottom: 10, containLabel: true },
@@ -25,7 +33,7 @@ const option = computed(() => {
     },
     yAxis: {
       type: 'category',
-      data: data.map((d) => d.name),
+      data: props.data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
       axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 20 }
@@ -33,7 +41,7 @@ const option = computed(() => {
     series: [
       {
         type: 'bar',
-        data: data.map((d) => d.value),
+        data: props.data.map((d) => d.value),
         barWidth: 30,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },

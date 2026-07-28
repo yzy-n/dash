@@ -14,7 +14,9 @@ export type RequestOptions = Omit<RequestInit, 'body' | 'headers'> & {
 const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ''
 
 const buildUrl = (path: string, params?: RequestOptions['params']) => {
-  const url = path.startsWith('http') ? new URL(path) : new URL(path, baseUrl || window.location.origin)
+  const url = path.startsWith('http')
+    ? new URL(path)
+    : new URL(path, baseUrl || window.location.origin)
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       if (v === null || v === undefined) continue
@@ -54,7 +56,8 @@ export const request = async <T>(path: string, options: RequestOptions = {}): Pr
   const payload = contentType.includes('application/json') ? await res.json() : await res.text()
 
   if (!res.ok) {
-    const message = typeof payload === 'string' ? payload : (payload?.message ?? payload?.msg ?? res.statusText)
+    const message =
+      typeof payload === 'string' ? payload : (payload?.message ?? payload?.msg ?? res.statusText)
     throw new ApiError(String(message || res.statusText), { status: res.status })
   }
 
@@ -62,8 +65,12 @@ export const request = async <T>(path: string, options: RequestOptions = {}): Pr
 }
 
 export const requestData = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
-  const envelope = await request<ApiEnvelope<T>>(path, options)
-  if (typeof envelope?.code === 'number' && envelope.code !== 0) {
+  const envelope = await request<ApiEnvelope<T> | T>(path, options)
+  if (!envelope || typeof envelope !== 'object' || !('data' in envelope)) {
+    return envelope as T
+  }
+
+  if (typeof envelope?.code === 'number' && ![0, 200].includes(envelope.code)) {
     const message = envelope.message ?? envelope.msg ?? '请求失败'
     throw new ApiError(message, { code: envelope.code })
   }

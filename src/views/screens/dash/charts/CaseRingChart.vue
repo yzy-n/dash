@@ -5,16 +5,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import type { RoseDatum } from '../useDashData'
 
-// 图表数据，和截图一一对应
-const dataList = [
-  { name: '上报数', value: 40, color: '#ffdd22' },
-  { name: '立案数', value: 30, color: '#0078ff' },
-  { name: '派遣数', value: 10, color: '#00ccff' },
-  { name: '处置数', value: 20, color: '#26e8ee' },
-  { name: '结案数', value: 80, color: '#ff8822' },
-  { name: '核查数', value: 10, color: '#ff2222' }
-]
+const props = withDefaults(
+  defineProps<{
+    data?: RoseDatum[]
+  }>(),
+  {
+    data: () => [
+      { name: '上报数', value: 40, color: '#ffdd22' },
+      { name: '立案数', value: 30, color: '#0078ff' },
+      { name: '派遣数', value: 10, color: '#00ccff' },
+      { name: '处置数', value: 20, color: '#26e8ee' },
+      { name: '结案数', value: 80, color: '#ff8822' },
+      { name: '核查数', value: 10, color: '#ff2222' }
+    ]
+  }
+)
 
 const chartOption = computed(() => {
   return {
@@ -51,7 +58,7 @@ const chartOption = computed(() => {
             width: 1
           }
         },
-        data: dataList.map((item) => ({
+        data: props.data.map((item) => ({
           name: item.name,
           value: item.value,
           itemStyle: { color: item.color }
@@ -72,7 +79,7 @@ const chartOption = computed(() => {
         },
         label: { show: false },
         labelLine: { show: false },
-        data: dataList.map((item) => ({ value: item.value }))
+        data: props.data.map((item) => ({ value: item.value }))
       }
     ],
     graphic: [

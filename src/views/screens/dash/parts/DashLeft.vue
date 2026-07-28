@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import tabBgUrl from '@/assets/img/tabBg.png'
 import CityGreeningChart from '../charts/CityGreeningChart.vue'
@@ -7,36 +7,40 @@ import LandUseAreaChart from '../charts/LandUseAreaChart.vue'
 import PopulationDensityLineChart from '../charts/PopulationDensityLineChart.vue'
 import SanitationSweepChart from '../charts/SanitationSweepChart.vue'
 import StreetLightGaugeChart from '../charts/StreetLightGaugeChart.vue'
+import type { DashScreenData, MetricKey } from '../useDashData'
 
-type GreeningTabKey = 'cover' | 'garden' | 'park'
+const props = defineProps<{
+  data: DashScreenData
+}>()
 
-const greeningTabs: Array<{ key: GreeningTabKey; label: string }> = [
+const greeningTabs: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '绿化覆盖面积' },
   { key: 'garden', label: '园林绿地面积' },
   { key: 'park', label: '公园占地面积' }
 ]
-const greeningTabs2: Array<{ key: GreeningTabKey; label: string }> = [
+const greeningTabs2: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '人均绿地面积' },
   { key: 'garden', label: '建成区绿地面积' }
 ]
-const greeningTabs3: Array<{ key: GreeningTabKey; label: string }> = [
+const greeningTabs3: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '清扫道路面积' },
   { key: 'garden', label: '生活垃圾清运量' },
   { key: 'park', label: '公厕数' }
 ]
-const greeningTabs4: Array<{ key: GreeningTabKey; label: string }> = [
+const greeningTabs4: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '十佳口袋公园' },
   { key: 'garden', label: '修建中口袋公园' }
 ]
-const activeGreeningTab = ref<GreeningTabKey>('cover')
+const activeGreeningTab = ref<MetricKey>('cover')
+const activeTrendTab = ref<MetricKey>('cover')
+const activeSanitationTab = ref<MetricKey>('cover')
+const activeParkTab = ref<MetricKey>('cover')
 
-const pocketParks = [
-  { rank: 1, district: '铁东区', name: '悠然园' },
-  { rank: 2, district: '立山区', name: '大观园' },
-  { rank: 3, district: '铁西区', name: '青风园' },
-  { rank: 4, district: '海城市', name: '曦光园' },
-  { rank: 5, district: '台安县', name: '清韵园' }
-]
+const parkRows = computed(() =>
+  activeParkTab.value === 'garden' ? props.data.pocketParkConstruction : props.data.pocketParks
+)
+
+const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? '建设位置' : '公园名称'))
 </script>
 
 <template>
@@ -60,7 +64,9 @@ const pocketParks = [
               {{ item.label }}
             </button>
           </div>
-          <div class="panel-chart"><CityGreeningChart :metric="activeGreeningTab" /></div>
+          <div class="panel-chart">
+            <CityGreeningChart :metric="activeGreeningTab" :metrics="props.data.greeningMetrics" />
+          </div>
         </div>
 
         <div class="section section--bottom">
@@ -70,14 +76,19 @@ const pocketParks = [
               :key="item.key"
               type="button"
               class="tab"
-              :class="{ 'tab--active': activeGreeningTab === item.key }"
+              :class="{ 'tab--active': activeTrendTab === item.key }"
               :style="{ backgroundImage: `url(${tabBgUrl})` }"
-              @click="activeGreeningTab = item.key"
+              @click="activeTrendTab = item.key"
             >
               {{ item.label }}
             </button>
           </div>
-          <div class="panel-chart"><PopulationDensityLineChart /></div>
+          <div class="panel-chart">
+            <PopulationDensityLineChart
+              :x="props.data.greenlandTrend.x"
+              :series="props.data.greenlandTrend.series"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -91,14 +102,16 @@ const pocketParks = [
             :key="item.key"
             type="button"
             class="tab"
-            :class="{ 'tab--active': activeGreeningTab === item.key }"
+            :class="{ 'tab--active': activeSanitationTab === item.key }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeGreeningTab = item.key"
+            @click="activeSanitationTab = item.key"
           >
             {{ item.label }}
           </button>
         </div>
-        <div class="panel-chart"><SanitationSweepChart /></div>
+        <div class="panel-chart">
+          <SanitationSweepChart :metric="props.data.sanitationMetrics[activeSanitationTab]" />
+        </div>
       </div>
 
       <div class="panel">
@@ -110,7 +123,7 @@ const pocketParks = [
     <div class="col">
       <div class="panel">
         <div class="panel-title">建设用地面积</div>
-        <div class="panel-chart"><LandUseAreaChart /></div>
+        <div class="panel-chart"><LandUseAreaChart :data="props.data.landAreaData" /></div>
       </div>
 
       <div class="panel">
@@ -121,9 +134,9 @@ const pocketParks = [
             :key="item.key"
             type="button"
             class="tab"
-            :class="{ 'tab--active': activeGreeningTab === item.key }"
+            :class="{ 'tab--active': activeParkTab === item.key }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeGreeningTab = item.key"
+            @click="activeParkTab = item.key"
           >
             {{ item.label }}
           </button>
@@ -132,9 +145,13 @@ const pocketParks = [
           <div class="table-row head">
             <span>排名</span>
             <span>地区</span>
-            <span>公园名称</span>
+            <span>{{ parkNameHeader }}</span>
           </div>
-          <div class="table-row" v-for="item in pocketParks" :key="item.rank">
+          <div
+            class="table-row"
+            v-for="item in parkRows"
+            :key="`${item.rank}-${item.district}-${item.name}`"
+          >
             <span>{{ item.rank }}</span>
             <span>{{ item.district }}</span>
             <span>{{ item.name }}</span>

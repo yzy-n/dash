@@ -3,23 +3,11 @@ import CaseRingChart from '../charts/CaseRingChart.vue'
 import CategoryProgressChart from '../charts/CategoryProgressChart.vue'
 import ComponentDistributionChart from '../charts/ComponentDistributionChart.vue'
 import CaseCountChart from '../charts/CaseCountChart.vue'
+import type { DashScreenData } from '../useDashData'
 
-const gridInfoRows = [
-  { name: '海城市', town: 26, village: 422, grid: 1415 },
-  { name: '台安县', town: 12, village: 174, grid: 1658 },
-  { name: '岫岩县', town: 24, village: 204, grid: 739 },
-  { name: '铁东区', town: 14, village: 107, grid: 128 },
-  { name: '铁西区', town: 8, village: 63, grid: 105 },
-  { name: '立山区', town: 7, village: 89, grid: 254 }
-]
-
-const appealEvents = [
-  { date: '2023-05-25', name: '海城市花园小区——噪音扰民', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '台安县南河街道——占道经营', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '铁西区教育街——路面破损', dep: '', score: '不满意' },
-  { date: '2023-05-23', name: '高新区万科广场——垃圾堆放', dep: '', score: '满意' },
-  { date: '2023-05-22', name: '岫岩县东门路段——井盖缺失', dep: '', score: '满意' }
-]
+const props = defineProps<{
+  data: DashScreenData
+}>()
 </script>
 
 <template>
@@ -35,7 +23,7 @@ const appealEvents = [
               <span class="table-num table-num--orange">村居（社区）数</span>
               <span class="table-num table-num--green">网格数</span>
             </div>
-            <div v-for="row in gridInfoRows" :key="row.name" class="table-row">
+            <div v-for="row in props.data.gridInfoRows" :key="row.name" class="table-row">
               <span class="table-name">{{ row.name }}</span>
               <span class="table-num table-num--cyan">{{ row.town }}</span>
               <span class="table-num table-num--orange">{{ row.village }}</span>
@@ -55,7 +43,11 @@ const appealEvents = [
               <span class="table-name">办理部门</span>
               <span class="table-name">办理评价</span>
             </div>
-            <div v-for="row in appealEvents" :key="`${row.date}-${row.name}`" class="table-row">
+            <div
+              v-for="row in props.data.appealEvents"
+              :key="`${row.date}-${row.name}`"
+              class="table-row"
+            >
               <span class="table-name">{{ row.date }}</span>
               <span class="table-name">{{ row.name }}</span>
               <span class="table-name">{{ row.dep || '-' }}</span>
@@ -91,11 +83,13 @@ const appealEvents = [
           <div class="panel-head">
             <div class="panel-title">案件数量</div>
           </div>
-          <div class="panel-chart"><CaseCountChart /></div>
+          <div class="panel-chart">
+            <CaseCountChart :x="props.data.caseCount.x" :y="props.data.caseCount.y" />
+          </div>
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><CaseRingChart /></div>
+          <div class="panel-chart"><CaseRingChart :data="props.data.caseRing" /></div>
         </div>
       </div>
     </div>
