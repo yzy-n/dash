@@ -2,10 +2,24 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
+import type { NamedValue } from '../types'
+
+const props = defineProps<{
+  data: NamedValue[]
+}>()
 
 const option = computed(() => {
-  const categories = ['公共设施', '园林绿化', '市容环境', '交通设施', '其他']
-  const values = [33.05, 18.79, 6.89, 2.36, 0.29]
+  const map = new Map<string, number>()
+  for (const item of props.data) {
+    if (!item?.name) continue
+    map.set(item.name, (map.get(item.name) ?? 0) + (item.value ?? 0))
+  }
+  const list = Array.from(map.entries())
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+
+  const categories = list.map((item) => item.name)
+  const values = list.map((item) => item.value)
 
   return {
     backgroundColor: 'transparent',

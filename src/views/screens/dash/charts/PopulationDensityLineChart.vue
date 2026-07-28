@@ -2,21 +2,12 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
-import type { LineSeries } from '../useDashData'
+import type { LineSeries } from '../types'
 
-const props = withDefaults(
-  defineProps<{
-    x?: string[]
-    series?: LineSeries[]
-  }>(),
-  {
-    x: () => ['2018', '2019', '2020', '2021'],
-    series: () => [
-      { name: '人均绿地面积', data: [14.2, 14.6, 15.1, 15.3], color: '#36e8ff' },
-      { name: '建成区绿地面积', data: [12.1, 12.6, 13.4, 13.9], color: '#7d5dff' }
-    ]
-  }
-)
+const props = defineProps<{
+  x: string[]
+  series: LineSeries[]
+}>()
 
 const option = computed(() => {
   return {

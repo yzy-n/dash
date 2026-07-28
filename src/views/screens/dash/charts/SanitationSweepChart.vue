@@ -2,21 +2,11 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
-import type { TimeBarMetric } from '../useDashData'
+import type { TimeBarMetric } from '../types'
 
-const props = withDefaults(
-  defineProps<{
-    metric?: TimeBarMetric
-  }>(),
-  {
-    metric: () => ({
-      name: '清扫道路面积',
-      years: ['2018', '2019', '2020', '2021', '2022'],
-      data: [2350, 2680, 2890, 3050, 3320],
-      unit: '万平方米'
-    })
-  }
-)
+const props = defineProps<{
+  metric: TimeBarMetric
+}>()
 
 const option = computed(() => {
   return {

@@ -7,7 +7,7 @@ import LandUseAreaChart from '../charts/LandUseAreaChart.vue'
 import PopulationDensityLineChart from '../charts/PopulationDensityLineChart.vue'
 import SanitationSweepChart from '../charts/SanitationSweepChart.vue'
 import StreetLightGaugeChart from '../charts/StreetLightGaugeChart.vue'
-import type { DashScreenData, MetricKey } from '../useDashData'
+import type { DashScreenData, MetricKey } from '../types'
 
 const props = defineProps<{
   data: DashScreenData
@@ -116,7 +116,7 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? '建�
 
       <div class="panel">
         <div class="panel-title">路灯照明</div>
-        <div class="panel-chart"><StreetLightGaugeChart /></div>
+        <div class="panel-chart"><StreetLightGaugeChart :data="props.data.energyItems" /></div>
       </div>
     </div>
 

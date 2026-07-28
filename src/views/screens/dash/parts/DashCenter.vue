@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DashScreenData } from '../useDashData'
+import type { DashScreenData } from '../types'
 import CityMapChart from '../charts/CityMapChart.vue'
 
 const props = defineProps<{
@@ -36,7 +36,7 @@ const props = defineProps<{
 
         <div class="map-box">
           <div class="map-caption">鞍山市</div>
-          <div class="map-chart"><CityMapChart /></div>
+          <div class="map-chart"><CityMapChart :rows="props.data.gridInfoRows" /></div>
         </div>
 
         <div class="side-cards">

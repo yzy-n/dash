@@ -5,15 +5,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import type { NamedValue } from '../types'
+
+const props = defineProps<{
+  data: NamedValue[]
+}>()
 
 const option = computed(() => {
-  const data = [
-    { name: '公共设施', value: 330543 },
-    { name: '园林绿化', value: 187872 },
-    { name: '市容环境', value: 68894 },
-    { name: '交通设施', value: 23621 },
-    { name: '其他部件', value: 292 }
-  ]
+  const map = new Map<string, number>()
+  for (const item of props.data) {
+    if (!item?.name) continue
+    map.set(item.name, (map.get(item.name) ?? 0) + (item.value ?? 0))
+  }
+  const data = Array.from(map.entries())
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
 
   // 计算总值
   const total = data.reduce((sum, item) => sum + item.value, 0)

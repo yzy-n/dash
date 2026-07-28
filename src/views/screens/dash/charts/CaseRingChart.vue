@@ -5,23 +5,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import type { RoseDatum } from '../useDashData'
+import type { RoseDatum } from '../types'
 
-const props = withDefaults(
-  defineProps<{
-    data?: RoseDatum[]
-  }>(),
-  {
-    data: () => [
-      { name: '上报数', value: 40, color: '#ffdd22' },
-      { name: '立案数', value: 30, color: '#0078ff' },
-      { name: '派遣数', value: 10, color: '#00ccff' },
-      { name: '处置数', value: 20, color: '#26e8ee' },
-      { name: '结案数', value: 80, color: '#ff8822' },
-      { name: '核查数', value: 10, color: '#ff2222' }
-    ]
-  }
-)
+const props = defineProps<{
+  data: RoseDatum[]
+}>()
 
 const chartOption = computed(() => {
   return {

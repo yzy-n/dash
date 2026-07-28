@@ -3,7 +3,7 @@ import CaseRingChart from '../charts/CaseRingChart.vue'
 import CategoryProgressChart from '../charts/CategoryProgressChart.vue'
 import ComponentDistributionChart from '../charts/ComponentDistributionChart.vue'
 import CaseCountChart from '../charts/CaseCountChart.vue'
-import type { DashScreenData } from '../useDashData'
+import type { DashScreenData } from '../types'
 
 const props = defineProps<{
   data: DashScreenData
@@ -68,11 +68,13 @@ const props = defineProps<{
           <div class="panel-head">
             <div class="panel-title">部件分布</div>
           </div>
-          <div class="panel-chart"><ComponentDistributionChart /></div>
+          <div class="panel-chart">
+            <ComponentDistributionChart :data="props.data.componentDistribution" />
+          </div>
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><CategoryProgressChart /></div>
+          <div class="panel-chart"><CategoryProgressChart :data="props.data.componentDistribution" /></div>
         </div>
       </div>
     </div>

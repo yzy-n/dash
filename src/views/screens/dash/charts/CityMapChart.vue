@@ -3,10 +3,28 @@ import { computed, onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
 import 'echarts-gl'
 import EChart from '@/components/echarts/EChart.vue'
+import type { GridInfoRow } from '../types'
+
+const props = defineProps<{
+  rows: GridInfoRow[]
+}>()
 
 const mapReady = ref(false)
 const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
 const techTexture = ref<HTMLCanvasElement | null>(null)
+
+const REGION_ALIAS: Record<string, string> = {
+  岫岩县: '岫岩满族自治县'
+}
+
+const REGION_COORDS: Record<string, [number, number]> = {
+  台安县: [122.42, 41.26],
+  海城市: [122.73, 40.87],
+  岫岩满族自治县: [123.27, 40.28],
+  铁东区: [123.18, 41.12],
+  铁西区: [122.95, 41.12],
+  立山区: [123.03, 41.15]
+}
 
 const createTechTexture = () => {
   const size = 512
@@ -86,21 +104,23 @@ const option = computed(() => {
   const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
   const detailTexture = techTexture.value as any
 
-  const mapData = [
-    { name: '铁东区', value: 120 },
-    { name: '铁西区', value: 98 },
-    { name: '立山区', value: 145 },
-    { name: '千山区', value: 76 },
-    { name: '台安县', value: 63 },
-    { name: '岫岩满族自治县', value: 52 },
-    { name: '海城市', value: 189 }
-  ]
+  const mapData = props.rows.map((row) => ({
+    name: REGION_ALIAS[row.name] ?? row.name,
+    value: row.grid
+  }))
 
-  const points = [
-    { name: '台安县', value: [122.42, 41.26, 18] },
-    { name: '海城市', value: [122.73, 40.87, 18] },
-    { name: '岫岩满族自治县', value: [123.27, 40.28, 18] }
-  ]
+  const points = [...mapData]
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 3)
+    .map((item) => {
+      const coord = REGION_COORDS[item.name]
+      if (!coord) return null
+      return {
+        name: item.name,
+        value: [coord[0], coord[1], item.value]
+      }
+    })
+    .filter(Boolean)
 
   return {
     backgroundColor: 'transparent',

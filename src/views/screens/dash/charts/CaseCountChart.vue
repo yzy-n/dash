@@ -2,16 +2,10 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
-const props = withDefaults(
-  defineProps<{
-    x?: string[]
-    y?: number[]
-  }>(),
-  {
-    x: () => ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06'],
-    y: () => [35210, 26840, 40120, 65420, 52890, 70210]
-  }
-)
+const props = defineProps<{
+  x: string[]
+  y: number[]
+}>()
 
 const option = computed(() => {
   return {

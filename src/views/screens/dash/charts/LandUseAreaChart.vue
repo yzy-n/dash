@@ -2,22 +2,11 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
-import type { NamedValue } from '../useDashData'
+import type { NamedValue } from '../types'
 
-const props = withDefaults(
-  defineProps<{
-    data?: NamedValue[]
-  }>(),
-  {
-    data: () => [
-      { name: '居住用地', value: 80.91, total: 106.43 },
-      { name: '工业用地', value: 82.06, total: 68.53 },
-      { name: '道路交通设施用地', value: 61.17, total: 34.5 },
-      { name: '商业服务业设施用地', value: 30.71, total: 14.91 },
-      { name: '绿地与广场用地', value: 60.29, total: 27.65 }
-    ]
-  }
-)
+const props = defineProps<{
+  data: NamedValue[]
+}>()
 
 const option = computed(() => {
   return {

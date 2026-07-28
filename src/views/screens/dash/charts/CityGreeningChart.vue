@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
-import type { MetricKey, TimeBarMetric } from '../useDashData'
+import type { MetricKey, TimeBarMetric } from '../types'
 
 const props = withDefaults(
   defineProps<{
@@ -15,37 +15,19 @@ const props = withDefaults(
 )
 
 const option = computed(() => {
-  const metricMap: Record<MetricKey, TimeBarMetric> = {
-    cover: {
-      name: '绿化覆盖面积',
-      years: ['2020', '2021', '2022', '2023'],
-      data: [7050, 7375.28, 7480, 7360],
-      yMax: 8000,
-      unit: '公顷'
-    },
-    garden: {
-      name: '园林绿地面积',
-      years: ['2020', '2021', '2022', '2023'],
-      data: [5120, 5360, 5580, 5730],
-      yMax: 6500,
-      unit: '公顷'
-    },
-    park: {
-      name: '公园占地面积',
-      data: [1320, 1410, 1560, 1685],
-      yMax: 2200,
-      unit: '公顷',
-      years: ['2020', '2021', '2022', '2023']
-    }
+  const metricNameMap: Record<MetricKey, string> = {
+    cover: '绿化覆盖面积',
+    garden: '园林绿地面积',
+    park: '公园占地面积'
   }
 
-  const mergedMap: Record<MetricKey, TimeBarMetric> = {
-    cover: { ...metricMap.cover, ...props.metrics?.cover },
-    garden: { ...metricMap.garden, ...props.metrics?.garden },
-    park: { ...metricMap.park, ...props.metrics?.park }
+  const selected: TimeBarMetric = {
+    name: props.metrics?.[props.metric]?.name ?? metricNameMap[props.metric],
+    years: props.metrics?.[props.metric]?.years ?? [],
+    data: props.metrics?.[props.metric]?.data ?? [],
+    yMax: props.metrics?.[props.metric]?.yMax,
+    unit: props.metrics?.[props.metric]?.unit
   }
-
-  const selected = mergedMap[props.metric]
 
   return {
     backgroundColor: 'transparent',
@@ -60,7 +42,7 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       max: selected.yMax,
-      name: `单位：${selected.unit}`,
+      name: selected.unit ? `单位：${selected.unit}` : undefined,
       nameTextStyle: { color: 'rgba(214,238,255,0.55)', fontSize: 12, padding: [0, 0, 0, 10] },
       axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }

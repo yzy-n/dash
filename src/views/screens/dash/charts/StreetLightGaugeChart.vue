@@ -5,16 +5,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import type { RoseDatum } from '../types'
 
-// 图表数据（对应截图 rose1~rose5，数值控制扇区长度）
-const roseData = [
-  { name: '安装路灯道路长度', value: 12, color: '#2563eb' },
-  { name: '道路照明灯盏数', value: 26, color: '#caa822' },
-  { name: '城市照明装灯总功率', value: 35, color: '#10b98c' },
-  { name: '城市照明总用电量', value: 48, color: '#6c42d8' }
-]
+const props = defineProps<{
+  data: RoseDatum[]
+}>()
 
 const chartOption = computed(() => {
+  const roseData = props.data
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
