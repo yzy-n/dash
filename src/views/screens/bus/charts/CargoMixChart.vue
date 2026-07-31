@@ -7,17 +7,32 @@ import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-const xAxisData = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
+interface Props {
+  xData?: string[]
+  provinceNumData?: number[]
+  provinceGrowthData?: number[]
+  cityNumData?: number[]
+  cityGrowthData?: number[]
+  numUnit?: string
+}
 
-// 柱状：省均货运、市货运（左Y轴 万吨）
-const barSource = [
+const props = defineProps<Props>()
+
+const defaultXAxisData = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
+const defaultProvinceNumData = [1020, 930, 880.2, 820, 650, 800]
+const defaultProvinceGrowthData = [0, -12, 3.4, -8, -22, 26]
+const defaultCityNumData = [1420, 1140, 1491, 1450, 940, 1060]
+const defaultCityGrowthData = [-10, -28, -6, 13, -16, 29]
+
+const xAxisData = computed(() => (props.xData?.length ? props.xData : defaultXAxisData))
+const barSource = computed(() => [
   {
     name: '省均货运量',
     gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
       { offset: 0, color: '#a5ffb8' },
       { offset: 1, color: '#24b956' }
     ]),
-    data: [1020, 930, 880.2, 820, 650, 800]
+    data: props.provinceNumData?.length ? props.provinceNumData : defaultProvinceNumData
   },
   {
     name: '市货运量',
@@ -25,23 +40,22 @@ const barSource = [
       { offset: 0, color: '#ffe99a' },
       { offset: 1, color: '#f7b71e' }
     ]),
-    data: [1420, 1140, 1491, 1450, 940, 1060]
+    data: props.cityNumData?.length ? props.cityNumData : defaultCityNumData
   }
-]
+])
 
-// 折线：省同比、市同比（右Y轴 %）
-const lineSource = [
+const lineSource = computed(() => [
   {
     name: '省同比增长',
     color: '#47e1ff',
-    data: [0, -12, 3.4, -8, -22, 26]
+    data: props.provinceGrowthData?.length ? props.provinceGrowthData : defaultProvinceGrowthData
   },
   {
     name: '市同比增长',
     color: '#ffcc21',
-    data: [-10, -28, -6, 13, -16, 29]
+    data: props.cityGrowthData?.length ? props.cityGrowthData : defaultCityGrowthData
   }
-]
+])
 
 // 参考链接 xWkXG0IATZ 标准圆柱生成函数
 function createCylinderSeries(list: any[]) {
@@ -83,16 +97,21 @@ function createCylinderSeries(list: any[]) {
       symbolOffset: [0, 5],
       silent: true,
       itemStyle: { color: 'rgba(255,255,255,0.12)' },
-      data: xAxisData.map(() => 0)
+      data: xAxisData.value.map(() => 0)
     })
   })
   return series
 }
 
 const chartOption = computed(() => {
-  const cylinderSeries = createCylinderSeries(barSource)
+  const numValues = [...barSource.value[0].data, ...barSource.value[1].data]
+  const growthValues = [...lineSource.value[0].data, ...lineSource.value[1].data]
+  const leftAxisMax = numValues.length ? Math.ceil(Math.max(...numValues) * 1.2 / 100) * 100 : 100
+  const maxAbsGrowth = growthValues.length ? Math.max(...growthValues.map((item) => Math.abs(item))) : 0
+  const rightAxisMax = maxAbsGrowth <= 10 ? 10 : Math.ceil(maxAbsGrowth / 10) * 10
+  const cylinderSeries = createCylinderSeries(barSource.value)
   // 追加折线
-  lineSource.forEach(line => {
+  lineSource.value.forEach(line => {
     cylinderSeries.push({
       name: line.name,
       type: 'line',
@@ -116,7 +135,7 @@ const chartOption = computed(() => {
         let res = params[0].axisValue + '<br/>'
         params.forEach(p => {
           if (!p.seriesName.includes('top') && !p.seriesName.includes('bottom')) {
-            const unit = p.seriesName.includes('货运') ? '万吨' : '%'
+            const unit = p.seriesName.includes('货运') ? props.numUnit || '万吨' : '%'
             res += `${p.seriesName}: ${p.value}${unit}<br/>`
           }
         })
@@ -127,7 +146,7 @@ const chartOption = computed(() => {
       top: 10,
       left: 'center',
       textStyle: { color: '#fff', fontSize: 14 },
-      data: [...barSource.map(i => i.name), ...lineSource.map(i => i.name)]
+      data: [...barSource.value.map(i => i.name), ...lineSource.value.map(i => i.name)]
     },
     grid: {
       left: '6%',
@@ -138,7 +157,7 @@ const chartOption = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: xAxisData,
+      data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: { show: false },
@@ -147,12 +166,12 @@ const chartOption = computed(() => {
     yAxis: [
       // 左侧 货运万吨
       {
-        name: '单位：万吨',
+        name: `单位：${props.numUnit || '万吨'}`,
         nameTextStyle: { color: '#fff', fontSize: 16 },
         type: 'value',
         min: 0,
-        max: 1500,
-        interval: 300,
+        max: leftAxisMax,
+        interval: Math.max(1, leftAxisMax / 5),
         axisLine: { lineStyle: { color: '#405888' } },
         axisLabel: { color: '#fff', fontSize: 15 },
         splitLine: { lineStyle: { color: 'rgba(82,110,165,0.3)' } },
@@ -163,9 +182,9 @@ const chartOption = computed(() => {
         name: '单位：%',
         nameTextStyle: { color: '#fff', fontSize: 16 },
         type: 'value',
-        min: -30,
-        max: 30,
-        interval: 10,
+        min: -rightAxisMax,
+        max: rightAxisMax,
+        interval: Math.max(1, rightAxisMax / 5),
         position: 'right',
         axisLine: { lineStyle: { color: '#405888' } },
         axisLabel: { color: '#fff', fontSize: 15 },

@@ -32,7 +32,7 @@ const chartOption = computed(() => {
       textStyle: { color: '#fff' },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
-        params.forEach(item => {
+        params.forEach((item) => {
           const unit = item.seriesName === '出租车数量' ? '辆' : '万人次'
           str += `${item.seriesName}: ${item.value}${unit}<br/>`
         })
@@ -43,7 +43,7 @@ const chartOption = computed(() => {
       top: 10,
       right: '8%',
       textStyle: { color: '#fff', fontSize: 14 },
-      data: sourceList.map(item => item.name)
+      data: sourceList.map((item) => item.name)
     },
     grid: {
       left: '6%',
@@ -89,7 +89,7 @@ const chartOption = computed(() => {
         axisTick: { show: false }
       }
     ],
-    series: sourceList.map(item => ({
+    series: sourceList.map((item) => ({
       name: item.name,
       type: 'line',
       yAxisIndex: item.yAxisIndex,

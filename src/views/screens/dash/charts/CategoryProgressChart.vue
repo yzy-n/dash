@@ -47,7 +47,7 @@ const option = computed(() => {
       {
         type: 'bar',
         data: data.map((d) => d.value),
-        barWidth: 40,
+        barWidth: 10,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {
@@ -59,7 +59,7 @@ const option = computed(() => {
             return `${percent}%`
           },
           color: '#dff3ff',
-          fontSize: 20
+          fontSize: 15
         },
         itemStyle: {
           borderRadius: 8,

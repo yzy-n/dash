@@ -1,35 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ParkingBarChart from '../charts/ParkingBarChart.vue'
 import ProgressBarChart from '../charts/ProgressBarChart.vue'
-// 标签切换
-// 标签切换
+import type { BusScreenData } from '../types'
+
 const parkingTab = ref<'ratio' | 'plan'>('ratio')
+const props = defineProps<{
+  data: BusScreenData
+}>()
 
-// 柱状图数据（父页面维护，传给子组件）
-const barXData = [
-  '总计',
-  '配建停车位(住宅类)',
-  '配建停车位(非住宅类)',
-  '路内停车位',
-  '路外公共停车位'
-]
-const barYData = [19, 17, 9, 4, 0.2]
+const currentParkingChart = computed(() => {
+  if (parkingTab.value === 'plan') {
+    return {
+      xData: props.data.parkingPlanXData,
+      yData: props.data.parkingPlanYData,
+      unit: '个'
+    }
+  }
 
-// 道路封闭预警数据
-const roadCloseList = [
-  { roadName: '真理街', section: '真理', time: '05/04-05/11' },
-  { roadName: '东工人街', section: '人街与石东街交叉口-东工人街与石东街', time: '04/17-04/21' },
-  { roadName: '大石街', section: '大石街德馨医院门前-大石街', time: '04/10-04/14' },
-  { roadName: '湖南街', section: '南8西-湖南街嘉宝家园湖南8西', time: '04/10-04/14' }
-]
-
-// 拥堵分析数据
-const congestionList = [
-  { pos: '第九中学', level: '轻度拥堵', start: '2023-04-08 17:32', end: '2023-04-08 17:42' },
-  { pos: '联营公司', level: '轻度拥堵', start: '2023-04-08 17:32', end: '2023-04-08 17:42' },
-  { pos: '曙光路南口', level: '轻度拥堵', start: '2023-04-08 17:32', end: '2023-04-08 17:42' }
-]
+  return {
+    xData: props.data.parkingRatioXData,
+    yData: props.data.parkingRatioYData,
+    unit: '万个'
+  }
+})
 </script>
 
 <template>
@@ -56,7 +50,11 @@ const congestionList = [
       </div>
       <!-- 柱状图区域 -->
       <div class="chart-box">
-        <ParkingBarChart :x-data="barXData" :y-data="barYData" />
+        <ParkingBarChart
+          :x-data="currentParkingChart.xData"
+          :y-data="currentParkingChart.yData"
+          :unit="currentParkingChart.unit"
+        />
       </div>
       <!-- 需求进度条 -->
       <!-- 需求模块区域 -->
@@ -71,9 +69,9 @@ const congestionList = [
               <div>(1.2车位/车)</div>
             </div>
             <div class="progress-bar">
-              <ProgressBarChart :percent="38.8" color-type="green" />
+              <ProgressBarChart :percent="data.parkingDemandIdeal" color-type="green" />
             </div>
-            <div class="progress-percent">38.8 %</div>
+            <div class="progress-percent">{{ data.parkingDemandIdeal }} %</div>
           </div>
           <!-- 2025目标 -->
           <div class="progress-item">
@@ -82,9 +80,9 @@ const congestionList = [
               <div>(0.6车位/车)</div>
             </div>
             <div class="progress-bar">
-              <ProgressBarChart :percent="77.6" color-type="blue" />
+              <ProgressBarChart :percent="data.parkingDemandTarget" color-type="blue" />
             </div>
-            <div class="progress-percent">77.6 %</div>
+            <div class="progress-percent">{{ data.parkingDemandTarget }} %</div>
           </div>
         </div>
       </div>
@@ -95,9 +93,18 @@ const congestionList = [
       <div class="panel-title">本年度道路封闭预警</div>
       <!-- 顶部统计 -->
       <div class="stat-row">
-        <div class="stat-item">未开始 <span class="num red">249</span>处</div>
-        <div class="stat-item">进行中 <span class="num orange">125</span>处</div>
-        <div class="stat-item">已完成 <span class="num green">110</span>处</div>
+        <div class="stat-item">
+          未开始 <span class="num red">{{ data.roadCloseSummary.pending }}</span
+          >处
+        </div>
+        <div class="stat-item">
+          进行中 <span class="num orange">{{ data.roadCloseSummary.processing }}</span
+          >处
+        </div>
+        <div class="stat-item">
+          已完成 <span class="num green">{{ data.roadCloseSummary.finished }}</span
+          >处
+        </div>
       </div>
       <!-- 道路表格 -->
       <div class="table-wrap">
@@ -106,7 +113,7 @@ const congestionList = [
           <span>封闭路段</span>
           <span>起止时间</span>
         </div>
-        <div class="table-row" v-for="item in roadCloseList" :key="item.roadName">
+        <div class="table-row" v-for="item in data.roadCloseList" :key="item.roadName">
           <span>{{ item.roadName }}</span>
           <span>{{ item.section }}</span>
           <span>{{ item.time }}</span>
@@ -119,13 +126,22 @@ const congestionList = [
       <div class="panel-title">拥堵分析</div>
       <!-- 拥堵统计 -->
       <div class="stat-row">
-        <div class="stat-item">严重拥堵 <span class="num red">30</span>处</div>
-        <div class="stat-item">中度拥堵 <span class="num orange">15</span>处</div>
-        <div class="stat-item">轻度拥堵 <span class="num yellow">22</span>处</div>
+        <div class="stat-item">
+          严重拥堵 <span class="num red">{{ data.congestionSummary.severe }}</span
+          >处
+        </div>
+        <div class="stat-item">
+          中度拥堵 <span class="num orange">{{ data.congestionSummary.moderate }}</span
+          >处
+        </div>
+        <div class="stat-item">
+          轻度拥堵 <span class="num yellow">{{ data.congestionSummary.light }}</span
+          >处
+        </div>
       </div>
       <!-- 拥堵列表 -->
       <div class="congest-list">
-        <div class="congest-item" v-for="item in congestionList" :key="item.pos">
+        <div class="congest-item" v-for="item in data.congestionList" :key="item.pos">
           <div class="warning-light-icon">🚨</div>
           <span>· 拥堵位置：{{ item.pos }}</span>
           <span
@@ -442,7 +458,6 @@ const congestionList = [
   position: relative;
   filter: drop-shadow(0 0 8px rgba(255, 50, 50, 0.7));
 }
-
 
 /* 高亮文字同步放大 */
 .level-tag {

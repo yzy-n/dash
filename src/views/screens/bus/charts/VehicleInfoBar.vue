@@ -7,18 +7,27 @@ import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-// X轴车辆类型
-const xAxisData = ['拖拉机', '挂车', '摩托车', '汽车']
+interface Props {
+  xData?: string[]
+  privateData?: number[]
+  totalData?: number[]
+}
 
-// 柱状数据源（私人数量、总数，左Y轴：辆）
-const barSource = [
+const props = defineProps<Props>()
+
+const defaultXAxisData = ['拖拉机', '挂车', '摩托车', '汽车']
+const defaultPrivateData = [0, 0, 0, 0]
+const defaultTotalData = [27179, 32333, 103183, 735438]
+
+const xAxisData = computed(() => (props.xData?.length ? props.xData : defaultXAxisData))
+const barSource = computed(() => [
   {
     name: '私人数',
     gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
       { offset: 0, color: '#90f0e8' },
       { offset: 1, color: '#22b8b0' }
     ]),
-    data: [26916, 12000, 102000, 990000]
+    data: props.privateData?.length ? props.privateData : defaultPrivateData
   },
   {
     name: '总数',
@@ -26,14 +35,14 @@ const barSource = [
       { offset: 0, color: '#b8ff78' },
       { offset: 1, color: '#48c820' }
     ]),
-    data: [26916, 38000, 118000, 1090000]
+    data: props.totalData?.length ? props.totalData : defaultTotalData
   }
-]
+])
 
 // 生成立体圆柱series（bar主体 + pictorialBar上下椭圆顶盖底盖）
 const buildCylinderSeries = () => {
   const seriesArr: any[] = []
-  barSource.forEach(item => {
+  barSource.value.forEach(item => {
     // 圆柱主体
     seriesArr.push({
       name: item.name,
@@ -69,13 +78,15 @@ const buildCylinderSeries = () => {
       silent: true,
       z: 99,
       itemStyle: { color: 'rgba(255,255,255,0.15)' },
-      data: xAxisData.map(() => 0)
+      data: xAxisData.value.map(() => 0)
     })
   })
   return seriesArr
 }
 
 const chartOption = computed(() => {
+  const maxValue = Math.max(...barSource.value.flatMap((item) => item.data), 0)
+  const yAxisMax = maxValue <= 100000 ? 100000 : Math.ceil(maxValue * 1.2 / 100000) * 100000
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -96,7 +107,7 @@ const chartOption = computed(() => {
       top: 10,
       right: '8%',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: barSource.map(item => item.name)
+      data: barSource.value.map(item => item.name)
     },
     grid: {
       left: '8%',
@@ -107,7 +118,7 @@ const chartOption = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: xAxisData,
+      data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: { show: false },
@@ -117,8 +128,8 @@ const chartOption = computed(() => {
       name: '单位：辆',
       nameTextStyle: { color: '#fff', fontSize: 16 },
       type: 'value',
-      max: 1200000,
-      interval: 200000,
+      max: yAxisMax,
+      interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },

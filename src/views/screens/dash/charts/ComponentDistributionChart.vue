@@ -24,7 +24,7 @@ const option = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
-    grid: { left: 40, right: 18, top: 48, bottom: 44 },
+    grid: { left: 40, right: 18, top: 48, bottom: 64 },
     xAxis: {
       type: 'category',
       data: categories,
@@ -39,7 +39,7 @@ const option = computed(() => {
     series: [
       {
         type: 'bar',
-        barWidth: 40,
+        barWidth: 10,
         data: values,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],

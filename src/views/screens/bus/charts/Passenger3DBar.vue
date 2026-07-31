@@ -7,57 +7,39 @@ import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-// 1. 业务数据源（和截图弹窗数据完全对应）
-const xAxisList = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
-const companySource = [
+interface Props {
+  xData?: string[]
+  passengerData?: number[]
+  taxiNumData?: number[]
+}
+
+const props = defineProps<Props>()
+
+const defaultXAxis = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
+const defaultPassengerData = [980, 861.9, 620, 600, 380, 790]
+const defaultTaxiNumData = [9120, 9117, 9119, 9118, 9112, 9110]
+
+const xAxisList = computed(() => (props.xData?.length ? props.xData : defaultXAxis))
+const passengerData = computed(() =>
+  props.passengerData?.length ? props.passengerData : defaultPassengerData
+)
+const taxiNumData = computed(() => (props.taxiNumData?.length ? props.taxiNumData : defaultTaxiNumData))
+
+const companySource = computed(() => [
   {
-    name: '龙腾城际',
-    // 渐变配色：浅蓝科技色
+    name: '客运量',
     gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
       { offset: 0, color: '#a0d8ff' },
       { offset: 1, color: '#3678e8' }
     ]),
-    data: [0, 3.5, 0, 0, 0, 5]
-  },
-  {
-    name: '长旅集团',
-    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: '#b6e3ff' },
-      { offset: 1, color: '#48b8ff' }
-    ]),
-    data: [0, 18, 0, 0, 0, 0]
-  },
-  {
-    name: '交运集团',
-    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: '#fff999' },
-      { offset: 1, color: '#f9dd20' }
-    ]),
-    data: [980, 861.9, 620, 600, 380, 790]
-  },
-  {
-    name: '龙腾快客',
-    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: '#b0fff0' },
-      { offset: 1, color: '#38d8bc' }
-    ]),
-    data: [10, 1.4, 8, 6, 5, 7]
-  },
-  {
-    name: '通达巴士',
-    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: '#ffe8b3' },
-      { offset: 1, color: '#ffbc40' }
-    ]),
-    data: [120, 213.6, 150, 130, 110, 140]
+    data: passengerData.value
   }
-]
+])
 
-// 2. 组装series：堆叠主体bar + 上下椭圆顶盖底盖（实现圆柱立体效果）
+// 组装series：柱体 + 顶盖底盖
 const buildSeries = () => {
   const seriesArr: any[] = []
-  // 堆叠柱状主体
-  companySource.forEach(item => {
+  companySource.value.forEach(item => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
@@ -82,9 +64,8 @@ const buildSeries = () => {
     itemStyle: {
       color: 'rgba(255,255,255,0.4)'
     },
-    data: xAxisList.map((_, idx) => {
-      // 计算当月总客流
-      const total = companySource.reduce((sum, comp) => sum + comp.data[idx], 0)
+    data: xAxisList.value.map((_, idx) => {
+      const total = companySource.value.reduce((sum, comp) => sum + (comp.data[idx] || 0), 0)
       return total
     })
   })
@@ -100,13 +81,14 @@ const buildSeries = () => {
     itemStyle: {
       color: 'rgba(255,255,255,0.2)'
     },
-    data: xAxisList.map(() => 0)
+    data: xAxisList.value.map(() => 0)
   })
   return seriesArr
 }
 
-// 3. 图表配置
 const chartOption = computed(() => {
+  const maxPassenger = passengerData.value.length ? Math.max(...passengerData.value) : 0
+  const yAxisMax = maxPassenger <= 0 ? 100 : Math.ceil(maxPassenger * 1.2 / 100) * 100
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -115,12 +97,17 @@ const chartOption = computed(() => {
       backgroundColor: 'rgba(0,0,0,0.75)',
       textStyle: { color: '#fff', fontSize: 14 },
       formatter: (params: any[]) => {
-        let tipStr = params[0].axisValue + '<br/>'
+        const dataIndex = params?.[0]?.dataIndex ?? 0
+        let tipStr = `${params[0].axisValue}<br/>`
         params.forEach(p => {
           if (!['顶盖', '底盖'].includes(p.seriesName)) {
             tipStr += `${p.seriesName}: ${p.value} 万人<br/>`
           }
         })
+        const taxiNum = taxiNumData.value[dataIndex]
+        if (taxiNum !== undefined) {
+          tipStr += `出租车数量: ${taxiNum} 辆<br/>`
+        }
         return tipStr
       }
     },
@@ -128,7 +115,7 @@ const chartOption = computed(() => {
       top: 12,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: companySource.map(item => item.name)
+      data: companySource.value.map(item => item.name)
     },
     grid: {
       left: '6%',
@@ -139,7 +126,7 @@ const chartOption = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: xAxisList,
+      data: xAxisList.value,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: { show: false },
@@ -149,8 +136,8 @@ const chartOption = computed(() => {
       name: '单位：万人',
       nameTextStyle: { color: '#fff', fontSize: 16 },
       type: 'value',
-      max: 1500,
-      interval: 300,
+      max: yAxisMax,
+      interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: {

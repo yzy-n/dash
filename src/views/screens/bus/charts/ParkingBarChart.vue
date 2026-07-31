@@ -6,6 +6,7 @@ import * as echarts from 'echarts'
 interface Props {
   xData: string[]
   yData: number[]
+  unit?: string
 }
 const props = defineProps<Props>()
 
@@ -15,6 +16,8 @@ const chartRef = ref<HTMLDivElement | null>(null)
 // 渲染图表
 const renderChart = () => {
   if (!chartRef.value || !chartInstance) return
+  const maxValue = props.yData.length ? Math.max(...props.yData) : 0
+  const yAxisMax = maxValue <= 20 ? 20 : Math.ceil(maxValue * 1.2)
   const option: echarts.EChartsOption = {
     tooltip: {
       trigger: 'axis',
@@ -41,9 +44,9 @@ const renderChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: '单位：万个',
+      name: `单位：${props.unit || '万个'}`,
       nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)' },
-      max: 20,
+      max: yAxisMax,
       axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)' } },
       splitLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.1)' } },
       axisLabel: { color: 'rgba(214, 238, 255, 0.7)' }

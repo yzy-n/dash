@@ -5,26 +5,25 @@ import TaxiPassengerLine from '../charts/TaxiPassengerLine.vue'
 import PyramidFunnelChart from '../charts/PyramidFunnelChart.vue'
 import CargoMixChart from '../charts/CargoMixChart.vue'
 import VehicleInfoBar from '../charts/VehicleInfoBar.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import type { BusScreenData } from '../types'
 
-const parkingTab = ref('ratio')
+const passengerTab = ref<'ratio' | 'plan'>('ratio')
+const cargoTab = ref<'ratio' | 'plan'>('ratio')
 
-const gridInfoRows = [
-  { name: '海城市', town: 26, village: 422, grid: 1415 },
-  { name: '台安县', town: 12, village: 174, grid: 1658 },
-  { name: '岫岩县', town: 24, village: 204, grid: 739 },
-  { name: '铁东区', town: 14, village: 107, grid: 128 },
-  { name: '铁西区', town: 8, village: 63, grid: 105 },
-  { name: '立山区', town: 7, village: 89, grid: 254 }
-]
+const props = defineProps<{
+  data: BusScreenData
+}>()
 
-const appealEvents = [
-  { date: '2023-05-25', name: '海城市花园小区——噪音扰民', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '台安县南河街道——占道经营', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '铁西区教育街——路面破损', dep: '', score: '不满意' },
-  { date: '2023-05-23', name: '高新区万科广场——垃圾堆放', dep: '', score: '满意' },
-  { date: '2023-05-22', name: '岫岩县东门路段——井盖缺失', dep: '', score: '满意' }
-]
+const currentPassengerShipSeries = computed(() =>
+  passengerTab.value === 'plan'
+    ? props.data.passengerShipSeries.type2
+    : props.data.passengerShipSeries.type1
+)
+
+const currentGoodsShipSeries = computed(() =>
+  cargoTab.value === 'plan' ? props.data.goodsShipSeries.type2 : props.data.goodsShipSeries.type1
+)
 </script>
 
 <template>
@@ -33,12 +32,16 @@ const appealEvents = [
       <div class="panel">
         <div class="panel-title">公共交通</div>
         <div class="panel-chart">
-          <Passenger3DBar />
+          <Passenger3DBar
+            :x-data="data.publicTransportXAxis"
+            :passenger-data="data.publicTransportPassengerData"
+            :taxi-num-data="data.publicTransportTaxiNumData"
+          />
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-title">诉求事件</div>
+        <div class="panel-title">出租车</div>
         <div class="panel-chart">
           <LineChart />
         </div>
@@ -48,25 +51,34 @@ const appealEvents = [
       <div class="panel panel--full">
         <div class="section">
           <div class="panel-head">
-            <div class="panel-title">部件分布</div>
+            <div class="panel-title">长途客运</div>
           </div>
           <div class="tabs">
             <button
               class="tab"
-              :class="{ 'tab--active': parkingTab === 'ratio' }"
-              @click="parkingTab = 'ratio'"
+              :class="{ 'tab--active': passengerTab === 'ratio' }"
+              @click="passengerTab = 'ratio'"
             >
               客运量
             </button>
             <button
               class="tab"
-              :class="{ 'tab--active': parkingTab === 'plan' }"
-              @click="parkingTab = 'plan'"
+              :class="{ 'tab--active': passengerTab === 'plan' }"
+              @click="passengerTab = 'plan'"
             >
               旅客周转量
             </button>
           </div>
-          <div class="panel-chart"><TaxiPassengerLine /></div>
+          <div class="panel-chart">
+            <TaxiPassengerLine
+              :x-data="currentPassengerShipSeries.xData"
+              :province-num-data="currentPassengerShipSeries.provinceNumData"
+              :province-growth-data="currentPassengerShipSeries.provinceGrowthData"
+              :city-num-data="currentPassengerShipSeries.cityNumData"
+              :city-growth-data="currentPassengerShipSeries.cityGrowthData"
+              :num-unit="passengerTab === 'plan' ? '万人公里' : '万人'"
+            />
+          </div>
         </div>
 
         <div class="section section--bottom">
@@ -79,30 +91,41 @@ const appealEvents = [
       <div class="panel">
         <div class="panel-title">货物运输</div>
         <div class="tabs">
-            <button
-              class="tab"
-              :class="{ 'tab--active': parkingTab === 'ratio' }"
-              @click="parkingTab = 'ratio'"
-            >
-              货运量
-            </button>
-            <button
-              class="tab"
-              :class="{ 'tab--active': parkingTab === 'plan' }"
-              @click="parkingTab = 'plan'"
-            >
-              货运周转量
-            </button>
-          </div>
+          <button
+            class="tab"
+            :class="{ 'tab--active': cargoTab === 'ratio' }"
+            @click="cargoTab = 'ratio'"
+          >
+            货运量
+          </button>
+          <button
+            class="tab"
+            :class="{ 'tab--active': cargoTab === 'plan' }"
+            @click="cargoTab = 'plan'"
+          >
+            货运周转量
+          </button>
+        </div>
         <div class="panel-chart">
-          <CargoMixChart />
+          <CargoMixChart
+            :x-data="currentGoodsShipSeries.xData"
+            :province-num-data="currentGoodsShipSeries.provinceNumData"
+            :province-growth-data="currentGoodsShipSeries.provinceGrowthData"
+            :city-num-data="currentGoodsShipSeries.cityNumData"
+            :city-growth-data="currentGoodsShipSeries.cityGrowthData"
+            :num-unit="cargoTab === 'plan' ? '万吨公里' : '万吨'"
+          />
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-title">车辆信息</div>
         <div class="panel-chart">
-          <VehicleInfoBar />
+          <VehicleInfoBar
+            :x-data="data.vehicleInfoXAxis"
+            :private-data="data.vehicleInfoPrivateData"
+            :total-data="data.vehicleInfoTotalData"
+          />
         </div>
       </div>
     </div>

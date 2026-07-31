@@ -7,18 +7,32 @@ import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-// X轴时间维度
-const xAxisData = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
+interface Props {
+  xData?: string[]
+  provinceNumData?: number[]
+  provinceGrowthData?: number[]
+  cityNumData?: number[]
+  cityGrowthData?: number[]
+  numUnit?: string
+}
 
-// 柱状图数据源（左Y轴：万人）
-const barSource = [
+const props = defineProps<Props>()
+
+const defaultXAxisData = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
+const defaultProvinceNumData = [82, 78.2, 16, 60, 74, 80]
+const defaultProvinceGrowthData = [-22, -35.2, -52, -48, -32, -18]
+const defaultCityNumData = [132, 81, 14, 61, 104, 122]
+const defaultCityGrowthData = [-36, -60, -72, -68, -45, -34]
+
+const xAxisData = computed(() => (props.xData?.length ? props.xData : defaultXAxisData))
+const barSource = computed(() => [
   {
     name: '省均客运量',
     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
       { offset: 0, color: '#90e8ff' },
       { offset: 1, color: '#28b8d8' }
     ]),
-    data: [82, 78.2, 16, 60, 74, 80]
+    data: props.provinceNumData?.length ? props.provinceNumData : defaultProvinceNumData
   },
   {
     name: '市客运量',
@@ -26,29 +40,28 @@ const barSource = [
       { offset: 0, color: '#d8b8ff' },
       { offset: 1, color: '#9258e8' }
     ]),
-    data: [132, 81, 14, 61, 104, 122]
+    data: props.cityNumData?.length ? props.cityNumData : defaultCityNumData
   }
-]
+])
 
-// 折线图数据源（右Y轴：百分比 %）
-const lineSource = [
+const lineSource = computed(() => [
   {
     name: '省同比增长',
     color: '#46e878',
-    data: [-22, -35.2, -52, -48, -32, -18]
+    data: props.provinceGrowthData?.length ? props.provinceGrowthData : defaultProvinceGrowthData
   },
   {
     name: '市同比增长',
     color: '#ffcc33',
-    data: [-36, -60, -72, -68, -45, -34]
+    data: props.cityGrowthData?.length ? props.cityGrowthData : defaultCityGrowthData
   }
-]
+])
 
 // 组装series：柱状 + 两条折线
 const buildSeries = () => {
   const seriesArr: any[] = []
   // 并列柱状
-  barSource.forEach(item => {
+  barSource.value.forEach(item => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
@@ -63,7 +76,7 @@ const buildSeries = () => {
     })
   })
   // 折线
-  lineSource.forEach(item => {
+  lineSource.value.forEach(item => {
     seriesArr.push({
       name: item.name,
       type: 'line',
@@ -83,6 +96,13 @@ const buildSeries = () => {
 }
 
 const chartOption = computed(() => {
+  const numValues = [...barSource.value[0].data, ...barSource.value[1].data]
+  const growthValues = [...lineSource.value[0].data, ...lineSource.value[1].data]
+  const maxNum = numValues.length ? Math.max(...numValues) : 0
+  const maxAbsGrowth = growthValues.length ? Math.max(...growthValues.map((item) => Math.abs(item))) : 0
+  const leftAxisMax = maxNum <= 0 ? 100 : Math.ceil(maxNum * 1.2 / 10) * 10
+  const rightAxisMax = maxAbsGrowth <= 10 ? 10 : Math.ceil(maxAbsGrowth / 10) * 10
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -92,7 +112,7 @@ const chartOption = computed(() => {
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
         params.forEach(p => {
-          const unit = p.seriesName.includes('客运') ? '万人' : '%'
+          const unit = p.seriesName.includes('客运') ? props.numUnit || '万人' : '%'
           str += `${p.seriesName}: ${p.value}${unit}<br/>`
         })
         return str
@@ -102,7 +122,7 @@ const chartOption = computed(() => {
       top: 10,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: [...barSource.map(i => i.name), ...lineSource.map(i => i.name)]
+      data: [...barSource.value.map(i => i.name), ...lineSource.value.map(i => i.name)]
     },
     grid: {
       left: '6%',
@@ -113,7 +133,7 @@ const chartOption = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: xAxisData,
+      data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
       axisLabel: { color: '#fff', fontSize: 15 },
       splitLine: { show: false },
@@ -122,12 +142,12 @@ const chartOption = computed(() => {
     yAxis: [
       // 左轴：客运量 万人
       {
-        name: '单位：万人',
+        name: `单位：${props.numUnit || '万人'}`,
         nameTextStyle: { color: '#fff', fontSize: 16 },
         type: 'value',
         min: 0,
-        max: 150,
-        interval: 30,
+        max: leftAxisMax,
+        interval: leftAxisMax / 5,
         axisLine: { lineStyle: { color: '#405888' } },
         axisLabel: { color: '#fff', fontSize: 15 },
         splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
@@ -138,9 +158,9 @@ const chartOption = computed(() => {
         name: '单位：%',
         nameTextStyle: { color: '#fff', fontSize: 16 },
         type: 'value',
-        min: -70,
-        max: 0,
-        interval: 10,
+        min: -rightAxisMax,
+        max: rightAxisMax,
+        interval: Math.max(1, rightAxisMax / 5),
         position: 'right',
         axisLine: { lineStyle: { color: '#405888' } },
         axisLabel: { color: '#fff', fontSize: 15 },
