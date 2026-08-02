@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import { getCityTrafficBusRealtime } from '@/api/citytraffic'
 
 const mapRef = ref<HTMLDivElement | null>(null)
 
 let map: AMap.Map | null = null
 let geoLayer: AMap.Polygon[] = []
+let busLayer: any[] = []
 let AMapGlobal: typeof AMap | null = null
 let loadPromise: Promise<typeof AMap | null> | null = null
 const loadError = ref('')
+let busTimer: number | undefined
 
 const ANSHAN_GEO_URL = `${import.meta.env.BASE_URL}geo/anshan.geojson`
+const BUS_REFRESH_MS = 5000
 
 const resolveFeaturePath = (feature: any) => {
   const geometry = feature?.geometry
@@ -57,6 +61,77 @@ const loadAMapApi = async () => {
     })
 
   return loadPromise
+}
+
+const resolveBusLngLat = (item: any) => {
+  const lng =
+    item?.lng ??
+    item?.lon ??
+    item?.longitude ??
+    item?.x ??
+    item?.lngLat?.[0] ??
+    item?.location?.[0] ??
+    item?.position?.[0]
+  const lat =
+    item?.lat ??
+    item?.latitude ??
+    item?.y ??
+    item?.lngLat?.[1] ??
+    item?.location?.[1] ??
+    item?.position?.[1]
+  const lngNum = typeof lng === 'string' ? Number(lng) : lng
+  const latNum = typeof lat === 'string' ? Number(lat) : lat
+  if (typeof lngNum !== 'number' || typeof latNum !== 'number') return null
+  if (!Number.isFinite(lngNum) || !Number.isFinite(latNum)) return null
+  return [lngNum, latNum] as [number, number]
+}
+
+const clearBusLayer = () => {
+  if (!map || !busLayer.length) return
+  map.remove(busLayer)
+  busLayer = []
+}
+
+const renderBusRealtime = async () => {
+  if (!map || !AMapGlobal) return
+  try {
+    const res: any = await getCityTrafficBusRealtime({ pageNo: 1, pageSize: 50 })
+    const payload = res?.data ?? res
+    const list = Array.isArray(payload?.summary?.list)
+      ? payload.summary.list
+      : Array.isArray(payload?.dataList)
+        ? payload.dataList
+        : Array.isArray(payload?.list)
+          ? payload.list
+          : Array.isArray(payload?.rows)
+            ? payload.rows
+            : Array.isArray(payload)
+              ? payload
+              : []
+
+    const overlays = list
+      .map((item: any) => {
+        const lngLat = resolveBusLngLat(item)
+        if (!lngLat) return null
+        return new (AMapGlobal as any).CircleMarker({
+          center: lngLat,
+          radius: 5,
+          fillColor: '#36e8ff',
+          fillOpacity: 0.9,
+          strokeColor: '#ffffff',
+          strokeWeight: 1,
+          strokeOpacity: 0.9,
+          zIndex: 200
+        })
+      })
+      .filter(Boolean) as any[]
+
+    clearBusLayer()
+    busLayer = overlays
+    if (busLayer.length) map.add(busLayer)
+  } catch (error) {
+    console.error('render bus realtime failed:', error)
+  }
 }
 
 const renderGeo = async () => {
@@ -145,9 +220,15 @@ const initMap = async () => {
 
 onMounted(async () => {
   await initMap()
+  await renderBusRealtime()
+  busTimer = window.setInterval(() => {
+    renderBusRealtime()
+  }, BUS_REFRESH_MS)
 })
 
 onBeforeUnmount(() => {
+  if (busTimer) window.clearInterval(busTimer)
+  clearBusLayer()
   if (map) {
     map.destroy()
     map = null

@@ -15,11 +15,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const defaultXAxisData = ['拖拉机', '挂车', '摩托车', '汽车']
-const defaultPrivateData = [0, 0, 0, 0]
-const defaultTotalData = [27179, 32333, 103183, 735438]
-
-const xAxisData = computed(() => (props.xData?.length ? props.xData : defaultXAxisData))
+const xAxisData = computed(() => (props.xData?.length ? props.xData : []))
 const barSource = computed(() => [
   {
     name: '私人数',
@@ -27,7 +23,7 @@ const barSource = computed(() => [
       { offset: 0, color: '#90f0e8' },
       { offset: 1, color: '#22b8b0' }
     ]),
-    data: props.privateData?.length ? props.privateData : defaultPrivateData
+    data: props.privateData?.length ? props.privateData : []
   },
   {
     name: '总数',
@@ -35,14 +31,14 @@ const barSource = computed(() => [
       { offset: 0, color: '#b8ff78' },
       { offset: 1, color: '#48c820' }
     ]),
-    data: props.totalData?.length ? props.totalData : defaultTotalData
+    data: props.totalData?.length ? props.totalData : []
   }
 ])
 
 // 生成立体圆柱series（bar主体 + pictorialBar上下椭圆顶盖底盖）
 const buildCylinderSeries = () => {
   const seriesArr: any[] = []
-  barSource.value.forEach(item => {
+  barSource.value.forEach((item) => {
     // 圆柱主体
     seriesArr.push({
       name: item.name,
@@ -85,17 +81,31 @@ const buildCylinderSeries = () => {
 }
 
 const chartOption = computed(() => {
+  const hasData = xAxisData.value.length && (props.privateData?.length || props.totalData?.length)
   const maxValue = Math.max(...barSource.value.flatMap((item) => item.data), 0)
-  const yAxisMax = maxValue <= 100000 ? 100000 : Math.ceil(maxValue * 1.2 / 100000) * 100000
+  const yAxisMax = maxValue <= 100000 ? 100000 : Math.ceil((maxValue * 1.2) / 100000) * 100000
   return {
     backgroundColor: 'transparent',
+    graphic: hasData
+      ? undefined
+      : {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: '暂无数据',
+            fill: 'rgba(214, 238, 255, 0.72)',
+            fontSize: 18,
+            fontWeight: 600
+          }
+        },
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,0,0,0.75)',
       textStyle: { color: '#fff', fontSize: 14 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
-        params.forEach(p => {
+        params.forEach((p) => {
           if (!p.seriesName.includes('顶盖') && !p.seriesName.includes('底盖')) {
             str += `${p.seriesName}: ${p.value} 辆<br/>`
           }
@@ -107,7 +117,7 @@ const chartOption = computed(() => {
       top: 10,
       right: '8%',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: barSource.value.map(item => item.name)
+      data: barSource.value.map((item) => item.name)
     },
     grid: {
       left: '8%',

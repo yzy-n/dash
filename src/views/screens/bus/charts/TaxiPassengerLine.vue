@@ -61,7 +61,7 @@ const lineSource = computed(() => [
 const buildSeries = () => {
   const seriesArr: any[] = []
   // 并列柱状
-  barSource.value.forEach(item => {
+  barSource.value.forEach((item) => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
@@ -76,7 +76,7 @@ const buildSeries = () => {
     })
   })
   // 折线
-  lineSource.value.forEach(item => {
+  lineSource.value.forEach((item) => {
     seriesArr.push({
       name: item.name,
       type: 'line',
@@ -99,8 +99,10 @@ const chartOption = computed(() => {
   const numValues = [...barSource.value[0].data, ...barSource.value[1].data]
   const growthValues = [...lineSource.value[0].data, ...lineSource.value[1].data]
   const maxNum = numValues.length ? Math.max(...numValues) : 0
-  const maxAbsGrowth = growthValues.length ? Math.max(...growthValues.map((item) => Math.abs(item))) : 0
-  const leftAxisMax = maxNum <= 0 ? 100 : Math.ceil(maxNum * 1.2 / 10) * 10
+  const maxAbsGrowth = growthValues.length
+    ? Math.max(...growthValues.map((item) => Math.abs(item)))
+    : 0
+  const leftAxisMax = maxNum <= 0 ? 100 : Math.ceil((maxNum * 1.2) / 10) * 10
   const rightAxisMax = maxAbsGrowth <= 10 ? 10 : Math.ceil(maxAbsGrowth / 10) * 10
 
   return {
@@ -111,7 +113,7 @@ const chartOption = computed(() => {
       textStyle: { color: '#fff', fontSize: 14 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
-        params.forEach(p => {
+        params.forEach((p) => {
           const unit = p.seriesName.includes('客运') ? props.numUnit || '万人' : '%'
           str += `${p.seriesName}: ${p.value}${unit}<br/>`
         })
@@ -122,7 +124,7 @@ const chartOption = computed(() => {
       top: 10,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: [...barSource.value.map(i => i.name), ...lineSource.value.map(i => i.name)]
+      data: [...barSource.value.map((i) => i.name), ...lineSource.value.map((i) => i.name)]
     },
     grid: {
       left: '6%',

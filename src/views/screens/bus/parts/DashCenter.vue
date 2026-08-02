@@ -22,6 +22,11 @@ defineProps<{
             <span>{{ item.start }}</span>
             <span>{{ item.end }}</span>
           </div>
+          <div v-if="!data.routes.length" class="route-item">
+            <span>暂无数据</span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
 
         <div class="map-box">
@@ -37,6 +42,7 @@ defineProps<{
           <div v-for="station in data.stations" :key="station.name" class="station-item">
             ● {{ station.name }}
           </div>
+          <div v-if="!data.stations.length" class="station-item">暂无数据</div>
         </div>
       </div>
     </div>

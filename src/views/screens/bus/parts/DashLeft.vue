@@ -115,8 +115,13 @@ const currentParkingChart = computed(() => {
         </div>
         <div class="table-row" v-for="item in data.roadCloseList" :key="item.roadName">
           <span>{{ item.roadName }}</span>
-          <span>{{ item.section }}</span>
+          <span>{{ item.startPoint }} - {{ item.endPoint }}</span>
           <span>{{ item.time }}</span>
+        </div>
+        <div v-if="!data.roadCloseList.length" class="table-row">
+          <span>暂无数据</span>
+          <span></span>
+          <span></span>
         </div>
       </div>
     </div>
@@ -149,6 +154,13 @@ const currentParkingChart = computed(() => {
           >
           <span>· 开始时间：{{ item.start }}</span>
           <span>· 预计缓解时间：{{ item.end }}</span>
+        </div>
+        <div v-if="!data.congestionList.length" class="congest-item">
+          <div class="warning-light-icon"></div>
+          <span>暂无数据</span>
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
       </div>
     </div>
@@ -412,6 +424,9 @@ const currentParkingChart = computed(() => {
   flex: 1;
   display: grid;
   gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  max-height: 260px;
 }
 .table-row {
   display: grid;
@@ -435,6 +450,9 @@ const currentParkingChart = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 8px; /* 缩小行间距，原来12px→8px */
+  min-height: 0;
+  overflow: auto;
+  max-height: 520px;
 }
 
 /* 单行布局：压缩图标列宽度，放大字体 */

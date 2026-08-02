@@ -24,7 +24,12 @@ export const getCityTrafficGoodsShip = <T = CityTrafficPayload>() =>
 
 export const getCityTrafficCongestion = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/congestion`)
-
+export const getCityTrafficRoadWarning = <T = CityTrafficPayload>() =>
+  requestData<T>(`${cityTrafficBigscreenBase}/road-warning`)
+export const getCityTrafficBusRealtime = <T = CityTrafficPayload>(params: {
+  pageNo: number
+  pageSize: number
+}) => requestData<T>(`${cityTrafficBigscreenBase}/bus-realtime`, { params })
 export const cityTrafficApi = {
   getParking: getCityTrafficParking,
   getRoadOverview: getCityTrafficRoadOverview,

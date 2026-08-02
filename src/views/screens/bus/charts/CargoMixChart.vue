@@ -60,7 +60,7 @@ const lineSource = computed(() => [
 // 参考链接 xWkXG0IATZ 标准圆柱生成函数
 function createCylinderSeries(list: any[]) {
   const series: any[] = []
-  list.forEach(item => {
+  list.forEach((item) => {
     // 柱身主体
     series.push({
       name: item.name,
@@ -106,12 +106,14 @@ function createCylinderSeries(list: any[]) {
 const chartOption = computed(() => {
   const numValues = [...barSource.value[0].data, ...barSource.value[1].data]
   const growthValues = [...lineSource.value[0].data, ...lineSource.value[1].data]
-  const leftAxisMax = numValues.length ? Math.ceil(Math.max(...numValues) * 1.2 / 100) * 100 : 100
-  const maxAbsGrowth = growthValues.length ? Math.max(...growthValues.map((item) => Math.abs(item))) : 0
+  const leftAxisMax = numValues.length ? Math.ceil((Math.max(...numValues) * 1.2) / 100) * 100 : 100
+  const maxAbsGrowth = growthValues.length
+    ? Math.max(...growthValues.map((item) => Math.abs(item)))
+    : 0
   const rightAxisMax = maxAbsGrowth <= 10 ? 10 : Math.ceil(maxAbsGrowth / 10) * 10
   const cylinderSeries = createCylinderSeries(barSource.value)
   // 追加折线
-  lineSource.value.forEach(line => {
+  lineSource.value.forEach((line) => {
     cylinderSeries.push({
       name: line.name,
       type: 'line',
@@ -133,7 +135,7 @@ const chartOption = computed(() => {
       textStyle: { color: '#fff', fontSize: 14 },
       formatter(params: any[]) {
         let res = params[0].axisValue + '<br/>'
-        params.forEach(p => {
+        params.forEach((p) => {
           if (!p.seriesName.includes('top') && !p.seriesName.includes('bottom')) {
             const unit = p.seriesName.includes('货运') ? props.numUnit || '万吨' : '%'
             res += `${p.seriesName}: ${p.value}${unit}<br/>`
@@ -146,7 +148,7 @@ const chartOption = computed(() => {
       top: 10,
       left: 'center',
       textStyle: { color: '#fff', fontSize: 14 },
-      data: [...barSource.value.map(i => i.name), ...lineSource.value.map(i => i.name)]
+      data: [...barSource.value.map((i) => i.name), ...lineSource.value.map((i) => i.name)]
     },
     grid: {
       left: '6%',

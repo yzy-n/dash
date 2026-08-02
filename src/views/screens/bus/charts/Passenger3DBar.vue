@@ -15,15 +15,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const defaultXAxis = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
-const defaultPassengerData = [980, 861.9, 620, 600, 380, 790]
-const defaultTaxiNumData = [9120, 9117, 9119, 9118, 9112, 9110]
-
-const xAxisList = computed(() => (props.xData?.length ? props.xData : defaultXAxis))
-const passengerData = computed(() =>
-  props.passengerData?.length ? props.passengerData : defaultPassengerData
-)
-const taxiNumData = computed(() => (props.taxiNumData?.length ? props.taxiNumData : defaultTaxiNumData))
+const xAxisList = computed(() => (props.xData?.length ? props.xData : []))
+const passengerData = computed(() => (props.passengerData?.length ? props.passengerData : []))
+const taxiNumData = computed(() => (props.taxiNumData?.length ? props.taxiNumData : []))
 
 const companySource = computed(() => [
   {
@@ -39,7 +33,7 @@ const companySource = computed(() => [
 // 组装series：柱体 + 顶盖底盖
 const buildSeries = () => {
   const seriesArr: any[] = []
-  companySource.value.forEach(item => {
+  companySource.value.forEach((item) => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
@@ -87,10 +81,24 @@ const buildSeries = () => {
 }
 
 const chartOption = computed(() => {
+  const hasData = xAxisList.value.length && passengerData.value.length
   const maxPassenger = passengerData.value.length ? Math.max(...passengerData.value) : 0
-  const yAxisMax = maxPassenger <= 0 ? 100 : Math.ceil(maxPassenger * 1.2 / 100) * 100
+  const yAxisMax = maxPassenger <= 0 ? 100 : Math.ceil((maxPassenger * 1.2) / 100) * 100
   return {
     backgroundColor: 'transparent',
+    graphic: hasData
+      ? undefined
+      : {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: '暂无数据',
+            fill: 'rgba(214, 238, 255, 0.72)',
+            fontSize: 18,
+            fontWeight: 600
+          }
+        },
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
@@ -99,7 +107,7 @@ const chartOption = computed(() => {
       formatter: (params: any[]) => {
         const dataIndex = params?.[0]?.dataIndex ?? 0
         let tipStr = `${params[0].axisValue}<br/>`
-        params.forEach(p => {
+        params.forEach((p) => {
           if (!['顶盖', '底盖'].includes(p.seriesName)) {
             tipStr += `${p.seriesName}: ${p.value} 万人<br/>`
           }
@@ -115,7 +123,7 @@ const chartOption = computed(() => {
       top: 12,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: companySource.value.map(item => item.name)
+      data: companySource.value.map((item) => item.name)
     },
     grid: {
       left: '6%',

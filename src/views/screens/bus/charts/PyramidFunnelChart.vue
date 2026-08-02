@@ -3,12 +3,7 @@
     <!-- 右上角月份下拉框 -->
     <div class="select-box">
       <select v-model="currentMonth">
-        <option value="2022-09">2022-09</option>
-        <option value="2022-10">2022-10</option>
-        <option value="2022-11">2022-11</option>
-        <option value="2022-12">2022-12</option>
-        <option value="2023-01">2023-01</option>
-        <option value="2023-02">2023-02</option>
+        <option v-for="month in monthOptions" :key="month" :value="month">{{ month }}</option>
       </select>
     </div>
     <EChart :option="chartOption" />
@@ -16,46 +11,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-// 默认选中2023-02
-const currentMonth = ref('2023-02')
+type FunnelRow = { name: string; value: number }
 
-// 各月份分层数据（从上到下：跨市班线 → 跨县班线 → 县内班线）
-const monthDataMap: Record<string, Array<{ name: string; value: number }>> = {
-  '2023-02': [
-    { name: '跨市班线', value: 15.8 },
-    { name: '跨县班线', value: 38.69 },
-    { name: '县内班线', value: 80.06 }
-  ],
-  '2023-01': [
-    { name: '跨市班线', value: 14.2 },
-    { name: '跨县班线', value: 37.1 },
-    { name: '县内班线', value: 66.3 }
-  ],
-  '2022-12': [
-    { name: '跨市班线', value: 13.5 },
-    { name: '跨县班线', value: 26.8 },
-    { name: '县内班线', value: 59.2 }
-  ],
-  '2022-11': [
-    { name: '跨市班线', value: 12.9 },
-    { name: '跨县班线', value: 25.3 },
-    { name: '县内班线', value: 44.7 }
-  ],
-  '2022-10': [
-    { name: '跨市班线', value: 13.2 },
-    { name: '跨县班线', value: 36.2 },
-    { name: '县内班线', value: 72.1 }
-  ],
-  '2022-09': [
-    { name: '跨市班线', value: 14.6 },
-    { name: '跨县班线', value: 37.9 },
-    { name: '县内班线', value: 77.5 }
-  ]
-}
+const props = withDefaults(
+  defineProps<{
+    monthDataMap?: Record<string, FunnelRow[]>
+    unit?: string
+  }>(),
+  {
+    monthDataMap: () => ({}),
+    unit: '万人'
+  }
+)
+
+const monthOptions = computed(() => {
+  const list = Object.keys(props.monthDataMap || {})
+  return list.length ? list : ['-']
+})
+
+const currentMonth = ref(monthOptions.value[0])
+
+watch(monthOptions, (list) => {
+  if (!list.length) return
+  if (!list.includes(currentMonth.value)) currentMonth.value = list[0]
+})
 
 // 径向渐变 模拟圆柱3D明暗光影（从上至下三层）
 const gradientList = [
@@ -77,20 +60,36 @@ const gradientList = [
 ]
 
 const chartOption = computed(() => {
-  const rawData = monthDataMap[currentMonth.value]
-  const renderData = rawData.map((item, idx) => ({
-    name: item.name,
-    value: item.value,
-    itemStyle: { color: gradientList[idx] }
-  }))
+  const rawData = props.monthDataMap?.[currentMonth.value] ?? []
+  const hasData = Array.isArray(rawData) && rawData.length > 0
+  const renderData = hasData
+    ? rawData.map((item, idx) => ({
+        name: item.name,
+        value: item.value,
+        itemStyle: { color: gradientList[idx % gradientList.length] }
+      }))
+    : []
 
   return {
     backgroundColor: 'transparent',
+    graphic: hasData
+      ? undefined
+      : {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: '暂无数据',
+            fill: 'rgba(214, 238, 255, 0.72)',
+            fontSize: 18,
+            fontWeight: 600
+          }
+        },
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(0,0,0,0.75)',
       textStyle: { color: '#fff' },
-      formatter: (params: any) => `${params.name}：${params.value} 万人`
+      formatter: (params: any) => `${params.name}：${params.value} ${props.unit}`
     },
     series: [
       {
@@ -115,7 +114,7 @@ const chartOption = computed(() => {
           position: 'right',
           color: '#ffffff',
           fontSize: 16,
-          formatter: '{b} {c} 万人'
+          formatter: `{b} {c} ${props.unit}`
         },
         labelLine: {
           show: true,

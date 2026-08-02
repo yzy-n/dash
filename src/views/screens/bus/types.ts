@@ -11,7 +11,11 @@ export type BusStationRow = {
 
 export type BusRoadCloseRow = {
   roadName: string
-  section: string
+  section?: string
+  startPoint?: string
+  endPoint?: string
+  startTime?: string
+  endTime?: string
   time: string
 }
 
