@@ -18,13 +18,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const defaultXAxisData = ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02']
-const defaultProvinceNumData = [1020, 930, 880.2, 820, 650, 800]
-const defaultProvinceGrowthData = [0, -12, 3.4, -8, -22, 26]
-const defaultCityNumData = [1420, 1140, 1491, 1450, 940, 1060]
-const defaultCityGrowthData = [-10, -28, -6, 13, -16, 29]
-
-const xAxisData = computed(() => (props.xData?.length ? props.xData : defaultXAxisData))
+const xAxisData = computed(() => (props.xData?.length ? props.xData : []))
 const barSource = computed(() => [
   {
     name: '省均货运量',
@@ -32,7 +26,7 @@ const barSource = computed(() => [
       { offset: 0, color: '#a5ffb8' },
       { offset: 1, color: '#24b956' }
     ]),
-    data: props.provinceNumData?.length ? props.provinceNumData : defaultProvinceNumData
+    data: props.provinceNumData?.length ? props.provinceNumData : []
   },
   {
     name: '市货运量',
@@ -40,7 +34,7 @@ const barSource = computed(() => [
       { offset: 0, color: '#ffe99a' },
       { offset: 1, color: '#f7b71e' }
     ]),
-    data: props.cityNumData?.length ? props.cityNumData : defaultCityNumData
+    data: props.cityNumData?.length ? props.cityNumData : []
   }
 ])
 
@@ -48,12 +42,12 @@ const lineSource = computed(() => [
   {
     name: '省同比增长',
     color: '#47e1ff',
-    data: props.provinceGrowthData?.length ? props.provinceGrowthData : defaultProvinceGrowthData
+    data: props.provinceGrowthData?.length ? props.provinceGrowthData : []
   },
   {
     name: '市同比增长',
     color: '#ffcc21',
-    data: props.cityGrowthData?.length ? props.cityGrowthData : defaultCityGrowthData
+    data: props.cityGrowthData?.length ? props.cityGrowthData : []
   }
 ])
 

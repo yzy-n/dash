@@ -18,8 +18,8 @@
     </div>
 
     <h3 class="stars-title" :style="getPointStyle(layout.starsTitle)">{{ data.starsTitle }}</h3>
-    <button class="chip chip--active" :style="getRectStyle(layout.starsCityTab)">全市</button>
-    <button class="chip" :style="getRectStyle(layout.starsDistrictTab)">地区</button>
+    <button class="chip2 chip--active" :style="getRectStyle(layout.starsCityTab)">全市</button>
+    <button class="chip2" :style="getRectStyle(layout.starsDistrictTab)">地区</button>
     <div class="stars-total" :style="getPointStyle(layout.starsTotal)">
       合计：<strong>{{ data.starsTotal }}</strong> 个
     </div>
@@ -30,17 +30,27 @@
       class="star-row"
       :style="getStarRowStyle(index)"
     >
+      <div class="star-dot"></div>
       <div class="star-icons">
         <span v-for="n in item.stars" :key="n" class="star">★</span>
       </div>
-      <span class="star-label">{{ item.label }}</span>
-      <span class="star-value">{{ item.value }}</span>
-      <span class="star-rate">{{ item.rate }}</span>
+      <div class="star-info">
+        <span class="star-label">{{ item.label }}</span>
+        <span class="star-value">{{ item.value }}</span>
+        <span class="star-rate">{{ item.rate }}</span>
+      </div>
+    </div>
+
+    <div class="panel-structure">
+      <div class="panel-structure__inner">
+        <PartyStructure :data="data.structurePanel" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import PartyStructure from './PartyStructure.vue'
 import type { PartyLeftData } from '../data'
 
 defineProps<{
@@ -58,7 +68,7 @@ type Rect = Point & {
 }
 
 const layout = {
-  orgTitle: { left: 152, top: 200 },
+  orgTitle: { left: 172, top: 190 },
   orgTotal: { left: 1018, top: 200 },
   cityTab: { left: 308, top: 286, width: 296, height: 46 },
   districtTab: { left: 692, top: 286, width: 296, height: 46 },
@@ -109,8 +119,7 @@ const getStarRowStyle = (index: number) =>
   color: #ffe4a5;
 }
 
-.org-title,
-.stars-title {
+.org-title {
   position: absolute;
   margin: 0;
   font-weight: 700;
@@ -118,19 +127,33 @@ const getStarRowStyle = (index: number) =>
   color: #ffefc8;
   text-shadow: 0 0 8px rgba(255, 196, 112, 0.16);
 }
+.stars-title {
+  position: absolute;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffefc8;
+  text-shadow: 0 0 8px rgba(255, 196, 112, 0.16);
+  margin-top: 10px;
+  margin-left: 130px;
+  font-size: 40px;
+}
 
 .org-title {
-  font-size: 30px;
+  font-size: 40px;
 }
 
-.stars-title {
+.org-total {
+  position: absolute;
   font-size: 30px;
+  color: #ffbf58;
+  white-space: nowrap;
 }
-
-.org-total,
 .stars-total {
   position: absolute;
-  font-size: 20px;
+  font-size: 30px;
+  margin-left: 250px;
+  margin-top: 50px;
   color: #ffbf58;
   white-space: nowrap;
 }
@@ -149,6 +172,22 @@ const getStarRowStyle = (index: number) =>
   color: #fff1cb;
   font-size: 28px;
   font-weight: 700;
+  background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 241, 190, 0.42),
+    inset 0 0 0 1px rgba(255, 211, 122, 0.34),
+    0 0 10px rgba(255, 170, 52, 0.1);
+  cursor: default;
+}
+.chip2 {
+  position: absolute;
+  border: none;
+  border-radius: 22px;
+  color: #fff1cb;
+  font-size: 28px;
+  font-weight: 700;
+  margin-left: 300px;
+  margin-top: 30px;
   background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
   box-shadow:
     inset 0 1px 0 rgba(255, 241, 190, 0.42),
@@ -178,28 +217,93 @@ const getStarRowStyle = (index: number) =>
   display: flex;
   align-items: center;
   font-size: 18px;
+  margin-left: 110px;
+  margin-top: 100px;
+}
+
+.star-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 18px;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9), rgba(255, 235, 168, 0.2) 45%),
+    radial-gradient(circle at 60% 60%, rgba(255, 188, 82, 0.95), rgba(255, 107, 0, 0.18));
+  box-shadow:
+    0 0 14px rgba(255, 184, 62, 0.28),
+    inset 0 0 0 2px rgba(255, 226, 146, 0.42);
+  flex: 0 0 auto;
 }
 
 .star-icons {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   color: #ffd74a;
   text-shadow: 0 0 10px rgba(255, 214, 84, 0.28);
+  font-size: 34px;
+  width: 140px;
+  flex: 0 0 auto;
+}
+
+.star {
+  line-height: 1;
+}
+
+.star-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 58px;
+  padding: 0 26px;
+  border-radius: 34px;
+  background: linear-gradient(90deg, rgba(255, 206, 120, 0.22), rgba(255, 160, 62, 0.08));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 214, 122, 0.18),
+    0 0 18px rgba(255, 170, 52, 0.08);
 }
 
 .star-label {
-  margin-left: 20px;
+  flex: 1;
   color: #ffe4aa;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .star-value {
-  margin-left: auto;
+  width: 220px;
   color: #ffd374;
+  font-size: 34px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .star-rate {
-  width: 108px;
-  text-align: right;
+  width: 180px;
   color: #ffd374;
+  font-size: 34px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.panel-structure {
+  position: absolute;
+  top: 0;
+  left: 1200px;
+  width: 2640px;
+  height: 2160px;
+  overflow: hidden;
+}
+
+.panel-structure__inner {
+  width: 4080px;
+  height: 2160px;
+  transform: scale(0.647);
+  transform-origin: top left;
 }
 </style>

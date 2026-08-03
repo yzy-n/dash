@@ -13,6 +13,12 @@ const props = defineProps<{
   data: DashScreenData
 }>()
 
+const emit = defineEmits<{
+  (e: 'greenland-metric-change', type: 1 | 2 | 3): void
+  (e: 'greenland-trend-change', type: 1 | 2 | 3): void
+  (e: 'sanitation-type-change', type: 1 | 2 | 3): void
+}>()
+
 const greeningTabs: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '绿化覆盖面积' },
   { key: 'garden', label: '园林绿地面积' },
@@ -35,6 +41,27 @@ const activeGreeningTab = ref<MetricKey>('cover')
 const activeTrendTab = ref<MetricKey>('cover')
 const activeSanitationTab = ref<MetricKey>('cover')
 const activeParkTab = ref<MetricKey>('cover')
+
+const metricToGreenlandType: Record<MetricKey, 1 | 2 | 3> = {
+  cover: 1,
+  garden: 2,
+  park: 3
+}
+
+const handleGreeningTabClick = (key: MetricKey) => {
+  activeGreeningTab.value = key
+  emit('greenland-metric-change', metricToGreenlandType[key])
+}
+
+const handleTrendTabClick = (key: MetricKey) => {
+  activeTrendTab.value = key
+  emit('greenland-trend-change', metricToGreenlandType[key])
+}
+
+const handleSanitationTabClick = (key: MetricKey) => {
+  activeSanitationTab.value = key
+  emit('sanitation-type-change', metricToGreenlandType[key])
+}
 
 const parkRows = computed(() =>
   activeParkTab.value === 'garden' ? props.data.pocketParkConstruction : props.data.pocketParks
@@ -59,7 +86,7 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? '建�
               class="tab"
               :class="{ 'tab--active': activeGreeningTab === item.key }"
               :style="{ backgroundImage: `url(${tabBgUrl})` }"
-              @click="activeGreeningTab = item.key"
+              @click="handleGreeningTabClick(item.key)"
             >
               {{ item.label }}
             </button>
@@ -78,7 +105,7 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? '建�
               class="tab"
               :class="{ 'tab--active': activeTrendTab === item.key }"
               :style="{ backgroundImage: `url(${tabBgUrl})` }"
-              @click="activeTrendTab = item.key"
+              @click="handleTrendTabClick(item.key)"
             >
               {{ item.label }}
             </button>
@@ -104,7 +131,7 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? '建�
             class="tab"
             :class="{ 'tab--active': activeSanitationTab === item.key }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeSanitationTab = item.key"
+            @click="handleSanitationTabClick(item.key)"
           >
             {{ item.label }}
           </button>

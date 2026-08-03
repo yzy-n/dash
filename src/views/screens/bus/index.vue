@@ -43,6 +43,7 @@ import {
   getCityTrafficCongestion,
   getCityTrafficParking,
   getCityTrafficPublicTransport,
+  getCityTrafficGoodsShip,
   getCityTrafficVehicle,
   getCityTrafficRoadWarning
 } from '@/api/citytraffic'
@@ -223,6 +224,81 @@ const applyPublicTransportSummary = (rawPayload: any) => {
 const loadPublicTransport = async () => {
   const res: any = await getCityTrafficPublicTransport()
   applyPublicTransportSummary(res)
+}
+
+const applyGoodsShipSummary = (rawPayload: any, type: 1 | 2 | 3) => {
+  const payload = rawPayload?.data ?? rawPayload
+  const summary = payload?.summary ?? payload?.data?.summary ?? payload
+  const rawRows = preferPublishedRows(
+    Array.isArray(summary?.list)
+      ? summary.list
+      : Array.isArray(summary?.dataList)
+        ? summary.dataList
+        : Array.isArray(payload?.dataList)
+          ? payload.dataList
+          : []
+  )
+
+  const rows = rawRows
+    .filter((item: any) => item && typeof item === 'object')
+    .filter((item: any) => !item.type || toStringValue(item.type) === String(type))
+    .map((item: any) => {
+      const label = toStringValue(
+        item.month ?? item.dateMonth ?? item.yearMonth ?? item.year ?? item.time
+      )
+      if (!label) return null
+      return {
+        label,
+        provinceNum:
+          toNumber(
+            item.provinceNum ??
+              item.provinceValue ??
+              item.provinceCount ??
+              item.proNum ??
+              item.proValue
+          ) ?? 0,
+        provinceGrowth:
+          toNumber(
+            item.provinceGrowth ??
+              item.provinceRate ??
+              item.provinceYoY ??
+              item.proGrowth ??
+              item.proRate
+          ) ?? 0,
+        cityNum:
+          toNumber(item.cityNum ?? item.cityValue ?? item.cityCount ?? item.num ?? item.value) ?? 0,
+        cityGrowth:
+          toNumber(item.cityGrowth ?? item.cityRate ?? item.cityYoY ?? item.growth ?? item.rate) ??
+          0
+      }
+    })
+    .filter(Boolean) as Array<{
+    label: string
+    provinceNum: number
+    provinceGrowth: number
+    cityNum: number
+    cityGrowth: number
+  }>
+
+  const sorted = [...rows].sort((a, b) => a.label.localeCompare(b.label))
+
+  const target =
+    type === 2
+      ? busData.goodsShipSeries.type2
+      : type === 1
+        ? busData.goodsShipSeries.type1
+        : busData.goodsShipSeries.type1
+
+  target.xData = sorted.map((r) => r.label)
+  target.provinceNumData = sorted.map((r) => r.provinceNum)
+  target.provinceGrowthData = sorted.map((r) => r.provinceGrowth)
+  target.cityNumData = sorted.map((r) => r.cityNum)
+  target.cityGrowthData = sorted.map((r) => r.cityGrowth)
+}
+
+const loadGoodsShip = async (type: 1 | 2 | 3) => {
+  const res: any = await getCityTrafficGoodsShip({ type })
+  applyGoodsShipSummary(res, type)
 }
 
 const applyVehicleSummary = (rawPayload: any) => {
@@ -455,6 +531,8 @@ onMounted(() => {
   }, 1000)
   loadParking()
   loadPublicTransport()
+  loadGoodsShip(1)
+  loadGoodsShip(2)
   loadVehicle()
   loadRoadWarning()
   loadCongestion()

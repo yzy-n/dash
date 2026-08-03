@@ -90,19 +90,19 @@ const screenData = ref(partyScreenMock)
 
 .body-left {
   left: 0;
-  width: 3460px;
+  width: 3840px;
   height: 2160px;
 }
 
 .body-center {
-  left: 3820px;
-  width: 4080px;
+  left: 3840px;
+  width: 3840px;
   height: 2160px;
 }
 
 .body-right {
   right: 0;
-  width: 2620px;
+  width: 3840px;
   height: 2160px;
 }
 </style>

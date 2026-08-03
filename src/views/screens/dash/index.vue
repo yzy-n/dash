@@ -22,7 +22,12 @@
         </header>
 
         <section class="body">
-          <DashLeft :data="dashData" />
+          <DashLeft
+            :data="dashData"
+            @greenland-metric-change="handleGreenlandMetricTypeChange"
+            @greenland-trend-change="handleGreenlandTrendTypeChange"
+            @sanitation-type-change="handleSanitationTypeChange"
+          />
           <DashCenter :data="dashData" />
           <DashRight :data="dashData" />
         </section>
@@ -160,18 +165,21 @@ const buildGreenlandMetric = (source: unknown, fallbackName: string, unit?: stri
 
 const buildTrend = (source: unknown) => {
   const trendSource = isRecord(source)
-    ? ((isRecord(source.trend) && source.trend) ||
-        (isRecord(source.lineChart) && source.lineChart) ||
-        (isRecord(source.line) && source.line) ||
-        source)
+    ? (isRecord(source.trend) && source.trend) ||
+      (isRecord(source.lineChart) && source.lineChart) ||
+      (isRecord(source.line) && source.line) ||
+      source
     : source
   const xSource =
     isRecord(trendSource) &&
-    (trendSource.x || trendSource.xAxis || trendSource.years || trendSource.dates || trendSource.months)
+    (trendSource.x ||
+      trendSource.xAxis ||
+      trendSource.years ||
+      trendSource.dates ||
+      trendSource.months)
   const x = Array.isArray(xSource) ? xSource.map((item) => String(item)) : []
   const rawSeries =
-    isRecord(trendSource) &&
-    (trendSource.series || trendSource.lines || trendSource.lineList)
+    isRecord(trendSource) && (trendSource.series || trendSource.lines || trendSource.lineList)
   const series: LineSeries[] = Array.isArray(rawSeries)
     ? rawSeries
         .map((item) => {
@@ -193,7 +201,8 @@ const buildTrend = (source: unknown) => {
 const buildKpis = (source: unknown) => {
   const summary = isRecord(source) && isRecord(source.summary) ? source.summary : undefined
   const standCase =
-    summary?.standCase || (isRecord(source) && (source.standCase || source.caseNum || source.fileCount))
+    summary?.standCase ||
+    (isRecord(source) && (source.standCase || source.caseNum || source.fileCount))
   const closeCase =
     summary?.closeCase ||
     (isRecord(source) && (source.closeCase || source.closeCount || source.finishCount))
@@ -255,41 +264,61 @@ const formatDate = (value: unknown) => {
   return toStringValue(value)
 }
 
-const loadGreenland = async () => {
-  const payload = await getCityBigscreenGreenland<UnknownRecord>()
-  dashData.greeningMetrics.cover = buildGreenlandMetric(
-    payload.cover || payload.greenCoverage || payload.greeningCoverage,
-    '绿化覆盖面积'
-  )
-  dashData.greeningMetrics.garden = buildGreenlandMetric(
-    payload.garden || payload.greenlandArea || payload.parkGreenArea,
-    '园林绿地面积'
-  )
-  dashData.greeningMetrics.park = buildGreenlandMetric(
-    payload.park || payload.parkArea || payload.parkLandArea,
-    '公园占地面积'
-  )
-  dashData.greenlandTrend = buildTrend(payload)
+const greenlandTypeToMetricKey = (type: 1 | 2 | 3) => {
+  if (type === 2) return 'garden'
+  if (type === 3) return 'park'
+  return 'cover'
 }
 
-const loadSanitation = async () => {
-  const payload = await getCityBigscreenSanitation<UnknownRecord>()
+const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
+  const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
+  const key = greenlandTypeToMetricKey(type)
+  const rows = preferPublishedRows(getDataList(payload)).filter(
+    (item) => isRecord(item) && toStringValue(item.type) === String(type)
+  )
+  const nameMap: Record<string, string> = {
+    cover: '绿化覆盖面积',
+    garden: '园林绿地面积',
+    park: '公园占地面积'
+  }
+  dashData.greeningMetrics[key] = buildTimeMetric(rows, nameMap[key])
+}
+
+const loadGreenlandTrend = async (type: 1 | 2 | 3 = 1) => {
+  const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
+  const key = greenlandTypeToMetricKey(type)
   const rows = preferPublishedRows(getDataList(payload))
-  dashData.sanitationMetrics.cover = buildTimeMetric(
-    rows.filter((item) => isRecord(item) && String(item.type) === '1'),
-    '清扫道路面积',
-    '万平方米'
+    .filter((item) => isRecord(item) && toStringValue(item.type) === String(type))
+    .filter((item) => toStringValue(item.year))
+    .sort((a, b) => String(a.year).localeCompare(String(b.year)))
+
+  const x = rows.map((item) => String(item.year))
+  const y = rows.map((item) => toNumber(item.area ?? item.num ?? item.value) ?? 0)
+
+  dashData.greenlandTrend = {
+    x,
+    series: [
+      {
+        name: dashData.greeningMetrics[key]?.name || '',
+        data: y,
+        color: '#36e8ff'
+      }
+    ]
+  }
+}
+
+const loadSanitationMetric = async (type: 1 | 2 | 3 = 1) => {
+  const payload = await getCityBigscreenSanitation<UnknownRecord>({ type })
+  const key = greenlandTypeToMetricKey(type)
+  const rows = preferPublishedRows(getDataList(payload)).filter(
+    (item) => isRecord(item) && (!item.type || toStringValue(item.type) === String(type))
   )
-  dashData.sanitationMetrics.garden = buildTimeMetric(
-    rows.filter((item) => isRecord(item) && String(item.type) === '2'),
-    '生活垃圾清运量',
-    '吨'
-  )
-  dashData.sanitationMetrics.park = buildTimeMetric(
-    rows.filter((item) => isRecord(item) && String(item.type) === '3'),
-    '公厕数',
-    '座'
-  )
+  const nameMap: Record<string, { name: string; unit?: string }> = {
+    cover: { name: '清扫道路面积', unit: '万平方米' },
+    garden: { name: '生活垃圾清运量', unit: '吨' },
+    park: { name: '公厕数', unit: '座' }
+  }
+  dashData.sanitationMetrics[key] = buildTimeMetric(rows, nameMap[key].name, nameMap[key].unit)
 }
 
 const loadPark = async () => {
@@ -408,18 +437,46 @@ const loadCaseStatistics = async () => {
 }
 
 const loadAppealList = async () => {
-  const payload = await getCityBigscreenAppealList<UnknownRecord>()
-  dashData.appealEvents = getDataList(payload)
+  const payload = await getCityBigscreenAppealList<UnknownRecord>({ pageNo: 1, pageSize: 20 })
+  const summary = isRecord(payload.summary) ? payload.summary : undefined
+  const listSource =
+    (summary && Array.isArray(summary.list) && summary.list) ||
+    (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
+    getDataList(payload)
+
+  dashData.appealEvents = (Array.isArray(listSource) ? listSource : [])
     .map((item) => {
       if (!isRecord(item)) return null
-      const date = formatDate(item.date || item.time || item.createTime || item.occurTime)
+      const date = formatDate(
+        item.processingtime ||
+          item.processingTime ||
+          item.processTime ||
+          item.date ||
+          item.time ||
+          item.createTime ||
+          item.occurTime
+      )
       const name = toStringValue(item.name || item.title || item.eventName || item.appealName)
       if (!date && !name) return null
       return {
         date,
         name,
-        dep: toStringValue(item.department || item.deptName || item.handleDept || item.organName),
-        score: toStringValue(item.score || item.evaluate || item.satisfaction || item.status) || '-'
+        dep: toStringValue(
+          item.handlingDepartment ||
+            item.department ||
+            item.deptName ||
+            item.handleDept ||
+            item.organName
+        ),
+        score:
+          toStringValue(
+            item.handleEvaluate ||
+              item.handleResult ||
+              item.evaluate ||
+              item.score ||
+              item.satisfaction ||
+              item.status
+          ) || '-'
       }
     })
     .filter((item): item is DashScreenData['appealEvents'][number] => Boolean(item))
@@ -465,8 +522,9 @@ const loadDashScreen = async () => {
   dashError.value = ''
 
   const results = await Promise.allSettled([
-    loadGreenland(),
-    loadSanitation(),
+    loadGreenlandMetric(1),
+    loadGreenlandTrend(1),
+    loadSanitationMetric(1),
     loadPark(),
     loadLandArea(),
     loadEnergy(),
@@ -481,6 +539,24 @@ const loadDashScreen = async () => {
   if (results.every((item) => item.status === 'rejected')) {
     dashError.value = '大屏接口暂不可用，当前暂无数据'
   }
+}
+
+const handleGreenlandMetricTypeChange = async (type: 1 | 2 | 3) => {
+  try {
+    await loadGreenlandMetric(type)
+  } catch {}
+}
+
+const handleGreenlandTrendTypeChange = async (type: 1 | 2 | 3) => {
+  try {
+    await loadGreenlandTrend(type)
+  } catch {}
+}
+
+const handleSanitationTypeChange = async (type: 1 | 2 | 3) => {
+  try {
+    await loadSanitationMetric(type)
+  } catch {}
 }
 
 const now = ref(new Date())

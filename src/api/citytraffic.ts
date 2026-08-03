@@ -19,8 +19,17 @@ export const getCityTrafficPassengerShip = <T = CityTrafficPayload>() =>
 export const getCityTrafficVehicle = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/vehicle`)
 
-export const getCityTrafficGoodsShip = <T = CityTrafficPayload>() =>
-  requestData<T>(`${cityTrafficBigscreenBase}/goods-ship`)
+export type CityTrafficGoodsShipType = 1 | 2 | 3
+
+export const getCityTrafficGoodsShip = <T = CityTrafficPayload>(params?: {
+  type?: CityTrafficGoodsShipType
+}) => requestData<T>(`${cityTrafficBigscreenBase}/goods-ship`, { params })
+
+export type CityTrafficBusLineType = 1 | 2 | 3
+
+export const getCityTrafficBusLine = <T = CityTrafficPayload>(params?: {
+  type?: CityTrafficBusLineType
+}) => requestData<T>(`${cityTrafficBigscreenBase}/bus-line`, { params })
 
 export const getCityTrafficCongestion = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/congestion`)
