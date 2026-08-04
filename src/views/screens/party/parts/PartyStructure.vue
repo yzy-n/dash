@@ -3,9 +3,13 @@
     <h3 class="title">{{ data.title }}</h3>
 
     <div class="gender-row">
-      <div v-for="item in data.genderStats" :key="item.label" class="gender-card">
-        <span class="gender-label">{{ item.label }}</span>
-        <strong class="gender-value">{{ item.value }}</strong>
+      <div class="gender-card">
+        <span class="gender-label">{{ data.genderStats?.[0]?.label || '' }}</span>
+        <strong class="gender-value">{{ data.genderStats?.[0]?.value || '' }}</strong>
+      </div>
+      <div class="gender-card">
+        <span class="gender-label">{{ data.genderStats?.[1]?.label || '' }}</span>
+        <strong class="gender-value">{{ data.genderStats?.[1]?.value || '' }}</strong>
       </div>
     </div>
 
@@ -13,19 +17,43 @@
       <section class="dist-block dist-block--age">
         <div class="block-tag">年龄分布</div>
         <div class="dist-grid">
-          <div v-for="item in data.ageStats" :key="item.label" class="dist-item">
-            <div class="dist-name">{{ item.label }}</div>
-            <div class="dist-value">{{ item.value }}</div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.ageStats?.[0]?.label || '' }}</div>
+            <div class="dist-value">{{ data.ageStats?.[0]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.ageStats?.[1]?.label || '' }}</div>
+            <div class="dist-value">{{ data.ageStats?.[1]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.ageStats?.[2]?.label || '' }}</div>
+            <div class="dist-value">{{ data.ageStats?.[2]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.ageStats?.[3]?.label || '' }}</div>
+            <div class="dist-value">{{ data.ageStats?.[3]?.value || '' }}</div>
           </div>
         </div>
       </section>
 
       <section class="dist-block dist-block--join">
-        <div class="block-tag">入党时间分布</div>
+        <div class="block-tag2">入党时间分布</div>
         <div class="dist-grid">
-          <div v-for="item in data.joinStats" :key="item.label" class="dist-item">
-            <div class="dist-name">{{ item.label }}</div>
-            <div class="dist-value">{{ item.value }}</div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.joinStats?.[0]?.label || '' }}</div>
+            <div class="dist-value">{{ data.joinStats?.[0]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.joinStats?.[1]?.label || '' }}</div>
+            <div class="dist-value">{{ data.joinStats?.[1]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.joinStats?.[2]?.label || '' }}</div>
+            <div class="dist-value">{{ data.joinStats?.[2]?.value || '' }}</div>
+          </div>
+          <div class="dist-item">
+            <div class="dist-name">{{ data.joinStats?.[3]?.label || '' }}</div>
+            <div class="dist-value">{{ data.joinStats?.[3]?.value || '' }}</div>
           </div>
         </div>
       </section>
@@ -33,32 +61,71 @@
 
     <div class="middle-row">
       <div class="edu-col edu-col--left">
-        <div v-for="item in data.eduLeft" :key="item.label" class="edu-item">
-          <div class="edu-pill">{{ item.label }}</div>
-          <div class="edu-value">{{ item.value }}</div>
+        <div class="edu-item">
+          <div class="edu-pill">{{ data.eduLeft?.[0]?.label || '' }}</div>
+          <div class="edu-value">{{ data.eduLeft?.[0]?.value || '' }}</div>
+        </div>
+        <div class="edu-item">
+          <div class="edu-pill">{{ data.eduLeft?.[1]?.label || '' }}</div>
+          <div class="edu-value">{{ data.eduLeft?.[1]?.value || '' }}</div>
         </div>
       </div>
 
-      <div class="ring-box">
-        <div class="ring ring--outer"></div>
-        <div class="ring ring--inner"></div>
-        <div class="ring-text ring-text--main">学历分布</div>
-        <div class="ring-text ring-text--sub">职业分布</div>
-      </div>
-
       <div class="edu-col edu-col--right">
-        <div v-for="item in data.eduRight" :key="item.label" class="edu-item">
-          <div class="edu-pill">{{ item.label }}</div>
-          <div class="edu-value">{{ item.value }}</div>
+        <div class="edu-item">
+          <div class="edu-pill">
+            {{ data.eduRight?.[0]?.label || data.eduLeft?.[2]?.label || '' }}
+          </div>
+          <div class="edu-value">
+            {{ data.eduRight?.[0]?.value || data.eduLeft?.[2]?.value || '' }}
+          </div>
+        </div>
+        <div class="edu-item">
+          <div class="edu-pill">
+            {{ data.eduRight?.[1]?.label || data.eduLeft?.[3]?.label || '' }}
+          </div>
+          <div class="edu-value">
+            {{ data.eduRight?.[1]?.value || data.eduLeft?.[3]?.value || '' }}
+          </div>
         </div>
       </div>
     </div>
 
     <div class="job-row">
-      <div v-for="item in data.jobStats" :key="item.label" class="job-item">
-        <div class="job-bubble">{{ item.rate }}</div>
-        <div class="job-label">{{ item.label }}</div>
-        <div class="job-count">{{ item.count }}</div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[0]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[0]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[0]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[1]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[1]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[1]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[2]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[2]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[2]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[3]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[3]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[3]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[4]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[4]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[4]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[5]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[5]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[5]?.count || '' }}</div>
+      </div>
+      <div class="job-item">
+        <div class="job-bubble">{{ data.jobStats?.[6]?.rate || '' }}</div>
+        <div class="job-label">{{ data.jobStats?.[6]?.label || '' }}</div>
+        <div class="job-count">{{ data.jobStats?.[6]?.count || '' }}</div>
       </div>
     </div>
   </div>
@@ -130,6 +197,7 @@ defineProps<{
   position: absolute;
   top: 0;
   width: 1520px;
+  height: 100%;
 }
 
 .dist-block--age {
@@ -141,76 +209,84 @@ defineProps<{
 }
 
 .block-tag {
-  width: 240px;
-  height: 42px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
+  position: absolute;
+  top: 180px;
+  left: 700px;
+  font-size: 50px;
+}
+.block-tag2 {
+  width: 390px;
+  position: absolute;
+  left: 580px;
+  top: 180px;
+  text-align: center;
+  font-size: 50px;
   color: #ffe7ac;
-  background: linear-gradient(90deg, rgba(255, 196, 83, 0.28), rgba(255, 196, 83, 0.08));
 }
 
 .dist-grid {
   position: relative;
-  height: 360px;
-  margin-top: 26px;
+  height: 260px;
+  margin-top: 68px;
+  margin-left: 0;
 }
 
 .dist-item {
   position: absolute;
-  width: 760px;
+  width: 720px;
+  padding-left: 70px;
+  box-sizing: border-box;
 }
 
 .dist-block--age .dist-item:nth-child(1) {
-  left: 0;
-  top: 0;
+  left: 180px;
+  top: 370px;
 }
 
 .dist-block--age .dist-item:nth-child(2) {
-  left: 760px;
-  top: 0;
+  left: 940px;
+  top: 370px;
 }
 
 .dist-block--age .dist-item:nth-child(3) {
-  left: 0;
-  top: 128px;
+  left: 180px;
+  top: 690px;
 }
 
 .dist-block--age .dist-item:nth-child(4) {
-  left: 760px;
-  top: 128px;
+  left: 940px;
+  top: 690px;
 }
 
 .dist-block--join .dist-item:nth-child(1) {
-  left: 0;
-  top: 0;
+  left: 200px;
+  top: 370px;
 }
 
 .dist-block--join .dist-item:nth-child(2) {
-  left: 760px;
-  top: 0;
+  left: 960px;
+  top: 370px;
 }
 
 .dist-block--join .dist-item:nth-child(3) {
-  left: 0;
-  top: 128px;
+  left: 200px;
+  top: 690px;
 }
 
 .dist-block--join .dist-item:nth-child(4) {
-  left: 760px;
-  top: 128px;
+  left: 960px;
+  top: 690px;
 }
 
 .dist-name {
-  font-size: 24px;
+  font-size: 40px;
   color: #ffe4ad;
+  line-height: 1.2;
 }
 
 .dist-value {
-  margin-top: 10px;
-  font-size: 28px;
+  margin-top: 8px;
+  font-size: 40px;
   color: #ffcf77;
 }
 
@@ -241,11 +317,12 @@ defineProps<{
   position: absolute;
   width: 720px;
   text-align: center;
+  height: 120px;
 }
 
 .edu-col--left .edu-item:nth-child(1) {
   left: 0;
-  top: 0;
+  top: 500px;
 }
 
 .edu-col--left .edu-item:nth-child(2) {
@@ -264,20 +341,24 @@ defineProps<{
 }
 
 .edu-pill {
-  width: 180px;
+  width: 240px;
   height: 42px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  text-align: center;
+  line-height: 42px;
   border-radius: 22px;
-  background: rgba(255, 206, 119, 0.08);
   color: #ffe6aa;
-  font-size: 18px;
+  font-size: 48px;
 }
 
 .edu-value {
-  margin-top: 10px;
+  position: absolute;
+  left: 50%;
+  top: 56px;
+  transform: translateX(-50%);
   font-size: 24px;
   color: #ffcf77;
 }
