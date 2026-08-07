@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import * as echarts from 'echarts'
+import 'echarts-gl'
 
 type Props = {
   option: unknown

@@ -228,6 +228,17 @@ const hasKpiValue = (list: DashScreenData['centerKpis']) =>
   list.some((item) => String(item.value).trim() !== '')
 
 const buildSideStats = (source: unknown) => {
+  const root = isRecord(source) ? source : undefined
+  const payload = (root && isRecord(root.data) ? root.data : root) as UnknownRecord | undefined
+  const summary =
+    (payload && isRecord(payload.summary) ? payload.summary : undefined) ||
+    (payload && isRecord((payload as any).data) && isRecord((payload as any).data.summary)
+      ? ((payload as any).data.summary as UnknownRecord)
+      : undefined) ||
+    (root && isRecord(root.summary) ? root.summary : undefined)
+
+  const container = (summary || payload || root || {}) as UnknownRecord
+
   const parseRows = (rows: unknown[]): SideStat[] =>
     rows
       .map((item) => {
@@ -243,9 +254,17 @@ const buildSideStats = (source: unknown) => {
       .filter((item): item is SideStat => Boolean(item))
 
   const leftRows =
-    isRecord(source) && (source.left || source.leftList || source.leftRows || source.leftData)
+    container.left ||
+    (container as any).leftList ||
+    (container as any).leftRows ||
+    (container as any).leftData ||
+    (container as any).centerSideLeft
   const rightRows =
-    isRecord(source) && (source.right || source.rightList || source.rightRows || source.rightData)
+    container.right ||
+    (container as any).rightList ||
+    (container as any).rightRows ||
+    (container as any).rightData ||
+    (container as any).centerSideRight
 
   return {
     left: parseRows(Array.isArray(leftRows) ? leftRows : []),

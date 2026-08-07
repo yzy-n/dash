@@ -12,7 +12,8 @@
         <strong class="gender-value">{{ data.genderStats?.[1]?.value || '' }}</strong>
       </div>
     </div>
-
+    <div class="title2">学历分布</div>
+    <div class="title3">职业分布</div>
     <div class="dist-wrap">
       <section class="dist-block dist-block--age">
         <div class="block-tag">年龄分布</div>
@@ -321,23 +322,23 @@ defineProps<{
 }
 
 .edu-col--left .edu-item:nth-child(1) {
-  left: 0;
-  top: 500px;
+  left: 50px;
+  top: 900px;
 }
 
 .edu-col--left .edu-item:nth-child(2) {
-  left: 0;
-  top: 132px;
+  left: 50px;
+  top: 600px;
 }
 
 .edu-col--right .edu-item:nth-child(1) {
-  left: 0;
-  top: 0;
+  left: -40px;
+  top: 600px;
 }
 
 .edu-col--right .edu-item:nth-child(2) {
-  left: 0;
-  top: 132px;
+  left: -45px;
+  top: 900px;
 }
 
 .edu-pill {
@@ -356,10 +357,9 @@ defineProps<{
 
 .edu-value {
   position: absolute;
-  left: 50%;
-  top: 56px;
-  transform: translateX(-50%);
-  font-size: 24px;
+  left: 27%;
+  top: 160px;
+  font-size: 40px;
   color: #ffcf77;
 }
 
@@ -415,7 +415,7 @@ defineProps<{
   position: absolute;
   left: 0;
   right: 0;
-  top: 1700px;
+  top: 2400px;
   height: 360px;
 }
 
@@ -431,27 +431,27 @@ defineProps<{
 
 .job-item:nth-child(2) {
   left: 980px;
-  top: 40px;
+  top: 140px;
 }
 
 .job-item:nth-child(3) {
   left: 1440px;
-  top: 52px;
+  top: 230px;
 }
 
 .job-item:nth-child(4) {
   left: 1900px;
-  top: 40px;
+  top: 320px;
 }
 
 .job-item:nth-child(5) {
   left: 2360px;
-  top: 52px;
+  top: 230px;
 }
 
 .job-item:nth-child(6) {
   left: 2820px;
-  top: 40px;
+  top: 140px;
 }
 
 .job-item:nth-child(7) {
@@ -460,8 +460,8 @@ defineProps<{
 }
 
 .job-bubble {
-  width: 112px;
-  height: 112px;
+  width: 192px;
+  height: 192px;
   margin: 0 auto;
   border-radius: 50%;
   display: flex;
@@ -470,19 +470,53 @@ defineProps<{
   border: 3px solid rgba(255, 210, 120, 0.42);
   background: radial-gradient(circle, rgba(255, 196, 91, 0.28), rgba(225, 73, 21, 0.72));
   color: #fff0c0;
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 700;
 }
 
 .job-label {
   margin-top: 14px;
-  font-size: 18px;
+  font-size: 28px;
   color: #ffe2a6;
 }
 
 .job-count {
   margin-top: 8px;
-  font-size: 22px;
+  font-size: 32px;
   color: #ffcd72;
+}
+.title2 {
+  position: absolute;
+  top: 1850px;
+  left: 1840px;
+  width: 460px;
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  font-size: 86px;
+  font-weight: 800;
+  color: rgba(255, 238, 206, 0.98);
+  letter-spacing: 20px;
+  font-style: italic;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 172, 0.08),
+    0 0 16px rgba(255, 92, 32, 0.12);
+}
+.title3 {
+  position: absolute;
+  top: 2400px;
+  left: 1840px;
+  width: 460px;
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  font-size: 86px;
+  font-weight: 800;
+  color: rgba(255, 238, 206, 0.98);
+  letter-spacing: 20px;
+  font-style: italic;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 172, 0.08),
+    0 0 16px rgba(255, 92, 32, 0.12);
 }
 </style>
