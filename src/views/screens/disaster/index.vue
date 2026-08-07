@@ -14,7 +14,7 @@
             <span class="header-chip">{{ timeText }}</span>
             <span class="header-chip2">{{ weekText }}</span>
           </div>
-          <div class="brand">城 市 交 通</div>
+          <div class="brand">防 灾 减 灾</div>
           <div class="header-side header-side-right">
             <span class="header-chip3">北京时间</span>
             <span class="header-chip4">{{ hmsText }}</span>

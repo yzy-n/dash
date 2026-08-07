@@ -1,141 +1,172 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-
-const parkingTab = ref('ratio')
-
-const gridInfoRows = [
-  { name: '海城市', town: 26, village: 422, grid: 1415 },
-  { name: '台安县', town: 12, village: 174, grid: 1658 },
-  { name: '岫岩县', town: 24, village: 204, grid: 739 },
-  { name: '铁东区', town: 14, village: 107, grid: 128 },
-  { name: '铁西区', town: 8, village: 63, grid: 105 },
-  { name: '立山区', town: 7, village: 89, grid: 254 }
-]
-
-const appealEvents = [
-  { date: '2023-05-25', name: '海城市花园小区——噪音扰民', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '台安县南河街道——占道经营', dep: '', score: '满意' },
-  { date: '2023-05-24', name: '铁西区教育街——路面破损', dep: '', score: '不满意' },
-  { date: '2023-05-23', name: '高新区万科广场——垃圾堆放', dep: '', score: '满意' },
-  { date: '2023-05-22', name: '岫岩县东门路段——井盖缺失', dep: '', score: '满意' }
-]
-</script>
-
 <template>
-  <aside class="left">
-    <div class="col">
-      <div class="panel">
-        <div class="panel-title">公共交通</div>
-        <div class="panel-chart">
-          <Passenger3DBar />
+  <div class="right-wrap">
+    <section class="panel panel--command">
+      <div class="panel-title">应急指挥</div>
+      <div class="command-grid">
+        <div class="command-item">
+          <div class="c-label">指挥席位</div>
+          <div class="c-value">18</div>
+        </div>
+        <div class="command-item">
+          <div class="c-label">在线队伍</div>
+          <div class="c-value">86</div>
+        </div>
+        <div class="command-item">
+          <div class="c-label">联动部门</div>
+          <div class="c-value">24</div>
         </div>
       </div>
-
-      <div class="panel">
-        <div class="panel-title">诉求事件</div>
-        <div class="panel-chart"></div>
-      </div>
-    </div>
-    <div class="col col-left">
-      <div class="panel panel--full">
-        <div class="section">
-          <div class="panel-head">
-            <div class="panel-title">部件分布</div>
-          </div>
-          <div class="tabs">
-            <button
-              class="tab"
-              :class="{ 'tab--active': parkingTab === 'ratio' }"
-              @click="parkingTab = 'ratio'"
-            >
-              客运量
-            </button>
-            <button
-              class="tab"
-              :class="{ 'tab--active': parkingTab === 'plan' }"
-              @click="parkingTab = 'plan'"
-            >
-              旅客周转量
-            </button>
-          </div>
-          <div class="panel-chart"></div>
+      <div class="command-line"></div>
+      <div class="cmd-list">
+        <div class="cmd-row">
+          <span class="dot"></span>
+          <span class="txt">发布暴雨橙色预警响应</span>
+          <span class="time">09:05</span>
         </div>
-
-        <div class="section section--bottom">
-          <div class="panel-chart"></div>
+        <div class="cmd-row">
+          <span class="dot"></span>
+          <span class="txt">转移低洼区群众 126 人</span>
+          <span class="time">08:32</span>
+        </div>
+        <div class="cmd-row">
+          <span class="dot"></span>
+          <span class="txt">巡查地质灾害点 6 处</span>
+          <span class="time">07:40</span>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="col">
-      <div class="panel">
-        <div class="panel-title">货物运输</div>
-        <div class="tabs">
-          <button
-            class="tab"
-            :class="{ 'tab--active': parkingTab === 'ratio' }"
-            @click="parkingTab = 'ratio'"
-          >
-            货运量
-          </button>
-          <button
-            class="tab"
-            :class="{ 'tab--active': parkingTab === 'plan' }"
-            @click="parkingTab = 'plan'"
-          >
-            货运周转量
-          </button>
+    <section class="panel panel--task">
+      <div class="panel-title">任务派单</div>
+      <div class="task-table">
+        <div class="task-row task-row--head">
+          <span>编号</span>
+          <span>事项</span>
+          <span>状态</span>
         </div>
-        <div class="panel-chart"></div>
+        <div class="task-row">
+          <span>01023</span>
+          <span>沿河积水排险</span>
+          <span class="st st--run">进行中</span>
+        </div>
+        <div class="task-row">
+          <span>01018</span>
+          <span>山区道路除冰</span>
+          <span class="st st--run">进行中</span>
+        </div>
+        <div class="task-row">
+          <span>01011</span>
+          <span>老旧小区消防排查</span>
+          <span class="st st--done">已完成</span>
+        </div>
+        <div class="task-row">
+          <span>01005</span>
+          <span>危化企业巡查</span>
+          <span class="st st--done">已完成</span>
+        </div>
+        <div class="task-row">
+          <span>00998</span>
+          <span>避难场所开放检查</span>
+          <span class="st st--run">进行中</span>
+        </div>
       </div>
+    </section>
 
-      <div class="panel">
-        <div class="panel-title">车辆信息</div>
-        <div class="panel-chart"></div>
+    <section class="panel panel--rank">
+      <div class="panel-title">风险排行</div>
+      <div class="rank-box">
+        <EChart :option="rankOption" />
       </div>
-    </div>
-  </aside>
+    </section>
+  </div>
 </template>
 
-<style scoped>
-.left {
-  min-height: 0;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 26px;
-}
+<script setup lang="ts">
+import { computed } from 'vue'
+import EChart from '@/components/echarts/EChart.vue'
 
-.col {
-  min-height: 0;
+const rankOption = computed(() => {
+  const names = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区']
+  const values = [36, 28, 21, 12, 10, 9]
+  return {
+    backgroundColor: 'transparent',
+    tooltip: { show: false },
+    grid: { left: 140, right: 26, top: 24, bottom: 22 },
+    xAxis: {
+      type: 'value',
+      splitNumber: 4,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 14 },
+      axisTick: { show: false },
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } }
+    },
+    yAxis: {
+      type: 'category',
+      data: names,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.86)', fontSize: 18 },
+      axisTick: { show: false },
+      axisLine: { show: false }
+    },
+    series: [
+      {
+        type: 'bar',
+        data: values,
+        barWidth: 18,
+        itemStyle: {
+          borderRadius: [0, 10, 10, 0],
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              { offset: 0, color: 'rgba(150, 245, 255, 0.35)' },
+              { offset: 1, color: 'rgba(0, 160, 255, 0.95)' }
+            ]
+          }
+        },
+        label: {
+          show: true,
+          position: 'right',
+          color: 'rgba(240, 251, 255, 0.92)',
+          fontSize: 16,
+          fontWeight: 700
+        }
+      }
+    ]
+  }
+})
+</script>
+
+<style scoped>
+.right-wrap {
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   gap: 26px;
-}
-
-.col:not(.col-left) .panel {
-  flex: 1;
+  min-height: 0;
 }
 
 .panel {
   position: relative;
-  border: 1px solid rgba(84, 188, 255, 0.24);
-  box-shadow:
-    inset 0 0 36px rgba(34, 121, 255, 0.08),
-    0 0 30px rgba(0, 45, 111, 0.14);
   overflow: hidden;
   border-radius: 18px;
-  padding: 26px 28px 24px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  padding: 92px 28px 26px;
   background:
     linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
     url('@/assets/img/leftBg.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
+  border: 1px solid rgba(84, 188, 255, 0.24);
+  box-shadow:
+    inset 0 0 36px rgba(34, 121, 255, 0.08),
+    0 0 30px rgba(0, 45, 111, 0.14);
+  color: rgba(214, 238, 255, 0.86);
+  box-sizing: border-box;
+  min-height: 0;
 }
 
 .panel::before {
@@ -146,37 +177,17 @@ const appealEvents = [
   pointer-events: none;
 }
 
-.panel--full {
-  flex: 1;
-  background-size: 100% auto;
-  background-position: top center;
-}
-
-.section {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.section--bottom {
-  margin-top: 20px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(94, 197, 255, 0.16);
-}
-
 .panel-title {
-  height: 42px;
+  position: absolute;
+  left: 28px;
+  top: 18px;
+  height: 54px;
   display: inline-flex;
   align-items: center;
   font-size: 40px;
-  line-height: 2px;
-  margin-top: -10px;
-  margin-left: 30px;
-  font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
   font-style: italic;
   transform: skewX(-10deg);
-  font-weight: bold;
+  font-weight: 800;
   letter-spacing: 2px;
   color: #f8fbff;
   text-shadow:
@@ -187,76 +198,147 @@ const appealEvents = [
     0 0 24px #0f58d1;
 }
 
-.panel-head {
-  display: flex;
+.panel--command {
+  height: 520px;
+}
+
+.panel--task {
+  flex: 1;
+}
+
+.panel--rank {
+  height: 520px;
+}
+
+.command-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.command-item {
+  height: 140px;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.58);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+}
+
+.c-label {
+  font-size: 18px;
+  color: rgba(214, 238, 255, 0.72);
+}
+
+.c-value {
+  font-size: 44px;
+  font-weight: 900;
+  color: rgba(240, 251, 255, 0.96);
+  text-shadow: 0 0 14px rgba(45, 216, 255, 0.2);
+}
+
+.command-line {
+  margin-top: 18px;
+  height: 1px;
+  background: rgba(94, 197, 255, 0.16);
+}
+
+.cmd-list {
+  margin-top: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.cmd-row {
+  height: 62px;
+  display: grid;
+  grid-template-columns: 20px 1fr 110px;
+  gap: 14px;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 6px;
+  padding: 0 16px;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.46);
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
-.tabs {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin: 6px 0 18px;
-}
-.tab {
-  height: 64px;
-  min-width: 300px;
-  padding: 0 26px;
-  border: none;
-  outline: none;
-  background: url('@/assets/img/tabBg.png') no-repeat center;
-  background-size: 100% 100%;
-  background-color: transparent;
-  appearance: none;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 64px;
-  text-align: center;
-  cursor: pointer;
-  opacity: 0.72;
-  filter: saturate(0.85);
-  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 6px #fff,
-    0 0 12px #7cf,
-    0 0 24px #0cf,
-    0 0 40px #00a8ff;
-}
-.tab--active {
-  color: #eaf4ff;
-  opacity: 1;
-  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(57, 213, 255, 0.85);
+  box-shadow: 0 0 12px rgba(45, 216, 255, 0.22);
 }
 
-.panel-chart {
-  flex: 1;
-  min-height: 0;
+.txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
 }
 
-.table {
-  flex: 1;
-  min-height: 0;
+.time {
+  text-align: right;
+  color: rgba(214, 238, 255, 0.72);
+  font-size: 18px;
+}
+
+.task-table {
+  margin-top: 10px;
   display: grid;
   gap: 12px;
-  font-size: 20px;
-  color: rgba(214, 238, 255, 0.84);
-  margin-top: 100px;
 }
 
-.table-row {
+.task-row {
+  height: 64px;
   display: grid;
-  grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr;
+  grid-template-columns: 130px 1fr 120px;
+  gap: 14px;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  background: rgba(6, 18, 48, 0.58);
+  padding: 0 16px;
   border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.58);
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
+.task-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-row--head {
+  background: rgba(20, 30, 75, 0.55);
+  color: rgba(234, 240, 255, 0.95);
+  font-weight: 700;
+}
+
+.st {
+  justify-self: end;
+  font-weight: 800;
+}
+
+.st--run {
+  color: rgba(255, 190, 94, 0.95);
+  text-shadow: 0 0 10px rgba(255, 169, 60, 0.18);
+}
+
+.st--done {
+  color: rgba(92, 255, 178, 0.95);
+  text-shadow: 0 0 10px rgba(34, 255, 154, 0.16);
+}
+
+.rank-box {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 86px;
+  bottom: 18px;
 }
 
 .table-row.head {
