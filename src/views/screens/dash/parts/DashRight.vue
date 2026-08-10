@@ -74,7 +74,9 @@ const props = defineProps<{
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><CategoryProgressChart :data="props.data.componentDistribution" /></div>
+          <div class="panel-chart">
+            <CategoryProgressChart :data="props.data.componentDistribution" />
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +88,10 @@ const props = defineProps<{
             <div class="panel-title">案件数量</div>
           </div>
           <div class="panel-chart">
-            <CaseCountChart :x="props.data.caseCount.x" :y="props.data.caseCount.y" />
+            <CaseCountChart
+              :x="props.data.caseCount.x.slice(0, 5)"
+              :y="props.data.caseCount.y.slice(0, 5)"
+            />
           </div>
         </div>
 

@@ -13,6 +13,9 @@ export const getCityTrafficRoadOverview = <T = CityTrafficPayload>() =>
 export const getCityTrafficPublicTransport = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/public-transport`)
 
+export const getCityTrafficTaxi = <T = CityTrafficPayload>() =>
+  requestData<T>(`${cityTrafficBigscreenBase}/taxi`)
+
 export const getCityTrafficPassengerShip = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/passenger-ship`)
 
@@ -31,6 +34,14 @@ export const getCityTrafficBusLine = <T = CityTrafficPayload>(params?: {
   type?: CityTrafficBusLineType
 }) => requestData<T>(`${cityTrafficBigscreenBase}/bus-line`, { params })
 
+export const getCityTrafficBusLinePage = <T = CityTrafficPayload>(params: {
+  pageNo: number
+  pageSize: number
+}) => requestData<T>(`${cityTrafficBigscreenBase}/bus-line-page`, { params })
+
+export const getCityTrafficBusLineDetail = <T = CityTrafficPayload>(params: { lineNo: string }) =>
+  requestData<T>(`${cityTrafficBigscreenBase}/bus-line-detail`, { params })
+
 export const getCityTrafficCongestion = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/congestion`)
 export const getCityTrafficRoadWarning = <T = CityTrafficPayload>() =>
@@ -43,8 +54,10 @@ export const cityTrafficApi = {
   getParking: getCityTrafficParking,
   getRoadOverview: getCityTrafficRoadOverview,
   getPublicTransport: getCityTrafficPublicTransport,
+  getTaxi: getCityTrafficTaxi,
   getPassengerShip: getCityTrafficPassengerShip,
   getVehicle: getCityTrafficVehicle,
   getGoodsShip: getCityTrafficGoodsShip,
-  getCongestion: getCityTrafficCongestion
+  getCongestion: getCityTrafficCongestion,
+  getBusLinePage: getCityTrafficBusLinePage
 }

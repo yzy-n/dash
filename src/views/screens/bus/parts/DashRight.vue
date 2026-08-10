@@ -43,7 +43,11 @@ const currentGoodsShipSeries = computed(() =>
       <div class="panel">
         <div class="panel-title">出租车</div>
         <div class="panel-chart">
-          <LineChart />
+          <LineChart
+            :x-data="data.taxiXAxis"
+            :taxi-num-data="data.taxiNumData"
+            :passenger-data="data.taxiPassengerData"
+          />
         </div>
       </div>
     </div>

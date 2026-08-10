@@ -1,5 +1,6 @@
 export type BusRouteRow = {
   id: number | string
+  lineNo: string
   name: string
   start: string
   end: string
@@ -7,6 +8,9 @@ export type BusRouteRow = {
 
 export type BusStationRow = {
   name: string
+  lng?: number
+  lat?: number
+  direction?: 'up' | 'down'
 }
 
 export type BusRoadCloseRow = {
@@ -46,6 +50,9 @@ export type BusScreenData = {
   publicTransportXAxis: string[]
   publicTransportPassengerData: number[]
   publicTransportTaxiNumData: number[]
+  taxiXAxis: string[]
+  taxiNumData: number[]
+  taxiPassengerData: number[]
   vehicleInfoXAxis: string[]
   vehicleInfoPrivateData: number[]
   vehicleInfoTotalData: number[]
@@ -118,6 +125,7 @@ export type BusScreenData = {
   routes: BusRouteRow[]
   activeRouteId: number | string
   stations: BusStationRow[]
+  activeBusRunningCount: number
 }
 
 export const createEmptyBusData = (): BusScreenData => ({
@@ -128,6 +136,9 @@ export const createEmptyBusData = (): BusScreenData => ({
   publicTransportXAxis: [],
   publicTransportPassengerData: [],
   publicTransportTaxiNumData: [],
+  taxiXAxis: [],
+  taxiNumData: [],
+  taxiPassengerData: [],
   vehicleInfoXAxis: [],
   vehicleInfoPrivateData: [],
   vehicleInfoTotalData: [],
@@ -191,5 +202,6 @@ export const createEmptyBusData = (): BusScreenData => ({
   congestionList: [],
   routes: [],
   activeRouteId: '',
-  stations: []
+  stations: [],
+  activeBusRunningCount: 0
 })

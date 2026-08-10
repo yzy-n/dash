@@ -22,7 +22,7 @@ export const getCityBigscreenLandArea = <T = CityBigscreenPayload>() =>
 export const getCityBigscreenGrid = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/grid`)
 
-export type CityBigscreenGreenlandType = 1 | 2 | 3
+export type CityBigscreenGreenlandType = 1 | 2 | 3 | 4 | 5
 
 export const getCityBigscreenGreenland = <T = CityBigscreenPayload>(params?: {
   type?: CityBigscreenGreenlandType
@@ -32,7 +32,7 @@ export const getCityBigscreenFull = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/full`)
 
 export const getCityBigscreenEnergy = <T = CityBigscreenPayload>() =>
-  requestData<T>(`${cityBigscreenBase}/energy`)
+  requestData<T>(`${cityBigscreenBase}/street-light`)
 
 export const getCityBigscreenComponentDistribution = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/component-distribution`)

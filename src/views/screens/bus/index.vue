@@ -23,7 +23,7 @@
 
         <section class="body">
           <DashLeft :data="busData" />
-          <DashCenter :data="busData" />
+          <DashCenter :data="busData" @route-change="handleRouteChange" />
           <DashRight :data="busData" />
         </section>
       </div>
@@ -43,6 +43,10 @@ import {
   getCityTrafficCongestion,
   getCityTrafficParking,
   getCityTrafficPublicTransport,
+  getCityTrafficTaxi,
+  getCityTrafficBusLinePage,
+  getCityTrafficBusLineDetail,
+  getCityTrafficBusRealtime,
   getCityTrafficGoodsShip,
   getCityTrafficVehicle,
   getCityTrafficRoadWarning
@@ -224,6 +228,215 @@ const applyPublicTransportSummary = (rawPayload: any) => {
 const loadPublicTransport = async () => {
   const res: any = await getCityTrafficPublicTransport()
   applyPublicTransportSummary(res)
+}
+
+const applyTaxiSummary = (rawPayload: any) => {
+  const payload = rawPayload?.data ?? rawPayload
+  const taxiRoot = payload?.data ?? payload
+  const rows = preferPublishedRows(Array.isArray(taxiRoot?.dataList) ? taxiRoot.dataList : [])
+    .filter((item: any) => item && typeof item === 'object')
+    .filter((item: any) => toStringValue(item.dataStatus) !== 'ITEM_DEL')
+
+  const mapped = sortByLabel(
+    rows
+      .map((item: any) => {
+        const label = toStringValue(item?.month ?? item?.label ?? item?.time ?? item?.date)
+        if (!label) return null
+        const taxiNum = toNumber(item?.taxiNum ?? item?.taxiCount ?? item?.num ?? item?.count)
+        const passengerVolume = toNumber(
+          item?.passengerVolume ?? item?.passengerNum ?? item?.volume ?? item?.passenger
+        )
+        if (taxiNum === undefined && passengerVolume === undefined) return null
+        return {
+          label,
+          taxiNum: taxiNum ?? 0,
+          passengerVolume: passengerVolume ?? 0
+        }
+      })
+      .filter(Boolean) as Array<{ label: string; taxiNum: number; passengerVolume: number }>
+  )
+
+  busData.taxiXAxis = mapped.map((item) => item.label)
+  busData.taxiNumData = mapped.map((item) => item.taxiNum)
+  busData.taxiPassengerData = mapped.map((item) => item.passengerVolume)
+}
+
+const loadTaxi = async () => {
+  const res: any = await getCityTrafficTaxi()
+  applyTaxiSummary(res)
+}
+
+const applyBusLinePageSummary = (rawPayload: any) => {
+  const payload = rawPayload?.data ?? rawPayload
+  const root = payload?.data ?? payload
+  const summary = root?.summary ?? root?.data?.summary ?? payload?.summary ?? payload
+  const rawRows = preferPublishedRows(
+    Array.isArray(summary?.list)
+      ? summary.list
+      : Array.isArray(root?.dataList)
+        ? root.dataList
+        : Array.isArray(payload?.dataList)
+          ? payload.dataList
+          : []
+  )
+    .filter((item: any) => item && typeof item === 'object')
+    .filter((item: any) => toStringValue(item.dataStatus) !== 'ITEM_DEL')
+
+  const rows = rawRows
+    .map((item: any) => {
+      const id = item.id ?? item.lineId ?? item.routeId ?? item.busLineId
+      if (id === undefined || id === null) return null
+      const lineNo = toStringValue(
+        item.lineNo ?? item.lineCode ?? item.lineNum ?? item.lineId ?? item.busLineId
+      )
+      const name = toEllipsis(
+        item.lineName ?? item.name ?? item.lineNo ?? item.lineCode ?? item.routeName,
+        10
+      )
+      const start = toEllipsis(
+        item.start ?? item.startPoint ?? item.startName ?? item.startStation ?? item.origin,
+        8
+      )
+      const end = toEllipsis(
+        item.end ?? item.endPoint ?? item.endName ?? item.endStation ?? item.dest,
+        8
+      )
+      return {
+        id,
+        lineNo,
+        name: name || '-',
+        start: start || '',
+        end: end || ''
+      }
+    })
+    .filter(Boolean) as Array<{
+    id: number | string
+    lineNo: string
+    name: string
+    start: string
+    end: string
+  }>
+
+  busData.routes = rows
+  if (rows.length && !rows.some((item) => item.id === busData.activeRouteId)) {
+    busData.activeRouteId = rows[0].id
+  }
+  const current = rows.find((item) => item.id === busData.activeRouteId)
+  if (current?.lineNo) {
+    loadBusLineDetail(current.lineNo)
+  }
+  updateActiveBusRunningCount()
+}
+
+const loadBusLinePage = async () => {
+  const res: any = await getCityTrafficBusLinePage({ pageNo: 1, pageSize: 50 })
+  applyBusLinePageSummary(res)
+}
+
+const getBusRealtimeList = (rawPayload: any) => {
+  const payload = rawPayload?.data ?? rawPayload
+  return Array.isArray(payload?.summary?.list)
+    ? payload.summary.list
+    : Array.isArray(payload?.dataList)
+      ? payload.dataList
+      : Array.isArray(payload?.list)
+        ? payload.list
+        : Array.isArray(payload?.rows)
+          ? payload.rows
+          : Array.isArray(payload)
+            ? payload
+            : []
+}
+
+const matchRealtimeBusToLine = (item: any, lineNo: string, routeName: string) => {
+  const idText = toStringValue(
+    item?.lineNo ??
+      item?.lineCode ??
+      item?.lineNum ??
+      item?.busLineNo ??
+      item?.routeNo ??
+      item?.routeId ??
+      item?.lineId
+  )
+  const nameText = toStringValue(item?.lineName ?? item?.routeName ?? item?.name ?? item?.line)
+  if (lineNo && (idText === lineNo || nameText.includes(lineNo))) return true
+  if (routeName && nameText.includes(routeName)) return true
+  return false
+}
+
+const updateActiveBusRunningCount = async () => {
+  const current = busData.routes.find((item) => item.id === busData.activeRouteId)
+  const lineNo = toStringValue(current?.lineNo)
+  const routeName = toStringValue(current?.name)
+
+  if (!lineNo && !routeName) {
+    busData.activeBusRunningCount = 0
+    return
+  }
+
+  try {
+    const res: any = await getCityTrafficBusRealtime({ pageNo: 1, pageSize: 200 })
+    const list = getBusRealtimeList(res).filter((row: any) => row && typeof row === 'object')
+    const hasIdentifier = list.some((row: any) =>
+      Boolean(
+        row?.lineNo ||
+        row?.lineCode ||
+        row?.lineNum ||
+        row?.busLineNo ||
+        row?.routeName ||
+        row?.lineName ||
+        row?.routeNo
+      )
+    )
+    const matched = list.filter((row: any) => matchRealtimeBusToLine(row, lineNo, routeName))
+    busData.activeBusRunningCount = hasIdentifier ? matched.length : list.length
+  } catch {
+    busData.activeBusRunningCount = 0
+  }
+}
+
+const applyBusLineDetailSummary = (rawPayload: any) => {
+  const payload = rawPayload?.data ?? rawPayload
+  const root = payload?.data ?? payload
+  const summary = root?.summary ?? root?.data?.summary ?? payload?.summary ?? payload
+  const upStations = Array.isArray(summary?.upStations) ? summary.upStations : []
+  const downStations = Array.isArray(summary?.downStations) ? summary.downStations : []
+
+  const mapStations = (rows: any[], direction: 'up' | 'down') =>
+    rows
+      .filter((item: any) => item && typeof item === 'object')
+      .filter((item: any) => toStringValue(item.dataStatus) !== 'ITEM_DEL')
+      .map((item: any) => {
+        const name = toStringValue(item.stationName ?? item.name ?? item.station ?? item.title)
+        const lng = toNumber(item.lng ?? item.lon ?? item.longitude)
+        const lat = toNumber(item.lat ?? item.latitude)
+        if (!name) return null
+        return { name, lng, lat, direction }
+      })
+      .filter(Boolean) as Array<{
+      name: string
+      lng?: number
+      lat?: number
+      direction: 'up' | 'down'
+    }>
+
+  busData.stations = [...mapStations(upStations, 'up'), ...mapStations(downStations, 'down')]
+}
+
+async function loadBusLineDetail(lineNo: string) {
+  if (!lineNo) return
+  const res: any = await getCityTrafficBusLineDetail({ lineNo })
+  applyBusLineDetailSummary(res)
+}
+
+const handleRouteChange = async (route: any) => {
+  busData.activeRouteId = route.id
+  busData.stations = []
+  busData.activeBusRunningCount = 0
+  try {
+    await loadBusLineDetail(String(route.lineNo || ''))
+  } catch {}
+  updateActiveBusRunningCount()
 }
 
 const applyGoodsShipSummary = (rawPayload: any, type: 1 | 2 | 3) => {
@@ -524,6 +737,7 @@ const loadCongestion = async () => {
 const now = ref(new Date())
 
 let timer: number | undefined
+let busRealtimeTimer: number | undefined
 
 onMounted(() => {
   timer = window.setInterval(() => {
@@ -531,15 +745,22 @@ onMounted(() => {
   }, 1000)
   loadParking()
   loadPublicTransport()
+  loadTaxi()
+  loadBusLinePage()
   loadGoodsShip(1)
   loadGoodsShip(2)
   loadVehicle()
   loadRoadWarning()
   loadCongestion()
+  updateActiveBusRunningCount()
+  busRealtimeTimer = window.setInterval(() => {
+    updateActiveBusRunningCount()
+  }, 5000)
 })
 
 onBeforeUnmount(() => {
   if (timer) window.clearInterval(timer)
+  if (busRealtimeTimer) window.clearInterval(busRealtimeTimer)
 })
 
 const timeText = computed(() => {

@@ -1,10 +1,64 @@
 <script setup lang="ts">
-import BusMap from './busMap.vue'
-import type { BusScreenData } from '../types'
+import { computed, ref, toRef, watch } from 'vue'
 
-defineProps<{
+import BusMap from './busMap.vue'
+import type { BusRouteRow, BusScreenData } from '../types'
+
+const props = defineProps<{
   data: BusScreenData
 }>()
+
+const data = toRef(props, 'data')
+
+const emit = defineEmits<{
+  (e: 'route-change', route: BusRouteRow): void
+}>()
+
+const routeName = computed(
+  () => data.value.routes.find((item) => item.id === data.value.activeRouteId)?.name || '-'
+)
+
+const upStations = computed(() => data.value.stations.filter((item) => item.direction === 'up'))
+const downStations = computed(() => data.value.stations.filter((item) => item.direction === 'down'))
+const hasBothDirection = computed(
+  () => upStations.value.length > 0 && downStations.value.length > 0
+)
+
+const directionTab = ref<'up' | 'down'>('up')
+
+watch(
+  () => [upStations.value.length, downStations.value.length] as const,
+  ([upLen, downLen]) => {
+    if (!upLen && downLen) directionTab.value = 'down'
+    if (!downLen && upLen) directionTab.value = 'up'
+  },
+  { immediate: true }
+)
+
+const selectedDirection = computed(() => {
+  if (directionTab.value === 'up' && upStations.value.length) return 'up'
+  if (directionTab.value === 'down' && downStations.value.length) return 'down'
+  return upStations.value.length ? 'up' : 'down'
+})
+
+const currentStations = computed(() =>
+  selectedDirection.value === 'down' ? downStations.value : upStations.value
+)
+
+const mapStations = computed(() => {
+  if (hasBothDirection.value) return currentStations.value
+  return data.value.stations
+})
+
+const firstLastStationText = computed(() => {
+  const list = currentStations.value
+  if (!list.length) return '-'
+  const start = list[0]?.name || '-'
+  const end = list[list.length - 1]?.name || '-'
+  return `${start} → ${end}`
+})
+
+const firstLastTimeText = computed(() => '-')
 </script>
 
 <template>
@@ -17,6 +71,7 @@ defineProps<{
             :key="item.id"
             class="route-item"
             :class="{ active: item.id === data.activeRouteId }"
+            @click="emit('route-change', item)"
           >
             <span>{{ item.name }}</span>
             <span>{{ item.start }}</span>
@@ -31,18 +86,61 @@ defineProps<{
 
         <div class="map-box">
           <div class="map-caption">鞍山市</div>
-          <div class="map-chart"><BusMap /></div>
+          <div class="map-chart"><BusMap :stations="mapStations" /></div>
         </div>
 
         <div class="station-panel">
-          <div class="title">
-            {{ data.routes.find((item) => item.id === data.activeRouteId)?.name || '-' }}
+          <div class="station-head">
+            <span class="station-head-name">{{ routeName }}</span>
+            <span style="font-size: 22px; margin-left: 12px">正在运行</span>
+            <span class="station-head-num">{{ data.activeBusRunningCount }}</span>
+            <span style="font-size: 22px">辆公交车</span>
           </div>
 
-          <div v-for="station in data.stations" :key="station.name" class="station-item">
-            ● {{ station.name }}
+          <div v-if="hasBothDirection" class="station-tabs">
+            <button
+              type="button"
+              class="station-tab"
+              :class="{ 'station-tab--active': selectedDirection === 'up' }"
+              @click="directionTab = 'up'"
+            >
+              上行
+            </button>
+            <button
+              type="button"
+              class="station-tab"
+              :class="{ 'station-tab--active': selectedDirection === 'down' }"
+              @click="directionTab = 'down'"
+            >
+              下行
+            </button>
           </div>
-          <div v-if="!data.stations.length" class="station-item">暂无数据</div>
+
+          <div class="station-card">
+            <template v-if="currentStations.length">
+              <div class="station-meta">
+                <div class="meta-row">
+                  <span class="meta-label">首末站:</span>
+                  <span class="meta-value">{{ firstLastStationText }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">首末班时间:</span>
+                  <span class="meta-value">{{ firstLastTimeText }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">站点（{{ currentStations.length }}个）:</span>
+                </div>
+              </div>
+
+              <div class="station-list">
+                <div v-for="station in currentStations" :key="station.name" class="station-node">
+                  <span class="node-dot"></span>
+                  <span class="node-name">{{ station.name }}</span>
+                </div>
+              </div>
+            </template>
+            <div v-else class="station-empty">暂无数据</div>
+          </div>
         </div>
       </div>
     </div>
@@ -140,7 +238,7 @@ defineProps<{
   top: 24px;
   bottom: 24px;
   z-index: 3;
-  width: 320px;
+  width: 420px;
   padding: 18px 20px;
   border: 1px solid rgba(84, 188, 255, 0.18);
   background: linear-gradient(180deg, rgba(6, 27, 72, 0.72), rgba(4, 16, 44, 0.66));
@@ -171,6 +269,7 @@ defineProps<{
   color: #b8e9ff;
   padding: 0 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
 }
 
 .route-item.active {
@@ -213,26 +312,163 @@ defineProps<{
 }
 
 .title {
-  height: 56px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  margin-bottom: 12px;
-  color: #e8f7ff;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  border: 1px solid rgba(84, 188, 255, 0.18);
-  background: rgba(8, 36, 88, 0.46);
-  border-radius: 12px;
+  display: none;
 }
 
-.station-item {
-  color: #ccefff;
-  height: 52px;
+.station-panel {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.station-head {
+  height: 58px;
   display: flex;
   align-items: center;
-  border-left: 2px solid #00c3ff;
-  padding-left: 20px;
+  gap: 10px;
+  padding: 0 18px;
+  font-size: 28px;
+  font-weight: 800;
+  color: rgba(240, 252, 255, 0.95);
+  letter-spacing: 1px;
+  border: 1px solid rgba(84, 188, 255, 0.22);
+  background: rgba(8, 36, 88, 0.46);
+  border-radius: 14px;
+  box-shadow: inset 0 0 18px rgba(34, 121, 255, 0.12);
+}
+
+.station-head-name {
+  flex: 0 0 auto;
+}
+
+.station-head-num {
+  color: rgba(255, 205, 140, 0.98);
+  text-shadow: 0 0 14px rgba(255, 188, 64, 0.22);
+}
+
+.station-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.station-tab {
+  width: 120px;
+  height: 44px;
+  border: 1px solid rgba(84, 188, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(6, 27, 72, 0.65);
+  color: rgba(214, 238, 255, 0.75);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: inset 0 0 20px rgba(34, 121, 255, 0.1);
+}
+
+.station-tab--active {
+  color: #eaf4ff;
+  background: radial-gradient(circle at 30% 30%, rgba(84, 188, 255, 0.35), rgba(6, 27, 72, 0.62));
+  border-color: rgba(124, 242, 255, 0.42);
+  box-shadow:
+    inset 0 0 26px rgba(54, 232, 255, 0.18),
+    0 0 14px rgba(54, 232, 255, 0.14);
+}
+
+.station-card {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgba(84, 188, 255, 0.18);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(6, 27, 72, 0.68), rgba(4, 16, 44, 0.62));
+  box-shadow:
+    inset 0 0 30px rgba(34, 121, 255, 0.08),
+    0 0 24px rgba(0, 45, 111, 0.14);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.station-meta {
+  display: grid;
+  gap: 10px;
+  color: rgba(214, 238, 255, 0.82);
+  font-size: 22px;
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.meta-label {
+  color: rgba(214, 238, 255, 0.72);
+  width: 220px;
+}
+
+.meta-value {
+  color: rgba(234, 244, 255, 0.95);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.station-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 0 4px;
+  position: relative;
+}
+
+.station-list::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(54, 232, 255, 0.35);
+}
+
+.station-node {
+  position: relative;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
+  color: rgba(224, 246, 255, 0.92);
+  font-size: 22px;
+}
+
+.node-dot {
+  position: absolute;
+  left: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(54, 232, 255, 0.9);
+  box-shadow: 0 0 12px rgba(54, 232, 255, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.node-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.station-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(214, 238, 255, 0.7);
+  font-size: 24px;
 }
 </style>

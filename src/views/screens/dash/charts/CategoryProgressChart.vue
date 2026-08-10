@@ -47,7 +47,7 @@ const option = computed(() => {
       {
         type: 'bar',
         data: data.map((d) => d.value),
-        barWidth: 10,
+        barWidth: 50,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {

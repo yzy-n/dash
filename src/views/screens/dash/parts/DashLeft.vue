@@ -15,16 +15,18 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'greenland-metric-change', type: 1 | 2 | 3): void
-  (e: 'greenland-trend-change', type: 1 | 2 | 3): void
+  (e: 'greenland-trend-change', type: 4 | 5): void
   (e: 'sanitation-type-change', type: 1 | 2 | 3): void
 }>()
+
+type TrendKey = 'cover' | 'garden'
 
 const greeningTabs: Array<{ key: MetricKey; label: string }> = [
   { key: 'cover', label: '绿化覆盖面积' },
   { key: 'garden', label: '园林绿地面积' },
   { key: 'park', label: '公园占地面积' }
 ]
-const greeningTabs2: Array<{ key: MetricKey; label: string }> = [
+const greeningTabs2: Array<{ key: TrendKey; label: string }> = [
   { key: 'cover', label: '人均绿地面积' },
   { key: 'garden', label: '建成区绿地面积' }
 ]
@@ -38,7 +40,7 @@ const greeningTabs4: Array<{ key: MetricKey; label: string }> = [
   { key: 'garden', label: '修建中口袋公园' }
 ]
 const activeGreeningTab = ref<MetricKey>('cover')
-const activeTrendTab = ref<MetricKey>('cover')
+const activeTrendTab = ref<TrendKey>('cover')
 const activeSanitationTab = ref<MetricKey>('cover')
 const activeParkTab = ref<MetricKey>('cover')
 
@@ -48,14 +50,19 @@ const metricToGreenlandType: Record<MetricKey, 1 | 2 | 3> = {
   park: 3
 }
 
+const trendMetricToGreenlandType: Record<TrendKey, 4 | 5> = {
+  cover: 4,
+  garden: 5
+}
+
 const handleGreeningTabClick = (key: MetricKey) => {
   activeGreeningTab.value = key
   emit('greenland-metric-change', metricToGreenlandType[key])
 }
 
-const handleTrendTabClick = (key: MetricKey) => {
+const handleTrendTabClick = (key: TrendKey) => {
   activeTrendTab.value = key
-  emit('greenland-trend-change', metricToGreenlandType[key])
+  emit('greenland-trend-change', trendMetricToGreenlandType[key])
 }
 
 const handleSanitationTabClick = (key: MetricKey) => {

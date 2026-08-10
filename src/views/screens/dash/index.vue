@@ -283,8 +283,8 @@ const formatDate = (value: unknown) => {
   return toStringValue(value)
 }
 
-const greenlandTypeToMetricKey = (type: 1 | 2 | 3) => {
-  if (type === 2) return 'garden'
+const greenlandTypeToMetricKey = (type: 1 | 2 | 3 | 4 | 5) => {
+  if (type === 2 || type === 5) return 'garden'
   if (type === 3) return 'park'
   return 'cover'
 }
@@ -303,7 +303,7 @@ const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
   dashData.greeningMetrics[key] = buildTimeMetric(rows, nameMap[key])
 }
 
-const loadGreenlandTrend = async (type: 1 | 2 | 3 = 1) => {
+const loadGreenlandTrend = async (type: 4 | 5 = 4) => {
   const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
   const key = greenlandTypeToMetricKey(type)
   const rows = preferPublishedRows(getDataList(payload))
@@ -313,12 +313,18 @@ const loadGreenlandTrend = async (type: 1 | 2 | 3 = 1) => {
 
   const x = rows.map((item) => String(item.year))
   const y = rows.map((item) => toNumber(item.area ?? item.num ?? item.value) ?? 0)
+  const seriesName =
+    type === 4
+      ? '人均绿地面积'
+      : type === 5
+        ? '建成区绿地面积'
+        : dashData.greeningMetrics[key]?.name || ''
 
   dashData.greenlandTrend = {
     x,
     series: [
       {
-        name: dashData.greeningMetrics[key]?.name || '',
+        name: seriesName,
         data: y,
         color: '#36e8ff'
       }
@@ -383,25 +389,16 @@ const loadLandArea = async () => {
 
 const loadEnergy = async () => {
   const payload = await getCityBigscreenEnergy<UnknownRecord>()
-  const rows = preferPublishedRows(getDataList(payload))
-  const latest = rows[rows.length - 1]
-  if (!isRecord(latest)) {
-    dashData.energyItems = []
-    return
-  }
+  const rows = preferPublishedRows(getDataList(payload)).filter((item) => isRecord(item))
+  const colors = ['#caa822', '#10b98c', '#2563eb']
 
-  const mapping = [
-    { key: 'length', label: '安装路灯道路长度', color: '#2563eb' },
-    { key: 'lamp', label: '道路照明灯盏数', color: '#caa822' },
-    { key: 'powerAmount', label: '城市照明装灯总功率', color: '#10b98c' },
-    { key: 'powerRate', label: '城市照明总用电量', color: '#6c42d8' }
-  ]
-
-  dashData.energyItems = mapping
-    .map((item) => {
-      const value = toNumber(latest[item.key])
+  dashData.energyItems = rows
+    .slice(0, 3)
+    .map((item, index) => {
+      const value = toNumber(item.lamp)
       if (value === undefined) return null
-      return { name: item.label, value, color: item.color }
+      const name = toStringValue(item.id) || String(index + 1)
+      return { name, value, color: colors[index % colors.length] }
     })
     .filter((item): item is DashScreenData['energyItems'][number] => Boolean(item))
 }
@@ -542,7 +539,7 @@ const loadDashScreen = async () => {
 
   const results = await Promise.allSettled([
     loadGreenlandMetric(1),
-    loadGreenlandTrend(1),
+    loadGreenlandTrend(4),
     loadSanitationMetric(1),
     loadPark(),
     loadLandArea(),
@@ -566,7 +563,7 @@ const handleGreenlandMetricTypeChange = async (type: 1 | 2 | 3) => {
   } catch {}
 }
 
-const handleGreenlandTrendTypeChange = async (type: 1 | 2 | 3) => {
+const handleGreenlandTrendTypeChange = async (type: 4 | 5) => {
   try {
     await loadGreenlandTrend(type)
   } catch {}

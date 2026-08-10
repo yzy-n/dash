@@ -1,13 +1,26 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { getCityTrafficBusRealtime } from '@/api/citytraffic'
+import stationUpIconUrl from '@/assets/img/bus-stop.svg'
+import stationDownIconUrl from '@/assets/img/bus-stop-down.svg'
+import busIconUrl from '@/assets/img/bus-realtime.svg'
+
+const props = withDefaults(
+  defineProps<{
+    stations?: Array<{ name: string; lng?: number; lat?: number; direction?: 'up' | 'down' }>
+  }>(),
+  {
+    stations: () => []
+  }
+)
 
 const mapRef = ref<HTMLDivElement | null>(null)
 
 let map: AMap.Map | null = null
 let geoLayer: AMap.Polygon[] = []
 let busLayer: any[] = []
+let stationLayer: any[] = []
 let AMapGlobal: typeof AMap | null = null
 let loadPromise: Promise<typeof AMap | null> | null = null
 const loadError = ref('')
@@ -92,6 +105,94 @@ const clearBusLayer = () => {
   busLayer = []
 }
 
+const clearStationLayer = () => {
+  if (!map || !stationLayer.length) return
+  map.remove(stationLayer)
+  stationLayer = []
+}
+
+const renderStations = () => {
+  if (!map || !AMapGlobal) return
+  const source = props.stations || []
+  const upPoints = source
+    .filter((item) => item?.direction === 'up' || !item?.direction)
+    .map((item) => resolveBusLngLat(item))
+    .filter(Boolean) as [number, number][]
+  const downPoints = source
+    .filter((item) => item?.direction === 'down')
+    .map((item) => resolveBusLngLat(item))
+    .filter(Boolean) as [number, number][]
+
+  const overlays: any[] = []
+
+  if (upPoints.length >= 2) {
+    overlays.push(
+      new (AMapGlobal as any).Polyline({
+        path: upPoints,
+        strokeColor: '#ffbc40',
+        strokeOpacity: 0.9,
+        strokeWeight: 5,
+        zIndex: 260
+      })
+    )
+  }
+
+  if (downPoints.length >= 2) {
+    overlays.push(
+      new (AMapGlobal as any).Polyline({
+        path: downPoints,
+        strokeColor: '#36e8ff',
+        strokeOpacity: 0.9,
+        strokeWeight: 5,
+        zIndex: 259
+      })
+    )
+  }
+
+  const upIcon = new (AMapGlobal as any).Icon({
+    image: stationUpIconUrl,
+    size: new (AMapGlobal as any).Size(34, 34),
+    imageSize: new (AMapGlobal as any).Size(34, 34)
+  })
+
+  const downIcon = new (AMapGlobal as any).Icon({
+    image: stationDownIconUrl,
+    size: new (AMapGlobal as any).Size(34, 34),
+    imageSize: new (AMapGlobal as any).Size(34, 34)
+  })
+
+  overlays.push(
+    ...(upPoints.map(
+      (lngLat) =>
+        new (AMapGlobal as any).Marker({
+          position: lngLat,
+          icon: upIcon,
+          offset: new (AMapGlobal as any).Pixel(-17, -34),
+          zIndex: 300
+        })
+    ) as any[])
+  )
+
+  overlays.push(
+    ...(downPoints.map(
+      (lngLat) =>
+        new (AMapGlobal as any).Marker({
+          position: lngLat,
+          icon: downIcon,
+          offset: new (AMapGlobal as any).Pixel(-17, -34),
+          zIndex: 299
+        })
+    ) as any[])
+  )
+
+  clearStationLayer()
+  stationLayer = overlays
+  if (stationLayer.length) {
+    map.add(stationLayer)
+    map.setFitView(stationLayer, false, [140, 140, 140, 140], 14)
+  }
+}
+
 const renderBusRealtime = async () => {
   if (!map || !AMapGlobal) return
   try {
@@ -109,19 +210,21 @@ const renderBusRealtime = async () => {
               ? payload
               : []
 
+    const icon = new (AMapGlobal as any).Icon({
+      image: busIconUrl,
+      size: new (AMapGlobal as any).Size(28, 28),
+      imageSize: new (AMapGlobal as any).Size(28, 28)
+    })
+
     const overlays = list
       .map((item: any) => {
         const lngLat = resolveBusLngLat(item)
         if (!lngLat) return null
-        return new (AMapGlobal as any).CircleMarker({
-          center: lngLat,
-          radius: 5,
-          fillColor: '#36e8ff',
-          fillOpacity: 0.9,
-          strokeColor: '#ffffff',
-          strokeWeight: 1,
-          strokeOpacity: 0.9,
-          zIndex: 200
+        return new (AMapGlobal as any).Marker({
+          position: lngLat,
+          icon,
+          offset: new (AMapGlobal as any).Pixel(-14, -28),
+          zIndex: 220
         })
       })
       .filter(Boolean) as any[]
@@ -220,6 +323,7 @@ const initMap = async () => {
 
 onMounted(async () => {
   await initMap()
+  renderStations()
   await renderBusRealtime()
   busTimer = window.setInterval(() => {
     renderBusRealtime()
@@ -229,11 +333,20 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   if (busTimer) window.clearInterval(busTimer)
   clearBusLayer()
+  clearStationLayer()
   if (map) {
     map.destroy()
     map = null
   }
 })
+
+watch(
+  () => props.stations,
+  () => {
+    renderStations()
+  },
+  { deep: true }
+)
 </script>
 
 <template>
