@@ -1,99 +1,213 @@
 <template>
   <div class="left-wrap">
-    <section class="panel panel--resource">
-      <div class="panel-title">应急资源</div>
-      <div class="resource-grid">
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--a"></span>
-          <div class="resource-label">{{ resourceStats[0].label }}</div>
-          <div class="resource-value">{{ resourceStats[0].value }}</div>
+    <section class="panel panel--command">
+      <div class="panel-title">指挥体系</div>
+      <div class="command-tabs">
+        <button type="button" class="command-tab command-tab--active">发布预警</button>
+        <button type="button" class="command-tab">应急响应</button>
+        <button type="button" class="command-tab">监测处置</button>
+      </div>
+      <div class="command-flow">
+        <div class="command-layer command-layer--top">
+          <div class="flow-node flow-node--left">
+            <span class="flow-icon flow-icon--bell"></span>
+            <div class="flow-text">
+              <div class="flow-name">检测预警</div>
+              <div class="flow-sub">应急预警响应</div>
+            </div>
+          </div>
+          <div class="flow-node flow-node--mid">
+            <span class="flow-icon flow-icon--cloud"></span>
+            <div class="flow-text">
+              <div class="flow-name">预警信息</div>
+              <div class="flow-sub">发布预警指令</div>
+            </div>
+          </div>
+          <div class="flow-node flow-node--right">
+            <span class="flow-icon flow-icon--doc"></span>
+            <div class="flow-text">
+              <div class="flow-name">应急处置</div>
+              <div class="flow-sub">协同联动处置</div>
+            </div>
+          </div>
         </div>
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--b"></span>
-          <div class="resource-label">{{ resourceStats[1].label }}</div>
-          <div class="resource-value">{{ resourceStats[1].value }}</div>
-        </div>
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--c"></span>
-          <div class="resource-label">{{ resourceStats[2].label }}</div>
-          <div class="resource-value">{{ resourceStats[2].value }}</div>
-        </div>
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--d"></span>
-          <div class="resource-label">{{ resourceStats[3].label }}</div>
-          <div class="resource-value">{{ resourceStats[3].value }}</div>
-        </div>
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--e"></span>
-          <div class="resource-label">{{ resourceStats[4].label }}</div>
-          <div class="resource-value">{{ resourceStats[4].value }}</div>
-        </div>
-        <div class="resource-item">
-          <span class="resource-icon resource-icon--f"></span>
-          <div class="resource-label">{{ resourceStats[5].label }}</div>
-          <div class="resource-value">{{ resourceStats[5].value }}</div>
+        <div class="command-layer command-layer--bottom">
+          <div class="flow-pill flow-pill--a">市应急指挥中心</div>
+          <div class="flow-pill flow-pill--b">应急救援队伍</div>
+          <div class="flow-pill flow-pill--c">应急物资库</div>
+          <div class="flow-pill flow-pill--d">社会力量</div>
+          <div class="flow-pill flow-pill--e">医疗保障</div>
+          <div class="flow-pill flow-pill--f">交通保障</div>
+          <div class="flow-pill flow-pill--g">通信保障</div>
         </div>
       </div>
     </section>
 
-    <section class="panel panel--risk">
-      <div class="panel-title">风险隐患</div>
-      <div class="table">
-        <div class="table-row table-row--head">
-          <span>点位</span>
-          <span>类型</span>
-          <span>等级</span>
+    <section class="panel panel--rescue">
+      <div class="panel-title">应急救援</div>
+      <div class="rescue-grid">
+        <div class="rescue-team">
+          <div class="team-grid">
+            <div class="team-panel">
+              <div class="team-panel-head">
+                <div class="team-panel-title">应急救援队伍</div>
+              </div>
+              <div class="team-stats">
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--a"></span>
+                  <span class="stat-label">应急救援队伍</span>
+                  <span class="stat-value">13</span>
+                  <span class="stat-unit">个</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--b"></span>
+                  <span class="stat-label">队伍总数</span>
+                  <span class="stat-value">47</span>
+                  <span class="stat-unit">支</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--c"></span>
+                  <span class="stat-label">人员总数</span>
+                  <span class="stat-value">3122</span>
+                  <span class="stat-unit">人</span>
+                </div>
+              </div>
+              <div class="team-tag">医疗卫生</div>
+              <div class="team-list">
+                <div class="team-row">鞍山市矿山救护大队</div>
+                <div class="team-row">鞍山市红十字医疗救援队</div>
+                <div class="team-row">鞍山市应急管理局综合救援队</div>
+                <div class="team-row">鞍山市消防救援支队</div>
+              </div>
+            </div>
+
+            <div class="team-panel">
+              <div class="team-panel-head">
+                <div class="team-panel-title">公益救援队伍</div>
+              </div>
+              <div class="team-stats">
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--a"></span>
+                  <span class="stat-label">公益救援队伍</span>
+                  <span class="stat-value">6</span>
+                  <span class="stat-unit">个</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--b"></span>
+                  <span class="stat-label">队伍总数</span>
+                  <span class="stat-value">6</span>
+                  <span class="stat-unit">支</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon stat-icon--c"></span>
+                  <span class="stat-label">人员总数</span>
+                  <span class="stat-value">110</span>
+                  <span class="stat-unit">人</span>
+                </div>
+              </div>
+              <div class="team-tag">医疗卫生</div>
+              <div class="team-list">
+                <div class="team-row">鞍山市红十字医疗救援队</div>
+                <div class="team-row">鞍山市红十字救护救援队</div>
+                <div class="team-row team-row--empty"></div>
+                <div class="team-row team-row--empty"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="table-row">
-          <span>{{ riskRows[0].name }}</span>
-          <span>{{ riskRows[0].type }}</span>
-          <span class="lvl lvl--high">{{ riskRows[0].level }}</span>
-        </div>
-        <div class="table-row">
-          <span>{{ riskRows[1].name }}</span>
-          <span>{{ riskRows[1].type }}</span>
-          <span class="lvl lvl--mid">{{ riskRows[1].level }}</span>
-        </div>
-        <div class="table-row">
-          <span>{{ riskRows[2].name }}</span>
-          <span>{{ riskRows[2].type }}</span>
-          <span class="lvl lvl--mid">{{ riskRows[2].level }}</span>
-        </div>
-        <div class="table-row">
-          <span>{{ riskRows[3].name }}</span>
-          <span>{{ riskRows[3].type }}</span>
-          <span class="lvl lvl--low">{{ riskRows[3].level }}</span>
-        </div>
-        <div class="table-row">
-          <span>{{ riskRows[4].name }}</span>
-          <span>{{ riskRows[4].type }}</span>
-          <span class="lvl lvl--low">{{ riskRows[4].level }}</span>
+
+        <div class="rescue-material">
+          <div class="material-head">
+            <div class="material-title">应急救援物资</div>
+            <div class="material-tabs">
+              <button type="button" class="material-tab material-tab--active">救灾物资</button>
+              <button type="button" class="material-tab">医疗防疫物资</button>
+            </div>
+          </div>
+          <div class="material-table">
+            <div class="material-row material-row--head">
+              <span>物资名称</span>
+              <span class="material-row-qty">物资数量</span>
+            </div>
+            <div class="material-row">
+              <span>救灾帐篷</span>
+              <span class="material-row-qty"><strong>2</strong><em>顶</em></span>
+            </div>
+            <div class="material-row">
+              <span>折叠床</span>
+              <span class="material-row-qty"><strong>756</strong><em>张</em></span>
+            </div>
+            <div class="material-row">
+              <span>棉被</span>
+              <span class="material-row-qty"><strong>4</strong><em>套</em></span>
+            </div>
+            <div class="material-row">
+              <span>棉褥</span>
+              <span class="material-row-qty"><strong>5904</strong><em>条</em></span>
+            </div>
+            <div class="material-row">
+              <span>棉裤</span>
+              <span class="material-row-qty"><strong>4054</strong><em>条</em></span>
+            </div>
+            <div class="material-row">
+              <span>毛巾被</span>
+              <span class="material-row-qty"><strong>1940</strong><em>条</em></span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="panel panel--trend">
-      <div class="panel-title">监测预警</div>
-      <div class="trend-body">
-        <div class="trend-left">
-          <EChart :option="typeOption" />
-        </div>
-        <div class="trend-right">
-          <EChart :option="trendOption" />
+    <section class="panel panel--places">
+      <div class="panel-title">应急场所</div>
+      <div class="places-body">
+        <div class="places-map">
+          <svg class="places-svg" viewBox="0 0 520 340" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M125 48 L168 35 L222 46 L254 30 L292 46 L322 82 L356 106 L390 146 L409 186 L386 218 L356 252 L332 288 L294 304 L262 330 L228 322 L200 300 L172 292 L142 260 L118 228 L96 200 L84 160 L96 126 L112 98 Z"
+              fill="rgba(124,242,255,0.18)"
+              stroke="rgba(124,242,255,0.65)"
+              stroke-width="3"
+            />
+            <path
+              d="M160 112 L196 96 L232 116 L260 98 L290 116 L316 150 L294 182 L268 208 L236 196 L210 170 L180 166 L150 140 Z"
+              fill="rgba(0,160,255,0.12)"
+              stroke="rgba(54,232,255,0.32)"
+              stroke-width="2"
+            />
+          </svg>
+          <div class="place-marker place-marker--a"><span></span></div>
+          <div class="place-marker place-marker--b"><span></span></div>
+          <div class="place-marker place-marker--c"><span></span></div>
+          <div class="place-marker place-marker--d"><span></span></div>
+          <div class="place-marker place-marker--e"><span></span></div>
+          <div class="place-marker place-marker--f"><span></span></div>
+          <div class="place-marker place-marker--g"><span></span></div>
+          <div class="place-marker place-marker--h"><span></span></div>
+          <div class="place-marker place-marker--i"><span></span></div>
+          <div class="place-marker place-marker--j"><span></span></div>
+          <div class="place-marker place-marker--k"><span></span></div>
+          <div class="place-marker place-marker--l"><span></span></div>
         </div>
       </div>
-      <div class="trend-foot">
-        <div class="foot-item">
-          <div class="foot-label">今日预警</div>
-          <div class="foot-value">18</div>
-        </div>
-        <div class="foot-item">
-          <div class="foot-label">处置中</div>
-          <div class="foot-value">6</div>
-        </div>
-        <div class="foot-item">
-          <div class="foot-label">已闭环</div>
-          <div class="foot-value">52</div>
+    </section>
+
+    <section class="panel panel--fund">
+      <div class="panel-title">资金保障</div>
+      <div class="fund-body">
+        <div class="fund-split">
+          <div class="fund-box">
+            <div class="fund-box-title">收入</div>
+            <div class="fund-box-chart">
+              <EChart :option="fundIncomeOption" />
+            </div>
+          </div>
+          <div class="fund-box">
+            <div class="fund-box-title">支出</div>
+            <div class="fund-box-chart">
+              <EChart :option="fundExpenseOption" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -104,94 +218,118 @@
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 
-const resourceStats = [
-  { label: '应急队伍', value: '128' },
-  { label: '物资仓库', value: '36' },
-  { label: '避难场所', value: '52' },
-  { label: '监测点位', value: '214' },
-  { label: '应急车辆', value: '76' },
-  { label: '专家库', value: '43' }
-]
+type FundGraphNode = {
+  id: string
+  label: string
+  valueText: string
+  size: number
+  color: string
+}
 
-const riskRows = [
-  { name: '西部山体滑坡点', type: '地质灾害', level: '高' },
-  { name: '沿河低洼易涝区', type: '内涝', level: '中' },
-  { name: '化工园区', type: '危化品', level: '中' },
-  { name: '老旧小区燃气', type: '消防', level: '低' },
-  { name: '山区道路结冰', type: '道路', level: '低' }
-]
+type FundGraphLink = {
+  source: string
+  target: string
+}
 
-const typeOption = computed(() => {
+const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: FundGraphLink[]) => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
     series: [
       {
-        type: 'pie',
-        radius: ['58%', '78%'],
-        center: ['50%', '50%'],
+        type: 'graph',
+        layout: 'force',
+        roam: false,
         silent: true,
-        itemStyle: { borderColor: 'rgba(0,0,0,0)', borderWidth: 0 },
-        label: {
-          show: true,
-          color: 'rgba(214, 238, 255, 0.86)',
-          fontSize: 18,
-          formatter: (p: any) => `${p.name}\n${p.percent.toFixed(0)}%`
+        draggable: false,
+        center: ['50%', '50%'],
+        zoom: 1.2,
+        edgeSymbol: ['none', 'arrow'],
+        edgeSymbolSize: [0, 12],
+        force: {
+          repulsion: 1600,
+          edgeLength: 240,
+          gravity: 0.06,
+          layoutAnimation: false
         },
-        labelLine: { length: 10, length2: 14, lineStyle: { color: 'rgba(120, 220, 255, 0.25)' } },
-        data: [
-          { name: '地质', value: 22, itemStyle: { color: '#39d5ff' } },
-          { name: '内涝', value: 18, itemStyle: { color: '#ffd36b' } },
-          { name: '消防', value: 14, itemStyle: { color: '#ff8f5a' } },
-          { name: '危化', value: 10, itemStyle: { color: '#ff5a7a' } }
-        ]
-      }
-    ]
-  }
-})
-
-const trendOption = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 42, right: 18, top: 26, bottom: 36 },
-    xAxis: {
-      type: 'category',
-      data: ['海城', '台安', '岫岩', '铁东', '铁西', '立山'],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 14 },
-      axisTick: { show: false },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } }
-    },
-    yAxis: {
-      type: 'value',
-      splitNumber: 4,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 14 },
-      axisTick: { show: false },
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } }
-    },
-    series: [
-      {
-        type: 'bar',
-        barWidth: 18,
-        data: [36, 21, 18, 12, 10, 9],
-        itemStyle: {
-          borderRadius: [6, 6, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(150, 245, 255, 0.95)' },
-              { offset: 1, color: 'rgba(0, 160, 255, 0.55)' }
-            ]
+        data: nodes.map((item) => {
+          const isRoot = item.id === rootId
+          return {
+            id: item.id,
+            name: `${item.label}\n${item.valueText}`,
+            symbol: 'circle',
+            symbolSize: item.size,
+            itemStyle: {
+              color: {
+                type: 'radial',
+                x: 0.35,
+                y: 0.35,
+                r: 0.9,
+                colorStops: [
+                  { offset: 0, color: 'rgba(255, 255, 255, 0.08)' },
+                  { offset: 1, color: 'rgba(6, 18, 48, 0.78)' }
+                ]
+              },
+              borderColor: item.color,
+              borderWidth: isRoot ? 3 : 2,
+              shadowBlur: 22,
+              shadowColor: 'rgba(54, 232, 255, 0.16)'
+            },
+            label: {
+              show: true,
+              position: 'inside',
+              color: 'rgba(240, 251, 255, 0.96)',
+              fontWeight: isRoot ? 900 : 800,
+              fontSize: isRoot ? 26 : 20,
+              lineHeight: isRoot ? 28 : 24
+            }
           }
+        }),
+        links,
+        lineStyle: {
+          color: 'rgba(54, 232, 255, 0.38)',
+          width: 3,
+          curveness: 0.22
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: { width: 4 }
         }
       }
     ]
   }
+}
+
+const fundIncomeOption = computed(() => {
+  const nodes: FundGraphNode[] = [
+    { id: 't', label: '收入合计', valueText: '1057.62 万元', size: 140, color: '#36e8ff' },
+    { id: 'b', label: '财政专项收入', valueText: '1057.62 万元', size: 96, color: '#ffbc40' },
+    { id: 'b2', label: '公共预算收入', valueText: '0 万元', size: 90, color: '#7cf2ff' },
+    { id: 'b3', label: '政府性基金收入', valueText: '0 万元', size: 90, color: '#79ffa8' }
+  ]
+  const links: FundGraphLink[] = [
+    { source: 't', target: 'b' },
+    { source: 't', target: 'b2' },
+    { source: 't', target: 'b3' }
+  ]
+  return buildFundGraphOption('t', nodes, links)
+})
+
+const fundExpenseOption = computed(() => {
+  const nodes: FundGraphNode[] = [
+    { id: 't', label: '支出合计', valueText: '1093.30 万元', size: 140, color: '#36e8ff' },
+    { id: 'a', label: '应急专项支出', valueText: '293.67 万元', size: 96, color: '#7cf2ff' },
+    { id: 'd', label: '个人救助补贴', valueText: '25.84 万元', size: 90, color: '#79ffa8' },
+    { id: 'e', label: '救灾物资采购', valueText: '106.28 万元', size: 90, color: '#8b5cff' },
+    { id: 'f', label: '工程抢险支出', valueText: '961.18 万元', size: 96, color: '#39d5ff' }
+  ]
+  const links: FundGraphLink[] = [
+    { source: 't', target: 'a' },
+    { source: 't', target: 'd' },
+    { source: 't', target: 'e' },
+    { source: 't', target: 'f' }
+  ]
+  return buildFundGraphOption('t', nodes, links)
 })
 </script>
 
@@ -254,142 +392,486 @@ const trendOption = computed(() => {
     0 0 24px #0f58d1;
 }
 
-.panel--trend {
-  grid-column: 1 / 3;
+.panel--fund {
+  display: flex;
+  flex-direction: column;
 }
 
-.resource-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 10px;
+.command-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 6px;
 }
 
-.resource-item {
-  height: 170px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.48);
+.command-tab {
+  width: 180px;
+  height: 54px;
   border-radius: 14px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 10px;
-}
-
-.resource-icon {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  border: 1px solid rgba(120, 220, 255, 0.35);
-  background: radial-gradient(circle, rgba(120, 220, 255, 0.22), rgba(6, 18, 48, 0.2));
-  box-shadow: 0 0 16px rgba(45, 216, 255, 0.12);
-}
-
-.resource-label {
+  border: 1px solid rgba(84, 188, 255, 0.18);
+  background: rgba(6, 18, 48, 0.45);
+  color: rgba(214, 238, 255, 0.7);
   font-size: 22px;
-  color: rgba(214, 238, 255, 0.86);
+  font-weight: 800;
+  letter-spacing: 2px;
+  cursor: pointer;
 }
 
-.resource-value {
-  font-size: 38px;
+.command-tab--active {
+  color: rgba(240, 251, 255, 0.96);
+  border-color: rgba(54, 232, 255, 0.4);
+  background: radial-gradient(circle at 30% 30%, rgba(54, 232, 255, 0.22), rgba(6, 18, 48, 0.55));
+  box-shadow:
+    inset 0 0 18px rgba(54, 232, 255, 0.12),
+    0 0 14px rgba(54, 232, 255, 0.12);
+}
+
+.command-flow {
+  margin-top: 18px;
+  height: calc(100% - 86px);
+  position: relative;
+}
+
+.command-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.command-layer--top {
+  top: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.command-layer--bottom {
+  bottom: 14px;
+  height: 120px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 48px;
+  gap: 12px 14px;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+.flow-node {
+  height: 118px;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.42);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 16px;
+  box-sizing: border-box;
+}
+
+.flow-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(120, 220, 255, 0.25);
+  background: radial-gradient(circle, rgba(54, 232, 255, 0.22), rgba(6, 18, 48, 0.18));
+  box-shadow: 0 0 16px rgba(45, 216, 255, 0.1);
+}
+
+.flow-text {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.flow-name {
+  font-size: 24px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
-  text-shadow: 0 0 14px rgba(45, 216, 255, 0.2);
+  letter-spacing: 2px;
 }
 
-.table {
-  margin-top: 16px;
-  display: grid;
-  gap: 12px;
-}
-
-.table-row {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 0.6fr;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.58);
-  border-radius: 10px;
-  font-size: 20px;
-}
-
-.table-row--head {
-  background: rgba(20, 30, 75, 0.55);
-  color: rgba(234, 240, 255, 0.95);
-  font-weight: 700;
-}
-
-.table-row span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lvl {
-  justify-self: end;
-  font-weight: 800;
-}
-
-.lvl--high {
-  color: rgba(255, 120, 120, 0.95);
-  text-shadow: 0 0 10px rgba(255, 70, 90, 0.18);
-}
-
-.lvl--mid {
-  color: rgba(255, 190, 94, 0.95);
-  text-shadow: 0 0 10px rgba(255, 169, 60, 0.18);
-}
-
-.lvl--low {
-  color: rgba(92, 255, 178, 0.95);
-  text-shadow: 0 0 10px rgba(34, 255, 154, 0.16);
-}
-
-.trend-body {
-  margin-top: 6px;
-  height: 620px;
-  display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  gap: 20px;
-}
-
-.trend-left,
-.trend-right {
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.42);
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.trend-foot {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.foot-item {
-  height: 96px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.42);
-  border-radius: 14px;
-  padding: 16px 18px;
-  box-sizing: border-box;
-  display: grid;
-  align-content: center;
-  row-gap: 10px;
-}
-
-.foot-label {
+.flow-sub {
   font-size: 18px;
   color: rgba(214, 238, 255, 0.72);
 }
 
-.foot-value {
-  font-size: 34px;
+.flow-pill {
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(214, 238, 255, 0.82);
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+
+.rescue-grid {
+  margin-top: 10px;
+  height: calc(100% - 10px);
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 18px;
+}
+
+.rescue-team,
+.rescue-material {
+  min-height: 0;
+}
+
+.team-grid {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.team-panel {
+  min-height: 0;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.42);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-panel-head {
+  height: 54px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(20, 30, 75, 0.55);
+  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.team-panel-title {
+  font-size: 22px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
+  letter-spacing: 2px;
+}
+
+.team-stats {
+  padding: 14px 16px 10px;
+  display: grid;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 26px 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 18px;
+  color: rgba(214, 238, 255, 0.78);
+}
+
+.stat-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 220, 255, 0.28);
+  background: radial-gradient(circle, rgba(54, 232, 255, 0.28), rgba(6, 18, 48, 0.2));
+  box-shadow: 0 0 10px rgba(54, 232, 255, 0.12);
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(240, 251, 255, 0.96);
+  text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
+}
+
+.stat-unit {
+  color: rgba(214, 238, 255, 0.7);
+}
+
+.team-tag {
+  width: 112px;
+  height: 32px;
+  margin: 2px auto 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(54, 232, 255, 0.35);
+  background: rgba(54, 232, 255, 0.12);
+  color: rgba(240, 251, 255, 0.92);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  border-top: 1px solid rgba(89, 194, 255, 0.12);
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 18px;
+  color: rgba(214, 238, 255, 0.82);
+  border-bottom: 1px solid rgba(89, 194, 255, 0.1);
+  box-sizing: border-box;
+}
+
+.team-row--empty {
+  opacity: 0;
+}
+
+.rescue-material {
+  min-height: 0;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.42);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.material-head {
+  height: 54px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(20, 30, 75, 0.55);
+  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.material-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(240, 251, 255, 0.96);
+  letter-spacing: 2px;
+}
+
+.material-tabs {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.material-tab {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(84, 188, 255, 0.18);
+  background: rgba(6, 18, 48, 0.32);
+  color: rgba(214, 238, 255, 0.7);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.material-tab--active {
+  border-color: rgba(54, 232, 255, 0.42);
+  color: rgba(240, 251, 255, 0.96);
+  background: rgba(54, 232, 255, 0.14);
+}
+
+.material-table {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 56px repeat(6, 1fr);
+}
+
+.material-row {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(89, 194, 255, 0.1);
+  color: rgba(214, 238, 255, 0.82);
+  font-size: 18px;
+  box-sizing: border-box;
+}
+
+.material-row--head {
+  background: rgba(20, 30, 75, 0.45);
+  color: rgba(234, 240, 255, 0.95);
+  font-weight: 800;
+}
+
+.material-row-qty {
+  justify-self: end;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.material-row-qty strong {
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(124, 242, 255, 0.95);
+}
+
+.material-row-qty em {
+  font-style: normal;
+  color: rgba(214, 238, 255, 0.65);
+}
+
+.places-body {
+  margin-top: 10px;
+  height: calc(100% - 10px);
+  display: grid;
+}
+
+.places-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.42);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.places-svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 78%;
+  height: 78%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 18px rgba(54, 232, 255, 0.12));
+}
+
+.place-marker {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(54, 232, 255, 0.95);
+  box-shadow: 0 0 16px rgba(54, 232, 255, 0.18);
+}
+
+.place-marker span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: rgba(6, 18, 48, 0.85);
+}
+
+.place-marker--a {
+  left: 40%;
+  top: 26%;
+}
+.place-marker--b {
+  left: 46%;
+  top: 34%;
+}
+.place-marker--c {
+  left: 52%;
+  top: 38%;
+}
+.place-marker--d {
+  left: 58%;
+  top: 44%;
+}
+.place-marker--e {
+  left: 62%;
+  top: 52%;
+}
+.place-marker--f {
+  left: 50%;
+  top: 56%;
+}
+.place-marker--g {
+  left: 44%;
+  top: 50%;
+}
+.place-marker--h {
+  left: 38%;
+  top: 44%;
+}
+.place-marker--i {
+  left: 34%;
+  top: 54%;
+}
+.place-marker--j {
+  left: 30%;
+  top: 40%;
+}
+.place-marker--k {
+  left: 56%;
+  top: 30%;
+}
+.place-marker--l {
+  left: 60%;
+  top: 60%;
+}
+
+.fund-body {
+  margin-top: 10px;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.42);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 14px;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.fund-split {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.fund-box {
+  min-height: 0;
+  border: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.36);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fund-box-title {
+  height: 46px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(240, 251, 255, 0.96);
+  background: rgba(20, 30, 75, 0.42);
+  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
+}
+
+.fund-box-chart {
+  flex: 1;
+  min-height: 0;
 }
 </style>
