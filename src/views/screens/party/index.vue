@@ -1,5 +1,5 @@
 <template>
-  <div class="shell" :class="{ 'shell--scrollable': shouldScroll }">
+  <div class="shell shell--scrollable">
     <div class="viewport" :style="{ width: `${designWidth}px`, height: `${designHeight}px` }">
       <div
         class="screen"
@@ -47,30 +47,18 @@ import PartyRight from './parts/PartyRight.vue'
 const designWidth = 11520
 const designHeight = 2160
 
-const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
-const shouldScroll = ref(isFile)
-
 const screenData = ref(partyScreenMock)
 const now = ref(new Date())
 
 let timer: number | undefined
 
-const syncShellMode = () => {
-  if (typeof window === 'undefined') return
-  shouldScroll.value =
-    isFile || window.innerWidth < designWidth || window.innerHeight < designHeight
-}
-
 onMounted(() => {
-  syncShellMode()
-  window.addEventListener('resize', syncShellMode)
   timer = window.setInterval(() => {
     now.value = new Date()
   }, 1000)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', syncShellMode)
   if (timer) window.clearInterval(timer)
 })
 
