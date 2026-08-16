@@ -7,6 +7,7 @@ import type { GridInfoRow } from '../types'
 
 const props = defineProps<{
   rows: GridInfoRow[]
+  activeName?: string
 }>()
 
 const mapReady = ref(false)
@@ -14,7 +15,9 @@ const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.
 const techTexture = ref<HTMLCanvasElement | null>(null)
 
 const REGION_ALIAS: Record<string, string> = {
-  岫岩县: '岫岩满族自治县'
+  岫岩县: '岫岩满族自治县',
+  高新区: '千山区',
+  风景区: '千山区'
 }
 
 const REGION_COORDS: Record<string, [number, number]> = {
@@ -23,7 +26,8 @@ const REGION_COORDS: Record<string, [number, number]> = {
   岫岩满族自治县: [123.27, 40.28],
   铁东区: [123.18, 41.12],
   铁西区: [122.95, 41.12],
-  立山区: [123.03, 41.15]
+  立山区: [123.03, 41.15],
+  千山区: [122.949298, 41.068909]
 }
 
 const createTechTexture = () => {
@@ -102,12 +106,20 @@ const option = computed(() => {
   const topColor = 'rgba(20, 140, 220, 0.65)'
   // hover高亮浅亮蓝
   const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
+  const activeColor = 'rgba(80, 200, 255, 0.92)'
+  const inactiveOpacity = 0.58
   const detailTexture = techTexture.value as any
 
-  const mapData = props.rows.map((row) => ({
-    name: REGION_ALIAS[row.name] ?? row.name,
-    value: row.grid
-  }))
+  const activeRegionName = props.activeName
+    ? REGION_ALIAS[props.activeName] ?? props.activeName
+    : ''
+
+  const aggregated = new Map<string, number>()
+  props.rows.forEach((row) => {
+    const name = REGION_ALIAS[row.name] ?? row.name
+    aggregated.set(name, (aggregated.get(name) ?? 0) + (row.grid ?? 0))
+  })
+  const mapData = Array.from(aggregated.entries()).map(([name, value]) => ({ name, value }))
 
   const points = [...mapData]
     .sort((a, b) => b.value - a.value)
@@ -121,6 +133,14 @@ const option = computed(() => {
       }
     })
     .filter(Boolean)
+
+  const activeCoord = activeRegionName ? REGION_COORDS[activeRegionName] : undefined
+  const activePoint =
+    activeCoord && activeRegionName
+      ? [{ name: activeRegionName, value: [activeCoord[0], activeCoord[1], 1] }]
+      : []
+
+  const hasActiveRegion = Boolean(activeRegionName)
 
   return {
     backgroundColor: 'transparent',
@@ -191,7 +211,24 @@ const option = computed(() => {
           intensity: 0.35
         }
       },
-      regions: mapData.map((r) => ({ name: r.name, value: r.value }))
+      regions: mapData.map((r) => {
+        const isActive = hasActiveRegion && r.name === activeRegionName
+        return {
+          name: r.name,
+          value: r.value,
+          itemStyle: isActive
+            ? {
+                color: activeColor,
+                borderColor: 'rgba(255, 210, 120, 1)',
+                borderWidth: 3,
+                opacity: 1
+              }
+            : hasActiveRegion
+              ? { opacity: inactiveOpacity }
+              : undefined,
+          label: isActive ? { color: '#ffffff', fontSize: 16 } : undefined
+        }
+      })
     },
     postEffect: {
       enable: true,
@@ -213,8 +250,8 @@ const option = computed(() => {
         type: 'scatter3D',
         coordinateSystem: 'geo3D',
         geo3DIndex: 0,
-        data: points,
-        symbolSize: 12,
+        data: [...points, ...activePoint],
+        symbolSize: (value: any[]) => (activeRegionName && value?.[2] === 1 ? 16 : 12),
         label: {
           show: true,
           formatter: (p: any) => p?.name ?? '',
@@ -223,7 +260,7 @@ const option = computed(() => {
           fontSize: 14
         },
         itemStyle: {
-          color: '#00ccff',
+          color: (p: any) => (p?.name === activeRegionName ? '#ffdd22' : '#00ccff'),
           shadowBlur: 18,
           shadowColor: 'rgba(0, 180, 255, 0.6)'
         }

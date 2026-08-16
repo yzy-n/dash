@@ -28,7 +28,7 @@
             @greenland-trend-change="handleGreenlandTrendTypeChange"
             @sanitation-type-change="handleSanitationTypeChange"
           />
-          <DashCenter :data="dashData" />
+          <DashCenter :data="dashData" @area-change="handleAreaChange" />
           <DashRight :data="dashData" />
         </section>
       </div>
@@ -42,10 +42,12 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
   getCityBigscreenAppealList,
   getCityBigscreenCaseStatistics,
+  getCityBigscreenCaseStatisticsByArea,
   getCityBigscreenComponentDistribution,
   getCityBigscreenEnergy,
   getCityBigscreenFull,
   getCityBigscreenGreenland,
+  getCityBigscreenGreenland2,
   getCityBigscreenGrid,
   getCityBigscreenLandArea,
   getCityBigscreenLawCase,
@@ -73,6 +75,7 @@ const isFile = typeof window !== 'undefined' && window.location.protocol === 'fi
 const isDev = import.meta.env.DEV || isFile
 const dashData = reactive<DashScreenData>(createEmptyDashData())
 const dashError = ref('')
+const selectedAreaName = ref('铁西区')
 
 type UnknownRecord = Record<string, unknown>
 
@@ -272,6 +275,64 @@ const buildSideStats = (source: unknown) => {
   }
 }
 
+const loadCaseStatisticsByArea = async (areaName: string) => {
+  const payload = await getCityBigscreenCaseStatisticsByArea<UnknownRecord>({ areaName })
+  const root = isRecord(payload) ? payload : ({} as UnknownRecord)
+  const summary =
+    (isRecord(root.summary) && root.summary) ||
+    ((isRecord((root as any).data) && isRecord((root as any).data.summary) && (root as any).data.summary) as
+      | UnknownRecord
+      | undefined)
+
+  const latestSource =
+    (summary && (summary.latestData || (summary as any).latestList || (summary as any).latest)) || []
+  const previousSource =
+    (summary && (summary.previousData || (summary as any).previousList || (summary as any).previous)) || []
+
+  const latestRows = preferPublishedRows(Array.isArray(latestSource) ? latestSource : []).filter((item) =>
+    isRecord(item)
+  )
+  const previousRows = preferPublishedRows(
+    Array.isArray(previousSource) ? previousSource : []
+  ).filter((item) => isRecord(item))
+
+  const getName = (item: UnknownRecord) => toStringValue(item.label || item.name || item.title)
+  const getValue = (item: UnknownRecord) =>
+    toNumber(item.standCase ?? item.closeCase ?? item.value ?? item.num ?? item.count)
+
+  const previousMap = new Map<string, UnknownRecord>()
+  previousRows.forEach((row) => {
+    const name = getName(row)
+    if (!name) return
+    previousMap.set(name, row)
+  })
+
+  const stats: SideStat[] = []
+  latestRows.forEach((row) => {
+    const name = getName(row)
+    if (!name) return
+    const prev = previousMap.get(name)
+    stats.push({
+      name,
+      year: getValue(row) ?? 0,
+      last: prev ? getValue(prev) ?? 0 : 0
+    })
+    previousMap.delete(name)
+  })
+
+  previousMap.forEach((row, name) => {
+    stats.push({
+      name,
+      year: 0,
+      last: getValue(row) ?? 0
+    })
+  })
+
+  const half = Math.ceil(stats.length / 2)
+  dashData.centerSideLeft = stats.slice(0, half)
+  dashData.centerSideRight = stats.slice(half)
+}
+
 const formatDate = (value: unknown) => {
   if (typeof value === 'number') {
     const date = new Date(value)
@@ -290,9 +351,14 @@ const greenlandTypeToMetricKey = (type: 1 | 2 | 3 | 4 | 5) => {
 }
 
 const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
-  const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
+  const payload = await getCityBigscreenGreenland2<UnknownRecord>({ type })
+  const summary = isRecord(payload.summary) ? payload.summary : undefined
+  const listSource =
+    (summary && Array.isArray(summary.list) && summary.list) ||
+    (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
+    getDataList(payload)
   const key = greenlandTypeToMetricKey(type)
-  const rows = preferPublishedRows(getDataList(payload)).filter(
+  const rows = preferPublishedRows(Array.isArray(listSource) ? listSource : []).filter(
     (item) => isRecord(item) && toStringValue(item.type) === String(type)
   )
   const nameMap: Record<string, string> = {
@@ -303,10 +369,15 @@ const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
   dashData.greeningMetrics[key] = buildTimeMetric(rows, nameMap[key])
 }
 
-const loadGreenlandTrend = async (type: 4 | 5 = 4) => {
+const loadGreenlandTrend = async (type: 1 | 2 = 1) => {
   const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
   const key = greenlandTypeToMetricKey(type)
-  const rows = preferPublishedRows(getDataList(payload))
+  const summary = isRecord(payload.summary) ? payload.summary : undefined
+  const listSource =
+    (summary && Array.isArray(summary.list) && summary.list) ||
+    (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
+    getDataList(payload)
+  const rows = preferPublishedRows(Array.isArray(listSource) ? listSource : [])
     .filter((item) => isRecord(item) && toStringValue(item.type) === String(type))
     .filter((item) => toStringValue(item.year))
     .sort((a, b) => String(a.year).localeCompare(String(b.year)))
@@ -314,9 +385,9 @@ const loadGreenlandTrend = async (type: 4 | 5 = 4) => {
   const x = rows.map((item) => String(item.year))
   const y = rows.map((item) => toNumber(item.area ?? item.num ?? item.value) ?? 0)
   const seriesName =
-    type === 4
+    type === 1
       ? '人均绿地面积'
-      : type === 5
+      : type === 2
         ? '建成区绿地面积'
         : dashData.greeningMetrics[key]?.name || ''
 
@@ -388,17 +459,34 @@ const loadLandArea = async () => {
 }
 
 const loadEnergy = async () => {
-  const payload = await getCityBigscreenEnergy<UnknownRecord>()
-  const rows = preferPublishedRows(getDataList(payload)).filter((item) => isRecord(item))
-  const colors = ['#caa822', '#10b98c', '#2563eb']
+  const payload = await getCityBigscreenEnergy<UnknownRecord>({ limit: 1 })
+  const summary = isRecord(payload.summary) ? payload.summary : undefined
+  const listSource =
+    (summary && Array.isArray(summary.list) && summary.list) ||
+    (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
+    getDataList(payload)
+  const rows = preferPublishedRows(Array.isArray(listSource) ? listSource : []).filter((item) =>
+    isRecord(item)
+  )
+  const latest = rows[0] ?? rows[rows.length - 1]
 
-  dashData.energyItems = rows
-    .slice(0, 3)
-    .map((item, index) => {
-      const value = toNumber(item.lamp)
+  if (!latest || !isRecord(latest)) {
+    dashData.energyItems = []
+    return
+  }
+
+  const mapping = [
+    { key: 'length', label: '安装路灯道路长度', color: '#2563eb' },
+    { key: 'lamp', label: '道路照明灯盏数', color: '#caa822' },
+    { key: 'powerAmount', label: '城市照明装灯总功率', color: '#10b98c' },
+    { key: 'powerRate', label: '城市照明总用电量', color: '#6c42d8' }
+  ]
+
+  dashData.energyItems = mapping
+    .map((item) => {
+      const value = toNumber((latest as any)[item.key])
       if (value === undefined) return null
-      const name = toStringValue(item.id) || String(index + 1)
-      return { name, value, color: colors[index % colors.length] }
+      return { name: item.label, value, color: item.color }
     })
     .filter((item): item is DashScreenData['energyItems'][number] => Boolean(item))
 }
@@ -528,9 +616,11 @@ const loadFull = async () => {
   if (hasKpiValue(kpis)) {
     dashData.centerKpis = kpis
   }
-  const sideStats = buildSideStats(payload)
-  dashData.centerSideLeft = sideStats.left
-  dashData.centerSideRight = sideStats.right
+  if (!selectedAreaName.value) {
+    const sideStats = buildSideStats(payload)
+    dashData.centerSideLeft = sideStats.left
+    dashData.centerSideRight = sideStats.right
+  }
 }
 
 const loadDashScreen = async () => {
@@ -539,7 +629,7 @@ const loadDashScreen = async () => {
 
   const results = await Promise.allSettled([
     loadGreenlandMetric(1),
-    loadGreenlandTrend(4),
+    loadGreenlandTrend(1),
     loadSanitationMetric(1),
     loadPark(),
     loadLandArea(),
@@ -547,6 +637,7 @@ const loadDashScreen = async () => {
     loadGrid(),
     loadComponentDistribution(),
     loadCaseStatistics(),
+    loadCaseStatisticsByArea(selectedAreaName.value),
     loadAppealList(),
     loadLawCase(),
     loadFull()
@@ -563,7 +654,7 @@ const handleGreenlandMetricTypeChange = async (type: 1 | 2 | 3) => {
   } catch {}
 }
 
-const handleGreenlandTrendTypeChange = async (type: 4 | 5) => {
+const handleGreenlandTrendTypeChange = async (type: 1 | 2) => {
   try {
     await loadGreenlandTrend(type)
   } catch {}
@@ -573,6 +664,16 @@ const handleSanitationTypeChange = async (type: 1 | 2 | 3) => {
   try {
     await loadSanitationMetric(type)
   } catch {}
+}
+
+const handleAreaChange = async (areaName: string) => {
+  selectedAreaName.value = areaName
+  try {
+    await loadCaseStatisticsByArea(areaName)
+  } catch {
+    dashData.centerSideLeft = []
+    dashData.centerSideRight = []
+  }
 }
 
 const now = ref(new Date())

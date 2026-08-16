@@ -9,24 +9,70 @@ import * as echarts from 'echarts'
 
 interface Props {
   xData?: string[]
-  passengerData?: number[]
-  taxiNumData?: number[]
+  oneData?: number[]
+  twoData?: number[]
+  threeData?: number[]
+  fourData?: number[]
+  fiveData?: number[]
 }
 
 const props = defineProps<Props>()
 
 const xAxisList = computed(() => (props.xData?.length ? props.xData : []))
-const passengerData = computed(() => (props.passengerData?.length ? props.passengerData : []))
-const taxiNumData = computed(() => (props.taxiNumData?.length ? props.taxiNumData : []))
+const oneData = computed(() => (props.oneData?.length ? props.oneData : []))
+const twoData = computed(() => (props.twoData?.length ? props.twoData : []))
+const threeData = computed(() => (props.threeData?.length ? props.threeData : []))
+const fourData = computed(() => (props.fourData?.length ? props.fourData : []))
+const fiveData = computed(() => (props.fiveData?.length ? props.fiveData : []))
+
+const legendItems = [
+  { name: '龙腾城际', color: '#49aaff' },
+  { name: '长旅集团', color: '#36e8ff' },
+  { name: '交运集团', color: '#ffdd22' },
+  { name: '龙腾快客', color: '#22c3a6' },
+  { name: '通达巴士', color: '#ffb24a' }
+]
 
 const companySource = computed(() => [
   {
-    name: '客运量',
+    name: legendItems[0].name,
     gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: '#a0d8ff' },
-      { offset: 1, color: '#3678e8' }
+      { offset: 0, color: '#8fd9ff' },
+      { offset: 1, color: '#2f7dff' }
     ]),
-    data: passengerData.value
+    data: oneData.value
+  },
+  {
+    name: legendItems[1].name,
+    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      { offset: 0, color: '#bdf7ff' },
+      { offset: 1, color: '#36e8ff' }
+    ]),
+    data: twoData.value
+  },
+  {
+    name: legendItems[2].name,
+    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      { offset: 0, color: '#fff6a8' },
+      { offset: 1, color: '#ffdd22' }
+    ]),
+    data: threeData.value
+  },
+  {
+    name: legendItems[3].name,
+    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      { offset: 0, color: '#73ffe0' },
+      { offset: 1, color: '#22c3a6' }
+    ]),
+    data: fourData.value
+  },
+  {
+    name: legendItems[4].name,
+    gradient: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      { offset: 0, color: '#ffe1a8' },
+      { offset: 1, color: '#ffb24a' }
+    ]),
+    data: fiveData.value
   }
 ])
 
@@ -81,9 +127,12 @@ const buildSeries = () => {
 }
 
 const chartOption = computed(() => {
-  const hasData = xAxisList.value.length && passengerData.value.length
-  const maxPassenger = passengerData.value.length ? Math.max(...passengerData.value) : 0
-  const yAxisMax = maxPassenger <= 0 ? 100 : Math.ceil((maxPassenger * 1.2) / 100) * 100
+  const hasData = xAxisList.value.length && companySource.value.some((s) => s.data.length)
+  const totals = xAxisList.value.map((_, idx) =>
+    companySource.value.reduce((sum, comp) => sum + (comp.data[idx] || 0), 0)
+  )
+  const maxTotal = totals.length ? Math.max(...totals) : 0
+  const yAxisMax = maxTotal <= 0 ? 100 : Math.ceil((maxTotal * 1.2) / 100) * 100
   return {
     backgroundColor: 'transparent',
     graphic: hasData
@@ -105,17 +154,12 @@ const chartOption = computed(() => {
       backgroundColor: 'rgba(0,0,0,0.75)',
       textStyle: { color: '#fff', fontSize: 14 },
       formatter: (params: any[]) => {
-        const dataIndex = params?.[0]?.dataIndex ?? 0
         let tipStr = `${params[0].axisValue}<br/>`
         params.forEach((p) => {
           if (!['顶盖', '底盖'].includes(p.seriesName)) {
             tipStr += `${p.seriesName}: ${p.value} 万人<br/>`
           }
         })
-        const taxiNum = taxiNumData.value[dataIndex]
-        if (taxiNum !== undefined) {
-          tipStr += `出租车数量: ${taxiNum} 辆<br/>`
-        }
         return tipStr
       }
     },
@@ -123,7 +167,12 @@ const chartOption = computed(() => {
       top: 12,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 14 },
-      data: companySource.value.map((item) => item.name)
+      selectedMode: false,
+      itemWidth: 10,
+      itemHeight: 10,
+      itemGap: 18,
+      icon: 'rect',
+      data: legendItems.map((item) => item.name)
     },
     grid: {
       left: '6%',

@@ -11,6 +11,13 @@ const props = defineProps<{
   data: RoseDatum[]
 }>()
 
+const legendNames = [
+  '安装路灯道路长度',
+  '道路照明灯盏数',
+  '城市照明装灯总功率',
+  '城市照明总用电量'
+]
+
 const chartOption = computed(() => {
   const roseData = props.data
   return {

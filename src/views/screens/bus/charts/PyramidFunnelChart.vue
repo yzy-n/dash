@@ -61,9 +61,27 @@ const gradientList = [
 
 const chartOption = computed(() => {
   const rawData = props.monthDataMap?.[currentMonth.value] ?? []
-  const hasData = Array.isArray(rawData) && rawData.length > 0
+  const rowMap = new Map<string, number>()
+  if (Array.isArray(rawData)) {
+    rawData.forEach((item) => {
+      if (!item) return
+      const name = String((item as any).name ?? '')
+      if (!name) return
+      const value = Number((item as any).value)
+      if (!Number.isFinite(value)) return
+      const prev = rowMap.get(name)
+      if (prev === undefined || value > prev) rowMap.set(name, value)
+    })
+  }
+
+  const uniqueRows: FunnelRow[] = Array.from(rowMap.entries()).map(([name, value]) => ({
+    name,
+    value
+  }))
+
+  const hasData = uniqueRows.length > 0
   const renderData = hasData
-    ? rawData.map((item, idx) => ({
+    ? uniqueRows.slice(0, 3).map((item, idx) => ({
         name: item.name,
         value: item.value,
         itemStyle: { color: gradientList[idx % gradientList.length] }

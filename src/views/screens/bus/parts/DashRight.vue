@@ -33,9 +33,12 @@ const currentGoodsShipSeries = computed(() =>
         <div class="panel-title">公共交通</div>
         <div class="panel-chart">
           <Passenger3DBar
-            :x-data="data.publicTransportXAxis"
-            :passenger-data="data.publicTransportPassengerData"
-            :taxi-num-data="data.publicTransportTaxiNumData"
+            :x-data="data.trafficCompanyXAxis"
+            :one-data="data.trafficCompanyOneData"
+            :two-data="data.trafficCompanyTwoData"
+            :three-data="data.trafficCompanyThreeData"
+            :four-data="data.trafficCompanyFourData"
+            :five-data="data.trafficCompanyFiveData"
           />
         </div>
       </div>
@@ -86,7 +89,9 @@ const currentGoodsShipSeries = computed(() =>
         </div>
 
         <div class="section section--bottom">
-          <div class="panel-chart"><PyramidFunnelChart /></div>
+          <div class="panel-chart">
+            <PyramidFunnelChart :month-data-map="data.busLineMonthDataMap" />
+          </div>
         </div>
       </div>
     </div>

@@ -16,6 +16,9 @@ export const getCityTrafficPublicTransport = <T = CityTrafficPayload>() =>
 export const getCityTrafficTaxi = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/taxi`)
 
+export const getCityTrafficTrafficCompany = <T = CityTrafficPayload>() =>
+  requestData<T>(`${cityTrafficBigscreenBase}/traffic-company`)
+
 export const getCityTrafficPassengerShip = <T = CityTrafficPayload>() =>
   requestData<T>(`${cityTrafficBigscreenBase}/passenger-ship`)
 
@@ -54,6 +57,7 @@ export const cityTrafficApi = {
   getParking: getCityTrafficParking,
   getRoadOverview: getCityTrafficRoadOverview,
   getPublicTransport: getCityTrafficPublicTransport,
+  getTrafficCompany: getCityTrafficTrafficCompany,
   getTaxi: getCityTrafficTaxi,
   getPassengerShip: getCityTrafficPassengerShip,
   getVehicle: getCityTrafficVehicle,

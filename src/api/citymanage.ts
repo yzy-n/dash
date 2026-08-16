@@ -22,8 +22,11 @@ export const getCityBigscreenLandArea = <T = CityBigscreenPayload>() =>
 export const getCityBigscreenGrid = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/grid`)
 
-export type CityBigscreenGreenlandType = 1 | 2 | 3 | 4 | 5
+export type CityBigscreenGreenlandType = 1 | 2 | 3
 
+export const getCityBigscreenGreenland2 = <T = CityBigscreenPayload>(params?: {
+  type?: CityBigscreenGreenlandType
+}) => requestData<T>(`${cityBigscreenBase}/greenland-area`, { params })
 export const getCityBigscreenGreenland = <T = CityBigscreenPayload>(params?: {
   type?: CityBigscreenGreenlandType
 }) => requestData<T>(`${cityBigscreenBase}/greenland`, { params })
@@ -31,8 +34,12 @@ export const getCityBigscreenGreenland = <T = CityBigscreenPayload>(params?: {
 export const getCityBigscreenFull = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/full`)
 
-export const getCityBigscreenEnergy = <T = CityBigscreenPayload>() =>
-  requestData<T>(`${cityBigscreenBase}/street-light`)
+export const getCityBigscreenEnergy = <T = CityBigscreenPayload>(params?: { limit?: number }) =>
+  requestData<T>(`${cityBigscreenBase}/street-light`, { params })
+
+export const getCityBigscreenCaseStatisticsByArea = <T = CityBigscreenPayload>(params: {
+  areaName: string
+}) => requestData<T>(`${cityBigscreenBase}/case-statistics-by-area`, { params })
 
 export const getCityBigscreenComponentDistribution = <T = CityBigscreenPayload>() =>
   requestData<T>(`${cityBigscreenBase}/component-distribution`)
@@ -52,8 +59,10 @@ export const cityBigscreenApi = {
   getLandArea: getCityBigscreenLandArea,
   getGrid: getCityBigscreenGrid,
   getGreenland: getCityBigscreenGreenland,
+  getGreenlandArea: getCityBigscreenGreenland2,
   getFull: getCityBigscreenFull,
   getEnergy: getCityBigscreenEnergy,
+  getCaseStatisticsByArea: getCityBigscreenCaseStatisticsByArea,
   getComponentDistribution: getCityBigscreenComponentDistribution,
   getCaseStatistics: getCityBigscreenCaseStatistics,
   getAppealList: getCityBigscreenAppealList

@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'greenland-metric-change', type: 1 | 2 | 3): void
-  (e: 'greenland-trend-change', type: 4 | 5): void
+  (e: 'greenland-trend-change', type: 1 | 2): void
   (e: 'sanitation-type-change', type: 1 | 2 | 3): void
 }>()
 
@@ -50,9 +50,9 @@ const metricToGreenlandType: Record<MetricKey, 1 | 2 | 3> = {
   park: 3
 }
 
-const trendMetricToGreenlandType: Record<TrendKey, 4 | 5> = {
-  cover: 4,
-  garden: 5
+const trendMetricToGreenlandType: Record<TrendKey, 1 | 2> = {
+  cover: 1,
+  garden: 2
 }
 
 const handleGreeningTabClick = (key: MetricKey) => {

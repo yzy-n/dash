@@ -42,7 +42,8 @@ import { createEmptyBusData, type BusScreenData } from './types'
 import {
   getCityTrafficCongestion,
   getCityTrafficParking,
-  getCityTrafficPublicTransport,
+  getCityTrafficBusLine,
+  getCityTrafficTrafficCompany,
   getCityTrafficTaxi,
   getCityTrafficBusLinePage,
   getCityTrafficBusLineDetail,
@@ -194,40 +195,46 @@ const loadParking = async () => {
 const sortByLabel = <T extends { label: string }>(rows: T[]) =>
   [...rows].sort((a, b) => a.label.localeCompare(b.label))
 
-const applyPublicTransportSummary = (rawPayload: any) => {
-  const payload = rawPayload?.data ?? rawPayload
-  const summary = payload?.summary ?? payload?.data?.summary ?? payload
-  const taxiRows = preferPublishedRows(
-    Array.isArray(summary?.taxi)
-      ? summary.taxi
-      : Array.isArray(summary?.dataList)
-        ? summary.dataList
-        : []
-  )
+const loadPublicTransport = async () => {
+  const payload: any = await getCityTrafficTrafficCompany()
+  const list = preferPublishedRows(Array.isArray(payload?.dataList) ? payload.dataList : [])
+    .filter((item: any) => item && typeof item === 'object')
+    .map((item: any) => {
+      const month = toStringValue(item.month)
+      if (!month) return null
+      return {
+        month,
+        one: toNumber(item.companyNameOne) ?? 0,
+        two: toNumber(item.companyNameTwo) ?? 0,
+        three: toNumber(item.companyNameThree) ?? 0,
+        four: toNumber(item.companyNameFour) ?? 0,
+        five: toNumber(item.companyNameFive) ?? 0
+      }
+    })
+    .filter(Boolean) as Array<{
+    month: string
+    one: number
+    two: number
+    three: number
+    four: number
+    five: number
+  }>
 
-  const normalizedTaxiRows = sortByLabel(
-    taxiRows
-      .map((item: any) => {
-        const label = toStringValue(item?.month ?? item?.label ?? item?.time ?? item?.date)
-        if (!label) return null
-        return {
-          label,
-          taxiNum: toNumber(item?.taxiNum ?? item?.taxiCount ?? item?.num ?? item?.count) ?? 0,
-          passengerVolume:
-            toNumber(item?.passengerVolume ?? item?.passengerNum ?? item?.volume) ?? 0
-        }
-      })
-      .filter(Boolean) as Array<{ label: string; taxiNum: number; passengerVolume: number }>
-  )
-
-  busData.publicTransportXAxis = normalizedTaxiRows.map((item) => item.label)
-  busData.publicTransportPassengerData = normalizedTaxiRows.map((item) => item.passengerVolume)
-  busData.publicTransportTaxiNumData = normalizedTaxiRows.map((item) => item.taxiNum)
+  const sorted = [...list].sort((a, b) => a.month.localeCompare(b.month))
+  busData.trafficCompanyXAxis = sorted.map((item) => item.month)
+  busData.trafficCompanyOneData = sorted.map((item) => item.one)
+  busData.trafficCompanyTwoData = sorted.map((item) => item.two)
+  busData.trafficCompanyThreeData = sorted.map((item) => item.three)
+  busData.trafficCompanyFourData = sorted.map((item) => item.four)
+  busData.trafficCompanyFiveData = sorted.map((item) => item.five)
 }
 
-const loadPublicTransport = async () => {
-  const res: any = await getCityTrafficPublicTransport()
-  applyPublicTransportSummary(res)
+const loadBusLine = async () => {
+  const payload: any = await getCityTrafficBusLine()
+  const summary = payload?.summary ?? payload?.data?.summary ?? {}
+  const monthDataMap = summary?.monthDataMap
+  busData.busLineMonthDataMap =
+    monthDataMap && typeof monthDataMap === 'object' ? (monthDataMap as any) : {}
 }
 
 const applyTaxiSummary = (rawPayload: any) => {
@@ -745,6 +752,7 @@ onMounted(() => {
   }, 1000)
   loadParking()
   loadPublicTransport()
+  loadBusLine()
   loadTaxi()
   loadBusLinePage()
   loadGoodsShip(1)

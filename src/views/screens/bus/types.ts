@@ -47,9 +47,13 @@ export type BusScreenData = {
   parkingRatioYData: number[]
   parkingPlanXData: string[]
   parkingPlanYData: number[]
-  publicTransportXAxis: string[]
-  publicTransportPassengerData: number[]
-  publicTransportTaxiNumData: number[]
+  trafficCompanyXAxis: string[]
+  trafficCompanyOneData: number[]
+  trafficCompanyTwoData: number[]
+  trafficCompanyThreeData: number[]
+  trafficCompanyFourData: number[]
+  trafficCompanyFiveData: number[]
+  busLineMonthDataMap: Record<string, Array<{ name: string; value: number }>>
   taxiXAxis: string[]
   taxiNumData: number[]
   taxiPassengerData: number[]
@@ -133,9 +137,13 @@ export const createEmptyBusData = (): BusScreenData => ({
   parkingRatioYData: [],
   parkingPlanXData: [],
   parkingPlanYData: [],
-  publicTransportXAxis: [],
-  publicTransportPassengerData: [],
-  publicTransportTaxiNumData: [],
+  trafficCompanyXAxis: [],
+  trafficCompanyOneData: [],
+  trafficCompanyTwoData: [],
+  trafficCompanyThreeData: [],
+  trafficCompanyFourData: [],
+  trafficCompanyFiveData: [],
+  busLineMonthDataMap: {},
   taxiXAxis: [],
   taxiNumData: [],
   taxiPassengerData: [],

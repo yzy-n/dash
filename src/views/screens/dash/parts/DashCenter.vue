@@ -1,10 +1,27 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+
 import type { DashScreenData } from '../types'
 import CityMapChart from '../charts/CityMapChart.vue'
 
 const props = defineProps<{
   data: DashScreenData
 }>()
+
+const emit = defineEmits<{
+  (e: 'area-change', areaName: string): void
+}>()
+
+const areaOptions = ['铁东区', '铁西区', '立山区', '高新区', '风景区', '台安县', '海城市', '岫岩县']
+const selectedAreaName = ref('铁西区')
+
+watch(
+  () => selectedAreaName.value,
+  (value) => {
+    emit('area-change', value)
+  },
+  { immediate: false }
+)
 </script>
 
 <template>
@@ -35,8 +52,14 @@ const props = defineProps<{
         </div>
 
         <div class="map-box">
-          <div class="map-caption">鞍山市</div>
-          <div class="map-chart"><CityMapChart :rows="props.data.gridInfoRows" /></div>
+          <div class="map-caption">
+            <select v-model="selectedAreaName" class="map-caption-select">
+              <option v-for="item in areaOptions" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+          <div class="map-chart">
+            <CityMapChart :rows="props.data.gridInfoRows" :active-name="selectedAreaName" />
+          </div>
         </div>
 
         <div class="side-cards">
@@ -225,6 +248,21 @@ const props = defineProps<{
   background: url('@/assets/img/as.png') no-repeat center center;
   background-size: 100% 100%;
   margin: 0 auto;
+}
+
+.map-caption-select {
+  width: 100%;
+  height: 100%;
+  padding: 0 42px 0 42px;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: center;
+  cursor: pointer;
 }
 
 .map-chart {
