@@ -11,7 +11,9 @@ const props = defineProps<{
 }>()
 
 const mapReady = ref(false)
-const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
+const anshanGeoBase = import.meta.env.BASE_URL.startsWith('.') ? '/' : import.meta.env.BASE_URL
+const ANSHAN_GEO_URL = `${anshanGeoBase}geo/anshan.geojson`
+const ANSHAN_GEO_FALLBACK_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
 const techTexture = ref<HTMLCanvasElement | null>(null)
 
 const REGION_ALIAS: Record<string, string> = {
@@ -89,9 +91,15 @@ const createTechTexture = () => {
 onMounted(async () => {
   try {
     techTexture.value = createTechTexture()
+    let geoJson: any
     const res = await fetch(ANSHAN_GEO_URL)
-    if (!res.ok) throw new Error('地图JSON加载失败')
-    const geoJson = await res.json()
+    if (res.ok) {
+      geoJson = await res.json()
+    } else {
+      const fallback = await fetch(ANSHAN_GEO_FALLBACK_URL)
+      if (!fallback.ok) throw new Error('地图JSON加载失败')
+      geoJson = await fallback.json()
+    }
     // 全局注册鞍山地图，所有图表共享
     echarts.registerMap('anshan', geoJson)
     mapReady.value = true

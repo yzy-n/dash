@@ -29,7 +29,7 @@ const option = computed(() => {
     series: [
       {
         type: 'bar',
-        barWidth: 18,
+        barWidth: 50,
         name: props.metric.name,
         data: props.metric.data,
         itemStyle: {

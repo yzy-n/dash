@@ -26,7 +26,8 @@ let loadPromise: Promise<typeof AMap | null> | null = null
 const loadError = ref('')
 let busTimer: number | undefined
 
-const ANSHAN_GEO_URL = `${import.meta.env.BASE_URL}geo/anshan.geojson`
+const anshanGeoBase = import.meta.env.BASE_URL.startsWith('.') ? '/' : import.meta.env.BASE_URL
+const ANSHAN_GEO_URL = `${anshanGeoBase}geo/anshan.geojson`
 const BUS_REFRESH_MS = 5000
 
 const resolveFeaturePath = (feature: any) => {

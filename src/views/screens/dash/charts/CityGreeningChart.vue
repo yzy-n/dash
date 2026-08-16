@@ -51,7 +51,7 @@ const option = computed(() => {
       {
         name: selected.name,
         type: 'bar',
-        barWidth: 22,
+        barWidth: 50,
         data: selected.data,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
