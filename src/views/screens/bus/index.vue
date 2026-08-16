@@ -1,5 +1,5 @@
 <template>
-  <div class="shell" :class="{ 'shell--dev': isDev }">
+  <div class="shell" :class="{ 'shell--scrollable': shouldScroll }">
     <div class="viewport" :style="{ width: `${designWidth}px`, height: `${designHeight}px` }">
       <div
         class="screen"
@@ -57,7 +57,7 @@ const designWidth = 11520
 const designHeight = 2160
 
 const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
-const isDev = import.meta.env.DEV || isFile
+const shouldScroll = ref(isFile)
 const busData = reactive<BusScreenData>(createEmptyBusData())
 
 const preferPublishedRows = (rows: any[]) => {
@@ -746,7 +746,15 @@ const now = ref(new Date())
 let timer: number | undefined
 let busRealtimeTimer: number | undefined
 
+const syncShellMode = () => {
+  if (typeof window === 'undefined') return
+  shouldScroll.value =
+    isFile || window.innerWidth < designWidth || window.innerHeight < designHeight
+}
+
 onMounted(() => {
+  syncShellMode()
+  window.addEventListener('resize', syncShellMode)
   timer = window.setInterval(() => {
     now.value = new Date()
   }, 1000)
@@ -767,6 +775,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', syncShellMode)
   if (timer) window.clearInterval(timer)
   if (busRealtimeTimer) window.clearInterval(busRealtimeTimer)
 })
@@ -800,14 +809,14 @@ const hmsText = computed(() => {
   background: #020a1e;
 }
 
-.shell--dev {
+.shell--scrollable {
   display: block;
   overflow: auto;
   padding: 24px;
   box-sizing: border-box;
 }
 
-.shell--dev .viewport {
+.shell--scrollable .viewport {
   margin: 0 auto;
 }
 
