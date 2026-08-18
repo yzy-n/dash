@@ -108,9 +108,8 @@
       <section class="panel panel--map">
         <div class="map-stage">
           <div class="map-box">
-            <EChart :option="mapOption" />
+            <CityMapChart :rows="gridInfoRows" :active-name="selectedAreaName" />
           </div>
-          <div v-if="!mapReady" class="map-empty">地图加载中...</div>
           <div class="map-base">
             <div class="map-ring map-ring--a"></div>
             <div class="map-ring map-ring--b"></div>
@@ -158,161 +157,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import * as echarts from 'echarts'
-import EChart from '@/components/echarts/EChart.vue'
+import { ref } from 'vue'
 
-const mapReady = ref(false)
+import CityMapChart from '../charts/CityMapChart.vue'
+import type { GridInfoRow } from '../types'
+
 const activeHazard = ref<'eq' | 'geo' | 'fire' | 'met' | 'flood'>('geo')
-const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
-const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
-const baseUrl = import.meta.env.BASE_URL || '/'
-const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
-const localGeoUrl = isFile ? 'geo/anshan.geojson' : `${normalizedBaseUrl}geo/anshan.geojson`
-const ANSHAN_GEO_URLS = [localGeoUrl, ANSHAN_GEO_URL]
+const areaOptions = ['铁东区', '铁西区', '立山区', '高新区', '风景区', '台安县', '海城市', '岫岩县']
+const selectedAreaName = ref('铁西区')
 
-const REGION_COORDS: Record<string, [number, number]> = {
-  台安县: [122.42, 41.26],
-  海城市: [122.73, 40.87],
-  岫岩满族自治县: [123.27, 40.28],
-  铁东区: [123.18, 41.12],
-  铁西区: [122.95, 41.12],
-  立山区: [123.03, 41.15]
-}
-
-const mapLabels = [
-  { name: '海城市', coord: REGION_COORDS['海城市'] },
-  { name: '台安县', coord: REGION_COORDS['台安县'] },
-  { name: '岫岩县', coord: REGION_COORDS['岫岩满族自治县'] },
-  { name: '铁东区', coord: REGION_COORDS['铁东区'] },
-  { name: '铁西区', coord: REGION_COORDS['铁西区'] },
-  { name: '立山区', coord: REGION_COORDS['立山区'] }
+const gridInfoRows: GridInfoRow[] = [
+  { name: '铁东区', town: 0, village: 0, grid: 12 },
+  { name: '铁西区', town: 0, village: 0, grid: 16 },
+  { name: '立山区', town: 0, village: 0, grid: 10 },
+  { name: '高新区', town: 0, village: 0, grid: 8 },
+  { name: '风景区', town: 0, village: 0, grid: 6 },
+  { name: '台安县', town: 0, village: 0, grid: 9 },
+  { name: '海城市', town: 0, village: 0, grid: 14 },
+  { name: '岫岩县', town: 0, village: 0, grid: 7 }
 ]
-
-onMounted(async () => {
-  try {
-    let geoJson: unknown = null
-    for (const url of ANSHAN_GEO_URLS) {
-      try {
-        const res = await fetch(url)
-        if (!res.ok) continue
-        geoJson = await res.json()
-        break
-      } catch {
-        continue
-      }
-    }
-    if (!geoJson) throw new Error('map geojson not loaded')
-    echarts.registerMap('anshan', geoJson as any)
-    mapReady.value = true
-  } catch (err) {
-    mapReady.value = false
-    console.error(err)
-  }
-})
-
-const mapOption = computed(() => {
-  if (!mapReady.value) return {}
-  const labelPoints = mapLabels
-    .map((item) => {
-      if (!item.coord) return null
-      return {
-        name: item.name,
-        value: [item.coord[0], item.coord[1], 1]
-      }
-    })
-    .filter(Boolean) as any[]
-
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    graphic: [
-      {
-        type: 'circle',
-        left: 'center',
-        top: '73%',
-        shape: { r: 220 },
-        style: {
-          fill: 'rgba(0, 190, 255, 0.06)',
-          stroke: 'rgba(54, 232, 255, 0.22)',
-          lineWidth: 2
-        }
-      },
-      {
-        type: 'circle',
-        left: 'center',
-        top: '73%',
-        shape: { r: 160 },
-        style: {
-          fill: 'rgba(0, 0, 0, 0)',
-          stroke: 'rgba(54, 232, 255, 0.14)',
-          lineWidth: 2
-        }
-      },
-      {
-        type: 'circle',
-        left: 'center',
-        top: '73%',
-        shape: { r: 110 },
-        style: {
-          fill: 'rgba(0, 0, 0, 0)',
-          stroke: 'rgba(54, 232, 255, 0.1)',
-          lineWidth: 2
-        }
-      }
-    ],
-    geo: {
-      map: 'anshan',
-      roam: false,
-      zoom: 1.06,
-      itemStyle: {
-        areaColor: 'rgba(140, 170, 92, 0.95)',
-        borderColor: 'rgba(120, 220, 255, 0.28)',
-        borderWidth: 2.4,
-        shadowBlur: 40,
-        shadowColor: 'rgba(0, 160, 255, 0.22)'
-      },
-      emphasis: {
-        itemStyle: { areaColor: 'rgba(170, 200, 120, 0.98)' }
-      },
-      label: { show: false }
-    },
-    series: [
-      {
-        type: 'map',
-        map: 'anshan',
-        geoIndex: 0,
-        data: []
-      },
-      {
-        type: 'scatter',
-        coordinateSystem: 'geo',
-        data: labelPoints,
-        symbolSize: 10,
-        label: {
-          show: true,
-          formatter: '{b}',
-          color: 'rgba(240, 251, 255, 0.95)',
-          fontSize: 18,
-          fontWeight: 800,
-          padding: [6, 14],
-          borderRadius: 999,
-          backgroundColor: 'rgba(6, 28, 70, 0.7)',
-          borderColor: 'rgba(54, 232, 255, 0.28)',
-          borderWidth: 1.2
-        },
-        itemStyle: {
-          color: 'rgba(80, 230, 255, 0.95)',
-          borderColor: 'rgba(240, 251, 255, 0.85)',
-          borderWidth: 2,
-          shadowBlur: 18,
-          shadowColor: 'rgba(45, 216, 255, 0.35)'
-        },
-        zlevel: 2
-      }
-    ]
-  }
-})
 </script>
 
 <style scoped>
@@ -403,8 +266,8 @@ const mapOption = computed(() => {
 .main {
   min-height: 0;
   display: grid;
-  grid-template-columns: 2100px 1fr 2100px;
-  gap: 26px;
+  grid-template-columns: 700px minmax(1px, 1fr) 700px;
+  gap: 60px;
 }
 
 .panel {
@@ -412,16 +275,6 @@ const mapOption = computed(() => {
   overflow: hidden;
   border-radius: 18px;
   padding: 92px 28px 26px;
-  background:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/leftBg.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
-  border: 1px solid rgba(84, 188, 255, 0.24);
-  box-shadow:
-    inset 0 0 36px rgba(34, 121, 255, 0.08),
-    0 0 30px rgba(0, 45, 111, 0.14);
   color: rgba(214, 238, 255, 0.86);
   box-sizing: border-box;
   min-height: 0;
@@ -431,7 +284,6 @@ const mapOption = computed(() => {
   content: '';
   position: absolute;
   inset: 10px;
-  border: 1px solid rgba(94, 197, 255, 0.12);
   pointer-events: none;
 }
 
@@ -459,10 +311,12 @@ const mapOption = computed(() => {
 .map-box {
   position: absolute;
   inset: 0;
+  z-index: 2;
 }
 
 .panel--map {
   padding: 0;
+  position: relative;
 }
 
 .panel--map::before {
@@ -477,16 +331,21 @@ const mapOption = computed(() => {
   min-height: 0;
 }
 
-.map-empty {
+.map-caption {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 26px;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  font-weight: 800;
-  color: rgba(214, 238, 255, 0.7);
-  pointer-events: none;
+  width: 420px;
+  height: 74px;
+  font-size: 36px;
+  letter-spacing: 6px;
+  color: rgba(214, 238, 255, 0.9);
+  background-size: 100% 100%;
+  z-index: 3;
 }
 
 .panel--left .panel-title,
@@ -497,6 +356,13 @@ const mapOption = computed(() => {
 
 .panel--left {
   padding: 92px 34px 34px;
+  transform: translateX(48px) perspective(1800px) rotateY(14deg);
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+  height: 75%;
+  align-self: center;
 }
 
 .quake-list {
@@ -505,6 +371,8 @@ const mapOption = computed(() => {
   min-height: 0;
   display: grid;
   gap: 18px;
+  grid-auto-rows: 1fr;
+  overflow: hidden;
 }
 
 .quake-item {
@@ -512,21 +380,49 @@ const mapOption = computed(() => {
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.58);
   border-radius: 14px;
-  padding: 18px 22px 18px 30px;
+  padding: 10px 16px 10px 22px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   box-sizing: border-box;
   display: grid;
   grid-template-columns: 16px 1fr;
-  gap: 18px;
+  gap: 12px;
   position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 24px rgba(54, 232, 255, 0.08),
+    0 10px 26px rgba(0, 10, 40, 0.35);
+  will-change: transform;
+  animation: cardTiltLeft 6.5s ease-in-out infinite;
+}
+
+.quake-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+  opacity: 0.6;
+  pointer-events: none;
+  transform: translateZ(1px);
+}
+
+.quake-item:hover {
+  animation-play-state: paused;
+  transform: translateZ(14px);
+  border-color: rgba(120, 255, 240, 0.22);
+  box-shadow:
+    inset 0 0 28px rgba(54, 232, 255, 0.12),
+    0 14px 34px rgba(0, 10, 40, 0.45);
 }
 
 .quake-item::before {
   content: '';
   position: absolute;
-  left: 38px;
-  top: 30px;
-  bottom: 30px;
+  left: 30px;
+  top: 18px;
+  bottom: 18px;
   width: 2px;
   background: rgba(54, 232, 255, 0.12);
 }
@@ -537,7 +433,7 @@ const mapOption = computed(() => {
   border-radius: 999px;
   background: rgba(54, 232, 255, 0.95);
   box-shadow: 0 0 12px rgba(45, 216, 255, 0.25);
-  margin-top: 8px;
+  margin-top: 6px;
   z-index: 1;
 }
 
@@ -548,19 +444,30 @@ const mapOption = computed(() => {
 }
 
 .quake-time {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
 }
 
 .quake-desc {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .panel--right {
   padding: 92px 34px 34px;
+  transform: translateX(-48px) perspective(1800px) rotateY(-14deg);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+  height: 75%;
+  align-self: center;
 }
 
 .forecast {
@@ -569,7 +476,7 @@ const mapOption = computed(() => {
   min-height: 0;
   display: grid;
   grid-template-rows: 1fr 1fr;
-  gap: 18px;
+  gap: 12px;
 }
 
 .forecast-card {
@@ -580,14 +487,61 @@ const mapOption = computed(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  box-shadow:
+    inset 0 0 24px rgba(54, 232, 255, 0.08),
+    0 10px 26px rgba(0, 10, 40, 0.35);
+  will-change: transform;
+  animation: cardTiltRight 6.5s ease-in-out infinite;
 }
 
+.forecast-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(225deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+  opacity: 0.55;
+  pointer-events: none;
+  transform: translateZ(1px);
+}
+
+.forecast-card:hover {
+  animation-play-state: paused;
+  transform: translateZ(14px);
+  border-color: rgba(120, 255, 240, 0.22);
+  box-shadow:
+    inset 0 0 28px rgba(54, 232, 255, 0.12),
+    0 14px 34px rgba(0, 10, 40, 0.45);
+}
+
+@keyframes cardTiltLeft {
+  0%,
+  100% {
+    transform: translateZ(0);
+  }
+  50% {
+    transform: translateZ(12px);
+  }
+}
+
+@keyframes cardTiltRight {
+  0%,
+  100% {
+    transform: translateZ(0);
+  }
+  50% {
+    transform: translateZ(12px);
+  }
+}
 .forecast-head {
-  height: 54px;
+  height: 42px;
   display: flex;
   align-items: center;
   padding: 0 18px;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(30, 20, 0, 0.9);
@@ -598,7 +552,7 @@ const mapOption = computed(() => {
 .forecast-body {
   flex: 1;
   min-height: 0;
-  padding: 16px 18px 18px;
+  padding: 10px 14px 12px;
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 12px;
@@ -606,23 +560,31 @@ const mapOption = computed(() => {
 }
 
 .forecast-text {
-  font-size: 18px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .forecast-steps {
   min-height: 0;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .forecast-step {
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.4;
   color: rgba(214, 238, 255, 0.82);
   padding-left: 14px;
   position: relative;
+}
+
+.forecast-step:nth-child(n + 3) {
+  display: none;
 }
 
 .forecast-step::before {
@@ -647,6 +609,7 @@ const mapOption = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .map-ring {

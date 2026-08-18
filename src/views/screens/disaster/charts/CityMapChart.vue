@@ -1,0 +1,310 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import * as echarts from 'echarts'
+import 'echarts-gl'
+import EChart from '@/components/echarts/EChart.vue'
+import type { GridInfoRow } from '../types'
+
+const props = defineProps<{
+  rows: GridInfoRow[]
+  activeName?: string
+}>()
+
+const mapReady = ref(false)
+const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
+const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
+const baseUrl = import.meta.env.BASE_URL || '/'
+const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
+const localGeoUrl = isFile ? 'geo/anshan.geojson' : `${normalizedBaseUrl}geo/anshan.geojson`
+const ANSHAN_GEO_URLS = [localGeoUrl, ANSHAN_GEO_URL]
+const techTexture = ref<HTMLCanvasElement | null>(null)
+
+const REGION_ALIAS: Record<string, string> = {
+  岫岩县: '岫岩满族自治县',
+  高新区: '千山区',
+  风景区: '千山区'
+}
+
+const REGION_COORDS: Record<string, [number, number]> = {
+  台安县: [122.42, 41.26],
+  海城市: [122.73, 40.87],
+  岫岩满族自治县: [123.27, 40.28],
+  铁东区: [123.18, 41.12],
+  铁西区: [122.95, 41.12],
+  立山区: [123.03, 41.15],
+  千山区: [122.949298, 41.068909]
+}
+
+const createTechTexture = () => {
+  const size = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return canvas
+
+  ctx.fillStyle = 'rgba(5, 25, 70, 0.2)'
+  ctx.fillRect(0, 0, size, size)
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.10)'
+  ctx.lineWidth = 1
+  const step = 32
+  for (let x = 0; x <= size; x += step) {
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x, size)
+    ctx.stroke()
+  }
+  for (let y = 0; y <= size; y += step) {
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y)
+    ctx.stroke()
+  }
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.08)'
+  for (let i = 0; i < 20; i += 1) {
+    const y = Math.floor((i / 20) * size)
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y + 18)
+    ctx.stroke()
+  }
+
+  ctx.fillStyle = 'rgba(220, 255, 255, 0.12)'
+  for (let i = 0; i < 2600; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    const r = Math.random() * 1.2
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'
+  for (let i = 0; i < 180; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    ctx.fillRect(x, y, 1, 1)
+  }
+
+  return canvas
+}
+
+onMounted(async () => {
+  try {
+    techTexture.value = createTechTexture()
+    let geoJson: unknown = null
+    for (const url of ANSHAN_GEO_URLS) {
+      try {
+        const res = await fetch(url)
+        if (!res.ok) continue
+        geoJson = await res.json()
+        break
+      } catch {
+        continue
+      }
+    }
+    if (!geoJson) throw new Error('map geojson not loaded')
+    echarts.registerMap('anshan', geoJson)
+    mapReady.value = true
+  } catch (err) {
+    mapReady.value = false
+    console.error('鞍山地图加载异常', err)
+  }
+})
+
+const option = computed(() => {
+  if (!mapReady.value) return {}
+  const topColor = 'rgba(20, 140, 220, 0.65)'
+  const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
+  const activeColor = 'rgba(80, 200, 255, 0.92)'
+  const inactiveOpacity = 0.58
+  const detailTexture = techTexture.value as any
+
+  const activeRegionName = props.activeName
+    ? (REGION_ALIAS[props.activeName] ?? props.activeName)
+    : ''
+
+  const aggregated = new Map<string, number>()
+  props.rows.forEach((row) => {
+    const name = REGION_ALIAS[row.name] ?? row.name
+    aggregated.set(name, (aggregated.get(name) ?? 0) + (row.grid ?? 0))
+  })
+  const mapData = Array.from(aggregated.entries()).map(([name, value]) => ({ name, value }))
+
+  const points = [...mapData]
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 3)
+    .map((item) => {
+      const coord = REGION_COORDS[item.name]
+      if (!coord) return null
+      return {
+        name: item.name,
+        value: [coord[0], coord[1], item.value]
+      }
+    })
+    .filter(Boolean)
+
+  const activeCoord = activeRegionName ? REGION_COORDS[activeRegionName] : undefined
+  const activePoint =
+    activeCoord && activeRegionName
+      ? [{ name: activeRegionName, value: [activeCoord[0], activeCoord[1], 1] }]
+      : []
+
+  const hasActiveRegion = Boolean(activeRegionName)
+
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      formatter: (p: any) => {
+        if (Array.isArray(p?.value)) return p?.name ?? ''
+        return `${p?.name ?? ''}<br>数据：${p?.value ?? ''}`
+      },
+      textStyle: { color: '#fff' }
+    },
+    geo3D: {
+      map: 'anshan',
+      regionHeight: 10,
+      shading: 'realistic',
+      realisticMaterial: {
+        detailTexture,
+        textureTiling: 1,
+        roughness: 0.28,
+        metalness: 0.02
+      },
+      groundPlane: { show: false },
+      itemStyle: {
+        color: topColor,
+        borderColor: 'rgba(255, 160, 40, 0.92)',
+        borderWidth: 2,
+        opacity: 1
+      },
+      label: {
+        show: true,
+        color: 'rgba(240, 252, 255, 0.92)',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textShadowBlur: 10,
+        textShadowColor: 'rgba(0, 120, 200, 0.6)'
+      },
+      emphasis: {
+        label: {
+          color: '#ffffff'
+        },
+        itemStyle: {
+          color: topColorEmphasis,
+          borderColor: 'rgba(255, 180, 80, 1)',
+          borderWidth: 2.6
+        }
+      },
+      viewControl: {
+        projection: 'perspective',
+        alpha: 70,
+        beta: -18,
+        distance: 175,
+        minDistance: 80,
+        maxDistance: 170,
+        rotateSensitivity: 0,
+        zoomSensitivity: 0,
+        panSensitivity: 0
+      },
+      light: {
+        main: {
+          intensity: 1.3,
+          alpha: 35,
+          beta: 35,
+          shadow: true,
+          shadowQuality: 'high',
+          color: '#e6f7ff'
+        },
+        ambient: {
+          intensity: 0.35
+        }
+      },
+      regions: mapData.map((r) => {
+        const isActive = hasActiveRegion && r.name === activeRegionName
+        return {
+          name: r.name,
+          value: r.value,
+          itemStyle: isActive
+            ? {
+                color: activeColor,
+                borderColor: 'rgba(255, 210, 120, 1)',
+                borderWidth: 3,
+                opacity: 1
+              }
+            : hasActiveRegion
+              ? { opacity: inactiveOpacity }
+              : undefined,
+          label: isActive ? { color: '#ffffff', fontSize: 16 } : undefined
+        }
+      })
+    },
+    postEffect: {
+      enable: true,
+      bloom: {
+        enable: true,
+        bloomIntensity: 0.85
+      },
+      SSAO: {
+        enable: true,
+        radius: 6,
+        intensity: 1
+      },
+      FXAA: {
+        enable: true
+      }
+    },
+    series: [
+      {
+        type: 'scatter3D',
+        coordinateSystem: 'geo3D',
+        geo3DIndex: 0,
+        data: [...points, ...activePoint],
+        symbolSize: (value: any[]) => (activeRegionName && value?.[2] === 1 ? 16 : 12),
+        label: {
+          show: true,
+          formatter: (p: any) => p?.name ?? '',
+          position: 'right',
+          color: '#f2fbff',
+          fontSize: 14
+        },
+        itemStyle: {
+          color: (p: any) => (p?.name === activeRegionName ? '#ffdd22' : '#00ccff'),
+          shadowBlur: 18,
+          shadowColor: 'rgba(0, 180, 255, 0.6)'
+        }
+      }
+    ]
+  }
+})
+</script>
+
+<template>
+  <div class="root">
+    <EChart :option="option" style="width: 100%; height: 100%" />
+    <div v-if="!mapReady" class="empty">地图加载中...</div>
+  </div>
+</template>
+
+<style scoped>
+.root {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: rgba(214, 238, 255, 0.7);
+  pointer-events: none;
+}
+</style>
