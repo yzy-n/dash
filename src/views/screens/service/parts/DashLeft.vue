@@ -20,7 +20,7 @@
           {{ tab }}
         </button>
       </div>
-      <div class="electric-body">
+      <div class="pile-body">
         <div class="metric-list">
           <div v-for="item in electricMetrics" :key="item.label" class="metric-row">
             <span class="metric-label">{{ item.label }}</span>
@@ -508,7 +508,7 @@ const pileOption = computed(() => {
         name: '民用充电站',
         type: 'bar',
         data: privateVals,
-        barWidth: 10,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
@@ -569,7 +569,7 @@ const energyOption = computed(() => {
       {
         type: 'bar',
         data: values,
-        barWidth: 18,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [0, 10, 10, 0],
           color: {

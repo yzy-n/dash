@@ -97,145 +97,59 @@
 
     <section class="panel panel--pile">
       <div class="panel-head">
-        <div class="panel-title">充电桩建设情况</div>
-        <select v-model="datePile" class="panel-date">
+        <div class="panel-title">规模以上工业增项</div>
+        <select v-model="dateElectric" class="panel-date">
           <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
-      <div class="pile-body">
-        <div class="pile-top">
-          <div class="pile-top-left">
-            <div class="pile-top-left-row">
-              <div class="pile-top-left-label">现有商用充电站/桩</div>
-              <div class="pile-top-left-value">
-                <span class="pile-num pile-num--cyan">60</span>
-                <span class="pile-unit">站</span>
-                <span class="pile-split">/</span>
-                <span class="pile-num">217</span>
-                <span class="pile-unit">个</span>
-              </div>
-            </div>
-            <div class="pile-top-left-row">
-              <div class="pile-top-left-label">现有民用充电桩</div>
-              <div class="pile-top-left-value">
-                <span class="pile-num pile-num--yellow">2611</span>
-                <span class="pile-unit">个</span>
-              </div>
-            </div>
-          </div>
-          <div class="pile-top-right">
-            <div class="pile-top-right-row">
-              <div class="pile-top-right-name">
-                <div class="pile-top-right-sub">本年累计</div>
-                <div class="pile-top-right-main">商用充电量</div>
-              </div>
-              <div class="pile-top-right-metrics">
-                <div class="pile-top-right-val">
-                  <span class="pile-num">340.94</span>
-                  <span class="pile-unit">万千瓦时</span>
-                </div>
-                <div class="pile-top-right-yoy">
-                  <span class="pile-top-right-yoy-label">同比:</span>
-                  <span class="pile-num pile-num--cyan">32.06</span>
-                  <span class="pile-unit">%</span>
-                </div>
-              </div>
-            </div>
-            <div class="pile-top-right-row">
-              <div class="pile-top-right-name">
-                <div class="pile-top-right-sub">本年累计</div>
-                <div class="pile-top-right-main">民用充电量</div>
-              </div>
-              <div class="pile-top-right-metrics">
-                <div class="pile-top-right-val">
-                  <span class="pile-num">287.77</span>
-                  <span class="pile-unit">万千瓦时</span>
-                </div>
-                <div class="pile-top-right-yoy">
-                  <span class="pile-top-right-yoy-label">同比:</span>
-                  <span class="pile-num pile-num--yellow">142.89</span>
-                  <span class="pile-unit">%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pile-chart">
-          <EChart :option="pileOption" />
-        </div>
-      </div>
-    </section>
-
-    <section class="panel panel--project">
-      <div class="panel-head">
-        <div class="panel-title">重点项目报装情况</div>
-        <select v-model="dateProject" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
-        </select>
-      </div>
-      <div class="panel-tabs panel-tabs--center">
+      <div class="panel-tabs">
         <button
-          v-for="tab in projectTabs"
+          v-for="tab in electricTabs"
           :key="tab"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeProjectTab }"
+          :class="{ 'tab--active': tab === activeElectricTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeProjectTab = tab"
+          @click="activeElectricTab = tab"
         >
           {{ tab }}
         </button>
       </div>
-      <div class="project-body">
-        <div class="project-kpi project-kpi--bar">
-          <span class="project-kpi-icon"></span>
-          <span class="project-kpi-label">有用电需求项目：</span>
-          <span class="project-kpi-value">{{ projectTotal }}</span>
-          <span class="project-kpi-unit">个</span>
+      <div class="pile-body">
+        <div class="metric-list">
+          <div v-for="item in electricMetrics" :key="item.label" class="metric-row">
+            <span class="metric-label">{{ item.label }}</span>
+            <span class="metric-num">{{ item.value }}</span>
+            <span class="metric-unit">{{ item.unit }}</span>
+          </div>
         </div>
-        <div class="project-stage">
-          <div class="project-base"></div>
-          <div class="project-ring project-ring--a"></div>
-          <div class="project-ring project-ring--b"></div>
-          <ProjectPie3D :done="projectDone" :todo="projectTodo" />
+        <div class="pile-chart">
+          <Line />
         </div>
-        <div class="project-table">
-          <div class="project-table-row">
-            <span class="project-dot project-dot--done"></span>
-            <span class="project-name">已报装</span>
-            <div class="project-stat">
-              <div class="project-stat-label">数量</div>
-              <div class="project-stat-value">
-                {{ projectDone }}
-                <span class="project-stat-unit">个</span>
-              </div>
-            </div>
-            <div class="project-stat">
-              <div class="project-stat-label">占比</div>
-              <div class="project-stat-value">
-                {{ projectDoneRate }}
-                <span class="project-stat-unit">%</span>
-              </div>
+      </div>
+    </section>
+
+    <section class="panel panel--resume">
+      <div class="panel-head">
+        <div class="panel-title">规模以上工业效益</div>
+        <select v-model="dateInvest" class="panel-date">
+          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
+      </div>
+      <div class="four-reform-wrap">
+        <div class="four-reform-list">
+          <div class="four-reform-item" v-for="item in fourReformMetrics2" :key="item.label">
+            <div class="four-reform-label">{{ item.label }}</div>
+            <div class="four-reform-value">
+              <span class="num">{{ item.value }}</span>
+              <span class="unit">{{ item.unit }}</span>
             </div>
           </div>
-          <div class="project-table-row">
-            <span class="project-dot project-dot--todo"></span>
-            <span class="project-name">待报装</span>
-            <div class="project-stat">
-              <div class="project-stat-label">数量</div>
-              <div class="project-stat-value">
-                {{ projectTodo }}
-                <span class="project-stat-unit">个</span>
-              </div>
-            </div>
-            <div class="project-stat">
-              <div class="project-stat-label">占比</div>
-              <div class="project-stat-value">
-                {{ projectTodoRate }}
-                <span class="project-stat-unit">%</span>
-              </div>
-            </div>
-          </div>
+        </div>
+      </div>
+      <div class="resume-invest-body">
+        <div class="resume-invest-chart">
+          <EChart :option="investOption2" />
         </div>
       </div>
     </section>
@@ -279,11 +193,12 @@ import { computed, ref } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import PieRing from '../charts/PieRing.vue'
-
+import Line from '../charts/line.vue'
+const electricTabs = ['地区', '行业', '园区']
 const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
 const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
 
-const dateElectric = ref(gdpDateOptions[0])
+const dateElectric = ref(dateOptions[0])
 const dateCapacity = ref(dateOptions[0])
 const dateInvest = ref(dateOptions[1])
 const datePile = ref(dateOptions[2])
@@ -563,14 +478,80 @@ const investOption = computed(() => {
     ]
   }
 })
-
+const investDistrictX2 = [
+  '钢铁行业',
+  '菱镁行业',
+  '建材行业',
+  '装备制造',
+  '化工行业',
+  '消费品',
+  '电子信息',
+  '铁矿行业',
+  '工业辅助'
+]
+const investOption2 = computed(() => {
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+    },
+    grid: { left: 60, right: 24, top: 24, bottom: 80 },
+    xAxis: {
+      type: 'category',
+      data: investDistrictX2,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 40 },
+      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      name: '单位：%',
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      {
+        type: 'bar',
+        barWidth: 50,
+        data: investDistrictY,
+        itemStyle: {
+          borderRadius: [6, 6, 0, 0],
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: '#54e8ff' },
+              { offset: 1, color: '#1966ff' }
+            ]
+          }
+        },
+        markLine: { silent: true, data: [{ yAxis: 0 }], lineStyle: { color: '#ff4444', width: 2 } }
+      }
+    ]
+  }
+})
 const fourReformMetrics = computed(() => [
   { label: '累计完成投资', value: '7.07', unit: '亿元' },
   { label: '较去年同期增长', value: '2.9', unit: '%' },
   { label: '占工业投资比重', value: '48.5', unit: '%' },
   { label: '较去年同期提升', value: '1.2', unit: '%' }
 ])
-
+const fourReformMetrics2 = computed(() => [
+  { label: '营业收入', value: '3014', unit: '亿元' },
+  { label: '税金总额', value: '83', unit: '亿元' },
+  { label: '平均用工人数', value: '149580', unit: '人' },
+  { label: '利润总额', value: '161', unit: '亿元' }
+])
 const pileOption = computed(() => {
   const districts = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
   const privateVals = [14, 65, 6, 18, 9, 10, 4, 7]
