@@ -154,34 +154,33 @@
       </div>
     </section>
 
-    <section class="panel panel--energy">
+    <section class="panel panel--steel">
       <div class="panel-head">
-        <div class="panel-title">能源装机情况</div>
-        <select v-model="dateEnergy" class="panel-date">
+        <div class="panel-title">钢价走势</div>
+        <select v-model="dateSteel" class="panel-date">
           <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
-      <div class="panel-tabs panel-tabs--right">
-        <button
-          v-for="tab in energyTabs"
-          :key="tab"
-          type="button"
-          class="tab"
-          :class="{ 'tab--active': tab === activeEnergyTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeEnergyTab = tab"
-        >
-          {{ tab }}
-        </button>
-      </div>
-      <div class="energy-body">
-        <div class="energy-kpi">
-          <span class="energy-kpi-label">能源总发电量</span>
-          <span class="energy-kpi-value">{{ energyTotal }}</span>
-          <span class="energy-kpi-unit">万千瓦时</span>
+      <div class="steel-body">
+        <!-- 表头 -->
+        <div class="steel-header-row">
+          <div class="col">品种</div>
+          <div class="col">规格</div>
+          <div class="col">价格(元)</div>
+          <div class="col">上周价格(元)</div>
+          <div class="col">环比增长(元)</div>
         </div>
-        <div class="energy-chart">
-          <EChart :option="energyOption" />
+        <!-- 数据行，每一行独立带左右箭头 -->
+        <div class="steel-row-wrap" v-for="row in steelTableData" :key="row.id">
+          <span class="arrow arrow-left"></span>
+          <div class="steel-data-row">
+            <div class="col">{{ row.category }}</div>
+            <div class="col">{{ row.spec }}</div>
+            <div class="col">{{ row.price }}</div>
+            <div class="col">{{ row.lastWeekPrice }}</div>
+            <div class="col" :class="{ 'text-down': row.change < 0 }">{{ row.change }}</div>
+          </div>
+          <span class="arrow arrow-right"></span>
         </div>
       </div>
     </section>
@@ -204,7 +203,15 @@ const dateInvest = ref(dateOptions[1])
 const datePile = ref(dateOptions[2])
 const dateProject = ref(dateOptions[0])
 const dateEnergy = ref(dateOptions[0])
-
+const dateSteel = ref('')
+// 模拟截图里表格数据
+const steelTableData = ref([
+  { id: 1, category: '工字钢', spec: '25A', price: 4150, lastWeekPrice: 4150, change: 0 },
+  { id: 2, category: '槽钢', spec: '16#', price: 4400, lastWeekPrice: 4340, change: -60 },
+  { id: 3, category: '槽钢', spec: '25#', price: 4150, lastWeekPrice: 4150, change: 0 },
+  { id: 4, category: '角钢', spec: '50*5', price: 4350, lastWeekPrice: 4290, change: -60 },
+  { id: 5, category: '角钢', spec: '160*10', price: 4110, lastWeekPrice: 4110, change: 0 }
+])
 const gdpLineOption = computed(() => {
   const x = ['2022年1季度', '2022年2季度', '2022年3季度', '2022年4季度']
   const national = [3.1, 2.4, 2.8, 2.8]
@@ -1278,5 +1285,63 @@ const energyOption = computed(() => {
 .energy-chart {
   min-height: 0;
   margin-top: -50px;
+}
+
+.steel-body {
+  width: 100%;
+}
+
+/* 表头行 */
+.steel-header-row {
+  display: flex;
+  width: 100%;
+  background: #0b306b;
+}
+.steel-header-row .col {
+  flex: 1;
+  text-align: center;
+  font-size: 24px;
+  color: #fff;
+  padding: 12px 4px;
+  text-shadow: 0 0 8px #2178dd;
+}
+
+/* 数据行容器，放左右箭头 */
+.steel-row-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-top: 40px;
+}
+.arrow {
+  width: 14px;
+  height: 18px;
+  color: #ffcc44;
+  font-size: 20px;
+  text-shadow: 0 0 6px #ffbc2c;
+}
+.arrow-left::before {
+  content: '◆';
+}
+.arrow-right::before {
+  content: '◆';
+}
+
+.steel-data-row {
+  flex: 1;
+  display: flex;
+  background: linear-gradient(90deg, #0c3370, #15448c, #0c3370);
+}
+.steel-data-row .col {
+  flex: 1;
+  text-align: center;
+  font-size: 24px;
+  color: #ffffff;
+  padding: 16px 4px;
+  text-shadow: 0 0 6px #247ddd;
+}
+.text-down {
+  color: #39f25c;
+  text-shadow: 0 0 8px #23d848;
 }
 </style>

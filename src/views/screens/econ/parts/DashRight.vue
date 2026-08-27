@@ -1,44 +1,39 @@
 <template>
   <aside class="right">
     <div class="col">
-      <section class="panel panel--gas">
+      <section class="panel market-panel">
         <div class="panel-head">
-          <div class="panel-title">燃气</div>
-          <div class="panel-date">2022年统计数据</div>
+          <div class="panel-title">各地区市场主体</div>
+          <div class="panel-date">2023.01‑02</div>
         </div>
-        <div class="panel-tabs">
-          <button
-            v-for="tab in gasTabs"
-            :key="tab"
-            type="button"
-            class="tab"
-            :class="{ 'tab--active': tab === activeGasTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeGasTab = tab"
-          >
-            {{ tab }}
-          </button>
+        <!-- 5个指标卡片，第一行3个，第二行2个居中 -->
+        <div class="market-metrics-wrap">
+          <div class="metric-item">
+            <div class="metric-label">总计</div>
+            <div class="metric-value">314493 <span class="unit">户</span></div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">内资企业</div>
+            <div class="metric-value">53425 <span class="unit">户</span></div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">个体工商户</div>
+            <div class="metric-value">256312 <span class="unit">户</span></div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">农民专业合作社</div>
+            <div class="metric-value">4601 <span class="unit">户</span></div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">外资企业</div>
+            <div class="metric-value">155 <span class="unit">户</span></div>
+          </div>
         </div>
-        <div class="gas-stage">
-          <div class="gas-gauge">
-            <EChart :option="gasOption" />
-          </div>
-          <div class="gas-icon"></div>
-          <div
-            v-for="item in gasMetrics"
-            :key="item.label"
-            class="gas-metric"
-            :class="`gas-metric--${item.pos}`"
-          >
-            <div class="gas-metric-label">{{ item.label }}</div>
-            <div class="gas-metric-value">
-              <span class="gas-metric-num">{{ item.value }}</span>
-              <span class="gas-metric-unit">{{ item.unit }}</span>
-            </div>
-          </div>
+        <!-- 柱状图区域 -->
+        <div class="chart-wrap">
+          <EChart :option="barOption" />
         </div>
       </section>
-
       <section class="panel panel--tower">
         <div class="panel-head">
           <div class="panel-title">通信铁塔建设情况</div>
@@ -66,7 +61,6 @@
         </div>
       </section>
     </div>
-
     <div class="col">
       <section class="panel panel--water">
         <div class="panel-head">
@@ -82,7 +76,6 @@
           <EChart :option="waterOption" />
         </div>
       </section>
-
       <section class="panel panel--heat">
         <div class="panel-head">
           <div class="panel-title">供暖情况</div>
@@ -111,7 +104,6 @@
         </div>
       </section>
     </div>
-
     <div class="col">
       <!-- 红十字会：高度由内容撑开，不抢占剩余高度 -->
       <section class="panel panel--red">
@@ -131,7 +123,6 @@
             <div class="red-top-label">捐献造血干细胞实际捐献</div>
             <div class="red-top-val">28 <span>例</span></div>
           </div>
-
           <!-- 5个模块卡片 -->
           <div class="red-card-wrap">
             <div class="red-card">
@@ -162,7 +153,6 @@
           </div>
         </div>
       </section>
-
       <!-- AED占剩下全部高度 -->
       <section class="panel--aed">
         <div class="panel-head panel-head--center">
@@ -175,7 +165,6 @@
     </div>
   </aside>
 </template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
@@ -183,7 +172,6 @@ import tabBgUrl from '@/assets/img/tabBg.png'
 
 const gasTabs = ['煤气', '天然气', '液化石油气']
 const activeGasTab = ref<(typeof gasTabs)[number]>(gasTabs[0])
-
 const gasMetrics = computed(() => {
   const map = {
     煤气: [
@@ -212,6 +200,76 @@ const gasMetrics = computed(() => {
     ]
   } as const
   return map[activeGasTab.value]
+})
+
+// 市场主体柱状图
+const barOption = ref<EChartsOption>({
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'axis',
+    backgroundColor: 'rgba(4,24,48,0.85)',
+    borderColor: '#26c9dd',
+    textStyle: { color: '#fff' },
+    formatter: (params: any) => {
+      return `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
+    }
+  },
+  grid: {
+    left: '8%',
+    right: '4%',
+    top: '12%',
+    bottom: '22%'
+  },
+  xAxis: {
+    type: 'category',
+    data: [
+      '海城市',
+      '台安县',
+      '岫岩县',
+      '铁东区',
+      '铁西区',
+      '立山区',
+      '千山区',
+      '高新区',
+      '经开区',
+      '风景区'
+    ],
+    axisLine: { lineStyle: { color: '#287892' } },
+    axisLabel: {
+      color: '#82d8e8',
+      rotate: 40,
+      fontSize: 14
+    }
+  },
+  yAxis: {
+    name: '单位：户',
+    nameTextStyle: { color: '#82d8e8' },
+    type: 'value',
+    splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
+    axisLine: { show: false },
+    axisLabel: { color: '#82d8e8' }
+  },
+  series: [
+    {
+      name: '内资企业',
+      type: 'bar',
+      barWidth: '40%',
+      data: [17200, 4600, 6200, 9800, 6100, 5088, 4300, 1200, 800, 300],
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: '#26e2dd' },
+            { offset: 1, color: '#086c94' }
+          ]
+        }
+      }
+    }
+  ]
 })
 
 const gasOption = computed(() => {
@@ -290,7 +348,6 @@ const gasOption = computed(() => {
 
 const waterTypes = ['综合生产能力', '城区合计']
 const activeWaterType = ref<(typeof waterTypes)[number]>(waterTypes[0])
-
 const waterOption = computed(() => {
   const x = ['城区合计', '海城市', '台安县', '岫岩县']
   const y = activeWaterType.value === '综合生产能力' ? [55, 10, 3, 2] : [36, 12, 4, 3]
@@ -342,7 +399,6 @@ const towerLegend = [
   { label: '楼面站', value: '1674', unit: '个', rate: '35.54%' },
   { label: 'H杆', value: '472', unit: '个', rate: '10.02%' }
 ]
-
 const towerOption = computed(() => {
   const data = [
     { name: '地面站', value: 2564 },
@@ -368,7 +424,6 @@ const towerOption = computed(() => {
 
 const heatTabs = ['供暖能力', '供暖组织']
 const activeHeatTab = ref<(typeof heatTabs)[number]>(heatTabs[0])
-
 const heatRows = computed(() => {
   const map = {
     供暖能力: [
@@ -388,19 +443,6 @@ const heatRows = computed(() => {
   } as const
   return map[activeHeatTab.value]
 })
-
-const redTopRows = [
-  { label: '造血干细胞捐献', value: '8485', unit: '人' },
-  { label: '捐献造血干细胞实际捐献', value: '28', unit: '例' }
-]
-
-const redCards = [
-  { label: '遗体捐献', value: '61', unit: '例' },
-  { label: '眼组织捐献', value: '24', unit: '例' },
-  { label: '器官捐献', value: '15', unit: '例' },
-  { label: '肝脏捐献', value: '15', unit: '个' },
-  { label: '肾脏捐献', value: '30', unit: '个' }
-]
 
 const aedOption = computed(() => {
   const points = [
@@ -455,7 +497,6 @@ const aedOption = computed(() => {
   grid-template-columns: repeat(3, 1fr);
   gap: 26px;
 }
-
 .col {
   min-height: 0;
   height: 100%;
@@ -463,7 +504,6 @@ const aedOption = computed(() => {
   flex-direction: column;
   gap: 26px;
 }
-
 .panel {
   position: relative;
   overflow: hidden;
@@ -481,7 +521,6 @@ const aedOption = computed(() => {
     0 0 30px rgba(0, 45, 111, 0.14);
   box-sizing: border-box;
 }
-
 .panel::before {
   content: '';
   position: absolute;
@@ -489,7 +528,6 @@ const aedOption = computed(() => {
   border: 1px solid rgba(94, 197, 255, 0.12);
   pointer-events: none;
 }
-
 .panel-title {
   font-size: 34px;
   font-style: italic;
@@ -506,7 +544,6 @@ const aedOption = computed(() => {
     0 0 14px #3b8fff,
     0 0 24px #0f58d1;
 }
-
 .panel-head {
   position: absolute;
   left: 26px;
@@ -518,15 +555,86 @@ const aedOption = computed(() => {
   justify-content: space-between;
   z-index: 2;
 }
+
+/* ========== 仅市场主体模块新增样式，不污染其他panel ========== */
+.market-panel {
+  flex: 1;
+  min-height: 0;
+}
+.market-metrics-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+/* 第4、5个卡片，第二行居中摆放 */
+.market-metrics-wrap .metric-item:nth-child(4) {
+  grid-column: 1 / 2;
+}
+.market-metrics-wrap .metric-item:nth-child(5) {
+  grid-column: 2 / 3;
+}
+.metric-item {
+  height: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  background: linear-gradient(90deg, rgba(14, 70, 134, 0.7), rgba(8, 42, 84, 0.5));
+  border: 1px solid rgba(38, 201, 221, 0.35);
+  border-radius: 4px;
+  position: relative;
+}
+.metric-item::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid #ffdd66;
+  border-left: 2px solid #ffdd66;
+}
+.metric-item::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid #ffdd66;
+  border-left: 2px solid #ffdd66;
+}
+.metric-label {
+  font-size: 22px;
+  color: #c6ecf8;
+}
+.metric-value {
+  font-size: 26px;
+  color: #ffffff;
+  font-weight: bold;
+}
+.metric-value .unit {
+  font-size: 20px;
+  color: #82d8e8;
+  margin-left: 4px;
+}
+.chart-wrap {
+  width: 100%;
+  height: calc(100% - 180px);
+}
+/* ========================================================= */
+
 /* 红十字头部：标题左，日期右 */
 .red-panel-head {
   justify-content: space-between;
 }
-
 .panel-head--center {
   justify-content: center;
 }
-
 .panel-date {
   height: 36px;
   padding: 0 18px;
@@ -541,7 +649,6 @@ const aedOption = computed(() => {
   align-items: center;
   justify-content: center;
 }
-
 .panel-tabs {
   position: absolute;
   left: 26px;
@@ -552,11 +659,9 @@ const aedOption = computed(() => {
   justify-content: center;
   gap: 14px;
 }
-
 .panel-tabs--center {
   justify-content: center;
 }
-
 .tab {
   border: none;
   outline: none;
@@ -573,24 +678,20 @@ const aedOption = computed(() => {
   letter-spacing: 2px;
   cursor: pointer;
 }
-
 .tab--active {
   color: rgba(240, 251, 255, 0.96);
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.22);
 }
-
 .panel--gas {
   flex: 1;
   min-height: 0;
 }
-
 .gas-stage {
   position: absolute;
   inset: 0;
   padding: 128px 26px 26px;
   box-sizing: border-box;
 }
-
 .gas-gauge {
   position: absolute;
   left: 50%;
@@ -599,7 +700,6 @@ const aedOption = computed(() => {
   height: 540px;
   transform: translate(-50%, -50%);
 }
-
 .gas-icon {
   position: absolute;
   left: 50%;
@@ -612,7 +712,6 @@ const aedOption = computed(() => {
   background: radial-gradient(circle at 50% 40%, rgba(54, 232, 255, 0.26), rgba(6, 18, 48, 0.25));
   box-shadow: 0 0 26px rgba(54, 232, 255, 0.14);
 }
-
 .gas-metric {
   position: absolute;
   width: 360px;
@@ -624,69 +723,57 @@ const aedOption = computed(() => {
   display: grid;
   gap: 10px;
 }
-
 .gas-metric-label {
   font-size: 18px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
-
 .gas-metric-value {
   display: inline-flex;
   align-items: baseline;
   gap: 10px;
 }
-
 .gas-metric-num {
   font-size: 24px;
   font-weight: 900;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 14px rgba(255, 226, 74, 0.18);
 }
-
 .gas-metric-unit {
   font-size: 16px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .gas-metric--lt {
   left: 40px;
   top: 140px;
 }
-
 .gas-metric--rt {
   right: 40px;
   top: 140px;
 }
-
 .gas-metric--lm {
   left: 40px;
   top: 50%;
   transform: translateY(-50%);
 }
-
 .gas-metric--rm {
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
 }
-
 .gas-metric--lb {
   left: 40px;
   bottom: 46px;
 }
-
 .gas-metric--rb {
   right: 40px;
   bottom: 46px;
 }
-
 .panel--tower {
   flex: 1;
   min-height: 0;
 }
-
 .tower-kpi {
   height: 54px;
   display: flex;
@@ -698,17 +785,14 @@ const aedOption = computed(() => {
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.78);
 }
-
 .tower-kpi-value {
   font-size: 26px;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .tower-kpi-unit {
   color: rgba(214, 238, 255, 0.62);
 }
-
 .tower-body {
   height: calc(100% - 54px);
   min-height: 0;
@@ -717,17 +801,14 @@ const aedOption = computed(() => {
   gap: 14px;
   align-items: center;
 }
-
 .tower-chart {
   height: 100%;
   min-height: 0;
 }
-
 .tower-legend {
   display: grid;
   gap: 12px;
 }
-
 .tower-legend-row {
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
@@ -739,44 +820,37 @@ const aedOption = computed(() => {
   gap: 10px;
   align-items: baseline;
 }
-
 .tower-legend-label {
   font-size: 18px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
-
 .tower-legend-value {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
 }
-
 .tower-legend-num {
   font-size: 22px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .tower-legend-unit {
   font-size: 16px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .tower-legend-rate {
   font-size: 18px;
   font-weight: 900;
   color: rgba(255, 226, 74, 0.9);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.14);
 }
-
 .panel--water {
   flex: 1;
   min-height: 0;
 }
-
 .water-filter {
   position: absolute;
   top: 78px;
@@ -792,7 +866,6 @@ const aedOption = computed(() => {
   box-sizing: border-box;
   z-index: 2;
 }
-
 .water-select {
   width: 100%;
   height: 100%;
@@ -806,28 +879,23 @@ const aedOption = computed(() => {
   letter-spacing: 2px;
   cursor: pointer;
 }
-
 .water-chart {
   height: 100%;
   min-height: 0;
 }
-
 .panel--heat {
   flex: 1;
   min-height: 0;
 }
-
 .heat-list {
   height: 100%;
   min-height: 0;
   display: grid;
   gap: 6px;
   margin-top: 90px;
-  /* 删除 margin-bottom:160px; 这个在这里无效 */
-  padding-bottom: 160px; /* ✅ 使用padding代替margin，实现底部留白 */
-  box-sizing: border-box; /* 必须加上，padding不会撑大高度 */
+  padding-bottom: 160px;
+  box-sizing: border-box;
 }
-
 .heat-row {
   height: 92px;
   border-radius: 12px;
@@ -843,7 +911,6 @@ const aedOption = computed(() => {
   font-size: 18px;
   font-weight: 900;
 }
-
 .heat-icon {
   width: 28px;
   height: 28px;
@@ -851,30 +918,25 @@ const aedOption = computed(() => {
   border: 1px solid rgba(54, 232, 255, 0.18);
   background: radial-gradient(circle, rgba(54, 232, 255, 0.2), rgba(6, 18, 48, 0.15));
 }
-
 .heat-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .heat-value {
   font-size: 22px;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .heat-unit {
   color: rgba(214, 238, 255, 0.62);
 }
-
 .panel--red {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-
 .red-inner {
   flex: 1;
   min-height: 0;
@@ -885,10 +947,8 @@ const aedOption = computed(() => {
   gap: 16px;
   box-sizing: border-box;
 }
-
-/* 顶部两行条目 */
 .red-top-item {
-  flex-shrink: 0; /* 禁止压缩 */
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   height: 80px;
@@ -928,9 +988,8 @@ const aedOption = computed(() => {
   color: #fff;
   margin-left: 4px;
 }
-
 .red-card-wrap {
-  flex: 1; /* ✅ 关键，把剩下全部高度给这个容器 */
+  flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -939,7 +998,6 @@ const aedOption = computed(() => {
 }
 .red-card {
   position: relative;
-  /* 不要写固定height，用min-height，卡片自身高度由内容决定 */
   min-height: 140px;
   border: 1px solid rgba(80, 160, 255, 0.3);
   border-radius: 10px;
@@ -970,8 +1028,6 @@ const aedOption = computed(() => {
   font-size: 18px;
   color: #fff;
 }
-
-/* AED面板占剩下全部高度 */
 .panel--aed {
   flex: 1;
   min-height: 0;
@@ -987,7 +1043,6 @@ const aedOption = computed(() => {
     0 0 30px rgba(0, 45, 111, 0.14);
   box-sizing: border-box;
 }
-
 .aed-chart {
   flex: 1;
   min-height: 0;
