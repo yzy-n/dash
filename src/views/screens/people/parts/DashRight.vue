@@ -3,37 +3,14 @@
     <div class="col">
       <section class="panel market-panel">
         <div class="panel-head">
-          <div class="panel-title">各地区市场主体</div>
+          <div class="panel-title">教育水平</div>
           <select v-model="dateCapacity" class="panel-date">
             <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
           </select>
         </div>
-        <!-- 5个指标卡片，第一行3个，第二行2个居中 -->
-        <div class="market-metrics-wrap">
-          <div class="metric-item">
-            <div class="metric-label">总计</div>
-            <div class="metric-value">314493 <span class="unit">户</span></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">内资企业</div>
-            <div class="metric-value">53425 <span class="unit">户</span></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">个体工商户</div>
-            <div class="metric-value">256312 <span class="unit">户</span></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">农民专业合作社</div>
-            <div class="metric-value">4601 <span class="unit">户</span></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">外资企业</div>
-            <div class="metric-value">155 <span class="unit">户</span></div>
-          </div>
-        </div>
         <!-- 柱状图区域 -->
-        <div class="chart-wrap">
-          <EChart :option="barOption" />
+        <div class="water-chart">
+          <pie3dChart :data="pieData" :innerRadius="0.6" :minThickness="0.15" :maxThickness="3" />
         </div>
       </section>
       <!-- ========== 价格监测：替换为表格+tab，移除原ECharts tower-chart ========== -->
@@ -185,7 +162,7 @@ import EChart from '@/components/echarts/EChart.vue'
 import productChart from '@/views/screens/econ/charts/product.vue'
 import plusChart from '@/views/screens/econ/charts/plus.vue'
 import houseChart from '@/views/screens/econ/charts/house.vue'
-import serviceChart from '@/views/screens/econ/charts/service.vue'
+import pie3dChart from '@/views/screens/people/charts/3d.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 
 const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
@@ -196,7 +173,15 @@ const dateRed = ref(dateOptions[0])
 const dateHeat = ref(dateOptions[0])
 const houseTabs = ['新房', '二手房']
 const activeHouseTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
-
+const pieData = [
+  { name: '小学', value: 160675, percent: '37.28%' },
+  { name: '幼儿园', value: 83449, percent: '19.36%' },
+  { name: '特殊教育', value: 862, percent: '0.20%' },
+  { name: '普通高等', value: 42332, percent: '9.82%' },
+  { name: '调整后中等职业', value: 4857, percent: '1.13%' },
+  { name: '普通中学', value: 135908, percent: '31.53%' },
+  { name: '职业中学', value: 2943, percent: '0.68%' }
+]
 const gasMetrics = computed(() => {
   const map = {
     煤气: [
@@ -690,7 +675,6 @@ const aedOption = computed(() => {
   width: 100%;
   height: calc(100% - 70px);
   display: flex;
-  margin-top: 150px;
   flex-direction: column;
   border: 1px solid rgba(84, 188, 255, 0.2);
   border-radius: 8px;
