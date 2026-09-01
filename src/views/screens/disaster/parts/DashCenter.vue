@@ -454,7 +454,7 @@ const gridInfoRows: GridInfoRow[] = [
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  --webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -564,7 +564,7 @@ const gridInfoRows: GridInfoRow[] = [
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  --webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

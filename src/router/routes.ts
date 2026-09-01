@@ -7,6 +7,7 @@ import PartyScreen from '@/views/screens/party/index.vue'
 import ServiceScreen from '@/views/screens/service/index.vue'
 import EconScreen from '@/views/screens/econ/index.vue'
 import PeopleScreen from '@/views/screens/people/index.vue'
+import AskScreen from '@/views/screens/ask/index.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -43,5 +44,10 @@ export const routes: RouteRecordRaw[] = [
     path: '/people',
     name: 'people-screen',
     component: PeopleScreen
+  },
+  {
+    path: '/ask',
+    name: 'ask-screen',
+    component: AskScreen
   }
 ]
