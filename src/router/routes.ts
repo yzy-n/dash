@@ -8,6 +8,7 @@ import ServiceScreen from '@/views/screens/service/index.vue'
 import EconScreen from '@/views/screens/econ/index.vue'
 import PeopleScreen from '@/views/screens/people/index.vue'
 import AskScreen from '@/views/screens/ask/index.vue'
+import WeatherScreen from '@/views/screens/weather/index.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -49,5 +50,10 @@ export const routes: RouteRecordRaw[] = [
     path: '/ask',
     name: 'ask-screen',
     component: AskScreen
+  },
+  {
+    path: '/weather',
+    name: 'weather-screen',
+    component: WeatherScreen
   }
 ]
