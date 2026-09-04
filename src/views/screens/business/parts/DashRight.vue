@@ -1,194 +1,145 @@
 <template>
-  <aside class="left">
-    <!-- 1 还利于民 -->
-    <section class="panel panel--electric">
-      <div class="panel-head">
-        <div class="panel-title">还利于民</div>
-        <div class="total-text">总额：<span class="num">341,049.2万元</span></div>
-      </div>
-      <div class="capacity-body">
-        <div class="capacity-chart">
-          <EChart :option="benefitBarOption" />
+  <div class="container">
+    <!-- 第一行：年度热门事项 | 辽事通平台 | 好差评主动评价率 -->
+    <div class="row row-top">
+      <section class="panel panel--rank">
+        <div class="panel-head">
+          <div class="panel-title">年度热门事项排行榜</div>
         </div>
-      </div>
-    </section>
-    <!-- 2 受理单位参与度 -->
-    <section class="panel panel--capacity">
-      <div class="panel-head">
-        <div class="panel-title">受理单位参与度</div>
-      </div>
-      <div class="capacity-body">
-        <div class="capacity-chart">
-          <EChart :option="acceptUnitTrendOption" />
-        </div>
-      </div>
-    </section>
-    <!--3 部门办理量排行 -->
-    <section class="panel panel--pop-state">
-      <div class="panel-head">
-        <div class="panel-title">部门办理量排行</div>
-      </div>
-      <div class="capacity-body">
-        <div class="rank-list">
-          <div v-for="(item, idx) in deptRankList" :key="idx" class="rank-item">
-            <div class="rank-index">{{ item.no }}</div>
-            <div class="rank-name">{{ item.name }}</div>
-            <div class="rank-value">
-              {{ item.count }}件 <span class="rate">{{ item.rate }}</span>
+        <div class="panel-body">
+          <div class="rank-table">
+            <div class="rank-table-head">
+              <span>序号</span>
+              <span>事项名称</span>
+              <span>数量</span>
+            </div>
+            <!-- 外层不再用1fr拉伸，行高度由内容决定 -->
+            <div class="rank-table-body">
+              <div class="rank-table-row" v-for="(item, idx) in hotRankData" :key="idx">
+                <span class="r-index"> <i class="r-index-bar"></i>{{ item.no }} </span>
+                <span class="r-name">{{ item.name }}</span>
+                <span class="r-val">{{ item.count }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-    <!--4 预警问题 -->
-    <section class="panel panel--pile">
-      <div class="panel-head">
-        <div class="panel-title">预警问题</div>
-      </div>
-      <div class="capacity-body">
-        <div class="capacity-chart">
-          <EChart :option="warnRingOption" />
+      </section>
+      <section class="panel panel--liaost">
+        <div class="panel-head">
+          <div class="panel-title">辽事通平台</div>
         </div>
-      </div>
-    </section>
-    <!--5 小件质量 -->
-    <section class="panel panel--resume">
-      <div class="panel-head">
-        <div class="panel-title">小件质量</div>
-      </div>
-      <div class="capacity-body">
-        <div class="quality-list">
-          <div v-for="(item, idx) in qualityList" :key="idx" class="quality-item">
-            <div class="q-event">{{ item.eventName }}</div>
-            <div class="q-unit">{{ item.dutyUnit }}</div>
-            <div class="q-star">★×{{ item.star }}</div>
+        <div class="panel-body liaost-wrap">
+          <div class="liaost-item">
+            <div class="liaost-icon"></div>
+            <div class="liaost-label">接入事项数:</div>
+            <div class="liaost-num">132</div>
+          </div>
+          <div class="liaost-item">
+            <div class="liaost-icon"></div>
+            <div class="liaost-label">用户活跃度:</div>
+            <div class="liaost-num">1.54%</div>
+          </div>
+          <div class="liaost-item">
+            <div class="liaost-icon"></div>
+            <div class="liaost-label">事项使用率:</div>
+            <div class="liaost-num">10.35%</div>
           </div>
         </div>
-      </div>
-    </section>
-    <!--6 监管情况 -->
-    <section class="panel panel--steel">
-      <div class="panel-head">
-        <div class="panel-title">监管情况</div>
-        <div class="panel-tabs panel-tabs--center">
-          <button
-            v-for="tab in socialAssistTabs"
-            :key="tab"
-            type="button"
-            class="tab"
-            :class="{ 'tab--active': tab === activeAssistTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeAssistTab = tab"
-          >
-            {{ tab }}
-          </button>
+      </section>
+      <section class="panel panel--rate">
+        <div class="panel-head">
+          <div class="panel-title">好差评主动评价率</div>
         </div>
-      </div>
-      <div class="capacity-body">
-        <div class="supervise-list">
-          <div class="supervise-header">
-            <div class="sv-col">序号</div>
-            <div class="sv-col">地区</div>
-            <div class="sv-col">交办量</div>
-            <div class="sv-col">办结量</div>
-            <div class="sv-col">办结率</div>
-            <div class="sv-col">满意率</div>
-          </div>
-          <div v-for="(item, idx) in superviseList" :key="idx" class="supervise-row">
-            <div class="sv-col">{{ item.no }}</div>
-            <div class="sv-col">{{ item.area }}</div>
-            <div class="sv-col">{{ item.assignNum }}</div>
-            <div class="sv-col">{{ item.finishNum }}</div>
-            <div class="sv-col">{{ item.finishRate }}</div>
-            <div class="sv-col">{{ item.satisfactionRate }}</div>
+        <div class="panel-body">
+          <div class="rate-table">
+            <div class="rate-table-head">
+              <span>地区</span>
+              <span>评价总数</span>
+              <span>主动评价率</span>
+              <span>事项覆盖度</span>
+              <span>部门覆盖度</span>
+            </div>
+            <div class="rate-table-row" v-for="(item, idx) in rateTableData" :key="idx">
+              <span class="r-area">{{ item.area }}</span>
+              <span>{{ item.total }}</span>
+              <span>{{ item.activeRate }}</span>
+              <span>{{ item.itemCover }}</span>
+              <span>{{ item.deptCover }}</span>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </aside>
+      </section>
+    </div>
+    <!--第二行：流程再造 | 电子证照电子印章 -->
+    <div class="row row-bottom">
+      <section class="panel panel--rebuild">
+        <div class="panel-head">
+          <div class="panel-title">流程再造</div>
+          <div class="rebuild-tabs">
+            <div class="rebuild-tab">减时限</div>
+            <div class="rebuild-tab">减环节</div>
+            <div class="rebuild-tab">减材料</div>
+            <div class="rebuild-tab">减跑动</div>
+          </div>
+        </div>
+        <div class="panel-body chart-body">
+          <EChart :option="rebuildBarOption" />
+        </div>
+      </section>
+      <section class="panel panel--cert">
+        <div class="panel-head">
+          <div class="panel-title">电子证照 <span class="sub">电子印章</span></div>
+        </div>
+        <div class="panel-body cert-wrap">
+          <div class="cert-left">
+            <div class="cert-card">
+              <div class="cert-icon"></div>
+              <div class="cert-text">全市电子证照种类数</div>
+              <div class="cert-big-num">216<span class="cert-unit">种</span></div>
+            </div>
+            <div class="cert-card">
+              <div class="cert-icon"></div>
+              <div class="cert-text">市直电子证照制证部门数</div>
+              <div class="cert-big-num">20<span class="cert-unit">个</span></div>
+              <div class="cert-small-text">
+                市直各部门制作电子证照种类数 <span class="cert-small-num">152种</span>
+              </div>
+            </div>
+          </div>
+          <div class="cert-right">
+            <div class="chart-desc">各地区电子证照制证</div>
+            <div class="chart-desc-sub">电子证照制证数·平均值</div>
+            <EChart :option="certBarOption" />
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 </template>
-
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
-const socialAssistTabs = ['质量监管', '超期监管']
-const activeAssistTab = ref<(typeof socialAssistTabs)[number]>('质量监管')
-// 部门办理量排行
-const deptRankList = [
-  { no: 1, name: '鞍山市交通运输局', count: 2117, rate: '11.17%' },
-  { no: 2, name: '鞍山市交通运输集团有限公司', count: 1318, rate: '6.96%' },
-  { no: 3, name: '鞍山市公安局交管支队', count: 1216, rate: '6.42%' },
-  { no: 4, name: '鞍山市东房房产管修有限公司', count: 1177, rate: '6.21%' },
-  { no: 5, name: '鞍山华润燃气有限公司', count: 1110, rate: '5.86%' },
-  { no: 6, name: '鞍山市邮政管理局', count: 911, rate: '4.81%' },
-  { no: 7, name: '鞍山市医疗保障事务服务中心', count: 790, rate: '4.17%' }
+// 年度热门事项排行榜
+const hotRankData = [
+  { no: 1, name: '存量房转让合同网签办理', count: 6716 },
+  { no: 2, name: '住房公积金汇缴', count: 5609 },
+  { no: 3, name: '参保单位参保信息查询', count: 3331 },
+  { no: 4, name: '房屋等建筑物、构筑物所有权登记', count: 2472 },
+  { no: 5, name: '抵押权登记--转移登记', count: 2420 },
+  { no: 6, name: '基本医疗保险参保和变更登记', count: 2258 }
 ]
-
-//小件质量高星件统计
-const qualityList = [
-  { eventName: '铁西区鞍山小潘君子兰...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 },
-  { eventName: '海城市巨伦广场5层江苏...', dutyUnit: '鞍山海城市人社局', star: 5 },
-  { eventName: '铁西区某米线餐饮业食...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 },
-  { eventName: '台安县物资大市场下水...', dutyUnit: '鞍山台安县八角台街道办.', star: 5 },
-  { eventName: '台安县西佛镇小红旗村...', dutyUnit: '鞍山台安县西佛镇政府', star: 5 },
-  { eventName: '铁西区三街口的某陶瓷...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 }
+// 好差评主动评价率表格
+const rateTableData = [
+  { area: '台安县', total: 4494, activeRate: '93.09 %', itemCover: '3.75 %', deptCover: '38.24 %' },
+  { area: '岫岩县', total: 587, activeRate: '92.75 %', itemCover: '1.25 %', deptCover: '18.92 %' },
+  { area: '铁西区', total: 237, activeRate: '85.71 %', itemCover: '1.38 %', deptCover: '12.5 %' },
+  { area: '铁东区', total: 455, activeRate: '81.6 %', itemCover: '1.13 %', deptCover: '19.23 %' },
+  { area: '海城市', total: 4650, activeRate: '78.69 %', itemCover: '3.51 %', deptCover: '31.43 %' },
+  { area: '立山区', total: 108, activeRate: '68.57 %', itemCover: '1.59 %', deptCover: '29.63 %' },
+  { area: '经开区', total: 12, activeRate: '66.67 %', itemCover: '0.58 %', deptCover: '25 %' }
 ]
-
-//监管情况
-const superviseList = [
-  {
-    no: 2,
-    area: '台安县',
-    assignNum: 9279,
-    finishNum: 8818,
-    finishRate: '95.03%',
-    satisfactionRate: '93.49%'
-  },
-  {
-    no: 3,
-    area: '岫岩县',
-    assignNum: 8190,
-    finishNum: 7840,
-    finishRate: '95.73%',
-    satisfactionRate: '96.21%'
-  },
-  {
-    no: 4,
-    area: '铁东区',
-    assignNum: 73719,
-    finishNum: 71614,
-    finishRate: '97.14%',
-    satisfactionRate: '92.12%'
-  },
-  {
-    no: 5,
-    area: '铁西区',
-    assignNum: 35204,
-    finishNum: 34177,
-    finishRate: '97.08%',
-    satisfactionRate: '95.39%'
-  },
-  {
-    no: 6,
-    area: '立山区',
-    assignNum: 30101,
-    finishNum: 28957,
-    finishRate: '96.20%',
-    satisfactionRate: '93.83%'
-  },
-  {
-    no: 7,
-    area: '千山区',
-    assignNum: 5196,
-    finishNum: 4966,
-    finishRate: '95.57%',
-    satisfactionRate: '91.95%'
-  }
-]
-
-//还利于民柱状图
-const benefitBarOption = computed(() => {
+//流程再造柱状图
+const rebuildBarOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -198,40 +149,81 @@ const benefitBarOption = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 50, right: 20, top: 40, bottom: 120 },
+    grid: { left: 40, right: 20, top: 30, bottom: 60 },
     xAxis: {
       type: 'category',
-      data: [
-        '鞍山市公安局',
-        '鞍山市财政局',
-        '鞍山市人社局',
-        '鞍山市住建局',
-        '鞍山市市场监管局',
-        '鞍山市交通运输...',
-        '鞍山市文旅广电局',
-        '鞍山市税务局',
-        '鞍山市铁东区人民法院',
-        '鞍山市铁西区人民法院'
-      ],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 38 },
+      data: ['市本级', '海城市', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区'],
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 14, rotate: 35 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      name: '单位：万元',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 20 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 20 },
+      name: '时限压缩比例',
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 14 },
+      max: 100,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 14 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
     },
     series: [
       {
-        name: '金额',
+        name: '时限压缩比例',
         type: 'bar',
-        barWidth: 40,
-        data: [285, 38.8, 32, 26, 22, 18, 15, 12, 9, 7],
+        barWidth: 24,
+        data: [78.8, 84.54, 76.46, 84.22, 87.97, 83.51, 83.09, 79.74],
+        itemStyle: {
+          borderRadius: [4, 4, 0, 0],
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: '#36e8bc' },
+              { offset: 1, color: 'rgba(22,160,120,0.4)' }
+            ]
+          }
+        }
+      }
+    ]
+  }
+})
+//电子证照柱状图
+const certBarOption = computed(() => {
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+    },
+    grid: { left: 30, right: 20, top: 40, bottom: 60 },
+    xAxis: {
+      type: 'category',
+      data: ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区'],
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 13 },
+      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      max: 60,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 13 },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      {
+        name: '制证数',
+        type: 'bar',
+        barWidth: 22,
+        data: [49, 54, 52, 35, 29, 43, 39],
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
@@ -246,383 +238,267 @@ const benefitBarOption = computed(() => {
             ]
           }
         }
-      }
-    ]
-  }
-})
-
-//受理单位参与度 面积折线图
-const acceptUnitTrendOption = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
-    },
-    grid: { left: 50, right: 20, top: 60, bottom: 60 },
-    xAxis: {
-      type: 'category',
-      data: [
-        '2022‑04',
-        '2022‑05',
-        '2022‑06',
-        '2022‑07',
-        '2022‑08',
-        '2022‑09',
-        '2022‑10',
-        '2022‑11',
-        '2022‑12',
-        '2023‑01',
-        '2023‑02',
-        '2023‑03',
-        '2023‑04'
-      ],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 35 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      name: '单位：个',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 20 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 20 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
+      },
       {
-        name: '数量',
+        name: '平均值',
         type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 6,
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(54, 160, 255,0.42)' },
-              { offset: 1, color: 'rgba(54, 160, 255,0.02)' }
-            ]
-          }
-        },
-        lineStyle: { color: '#44b8ff', width: 2 },
-        itemStyle: { color: '#44b8ff' },
-        data: [434, 452, 470, 460, 475, 452, 453, 461, 432, 424, 442, 467, 375]
-      }
-    ]
-  }
-})
-
-//预警问题 环形图
-const warnRingOption = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'item',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      textStyle: { color: 'rgba(240,251,255,0.9)' }
-    },
-    legend: { show: false },
-    series: [
-      {
-        type: 'pie',
-        radius: ['42%', '68%'],
-        center: ['50%', '52%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 6,
-          borderColor: '#061230',
-          borderWidth: 2
-        },
-        label: {
-          show: true,
-          position: 'outside',
-          color: 'rgba(214,238,255,0.8)',
-          fontSize: 11
-        },
-        data: [
-          { value: 467, name: '物业维修服务不到位、不及时', percent: '38.59%' },
-          { value: 283, name: '商铺办公电话', percent: '23.39%' },
-          { value: 227, name: '自来水供应', percent: '18.76%' },
-          { value: 131, name: '健康诉求', percent: '10.83%' },
-          { value: 43, name: '隔离要求', percent: '3.55%' },
-          { value: 60, name: '其他', percent: '4.88%' }
-        ]
+        symbol: 'none',
+        data: [43, 43, 43, 43, 43, 43, 43],
+        lineStyle: { color: '#fde82c', width: 2 }
       }
     ]
   }
 })
 </script>
-
 <style scoped>
-.left {
-  min-height: 0;
+.container {
+  width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+}
+.row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1fr 1fr;
-  gap: 26px;
+  gap: 20px;
+  min-height: 0;
+}
+.row-top {
+  flex: 1;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.row-bottom {
+  flex: 1;
+  grid-template-columns: 1fr 1.6fr;
 }
 .panel {
   position: relative;
   overflow: hidden;
-  border-radius: 18px;
-  padding: 118px 26px 22px;
-  background:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/leftBg.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
   border: 1px solid rgba(84, 188, 255, 0.22);
-  box-shadow:
-    inset 0 0 36px rgba(34, 121, 255, 0.08),
-    0 0 30px rgba(0, 45, 111, 0.14);
+  background: linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6));
   box-sizing: border-box;
   min-height: 0;
-}
-.panel::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  border: 1px solid rgba(94, 197, 255, 0.12);
-  pointer-events: none;
-}
-.panel-head {
-  position: absolute;
-  left: 26px;
-  right: 26px;
-  top: 18px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.panel-title {
-  height: 54px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 34px;
-  font-style: italic;
-  transform: skewX(-10deg);
-  font-weight: 800;
-  margin-top: -15px;
-  margin-left: 35px;
-  letter-spacing: 2px;
-  color: #f8fbff;
-  text-shadow:
-    -2px -2px 3px rgba(255, 255, 255, 0.7),
-    2px 2px 4px rgba(0, 20, 60, 0.5),
-    0 0 6px #90c4ff,
-    0 0 14px #3b8fff,
-    0 0 24px #0f58d1;
-}
-.panel-title .tip {
-  font-size: 16px;
-  font-weight: normal;
-  margin-left: 8px;
-  transform: skewX(10deg);
-}
-.panel-tabs {
-  position: absolute;
-  left: 26px;
-  right: 26px;
-  top: 100px;
-  height: 42px;
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  z-index: 3;
-  pointer-events: auto;
-}
-.panel-tabs--center {
-  justify-content: center;
-}
-.tab {
-  border: none;
-  outline: none;
-  height: 42px;
-  min-width: 170px;
-  padding: 0 20px;
-  border-radius: 999px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.38);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
-  opacity: 0.55;
-  filter: grayscale(1) brightness(0.75);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.12),
-    0 0 0 rgba(54, 232, 255, 0);
-  transition:
-    opacity 160ms ease,
-    filter 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease,
-    color 160ms ease;
-}
-.tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  text-shadow:
-    0 0 12px rgba(54, 232, 255, 0.35),
-    0 0 20px rgba(54, 232, 255, 0.18);
-  opacity: 1;
-  filter: none;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.38),
-    0 0 16px rgba(54, 232, 255, 0.22);
-}
-.total-text {
-  font-size: 18px;
-  color: rgba(214, 238, 255, 0.75);
-}
-.total-text .num {
-  color: #36e8ff;
-}
-.sub-title {
-  font-size: 20px;
-  margin-left: 12px;
-  transform: skewX(10deg);
-  color: #76c8ff;
-}
-.tab-wrap {
-  display: flex;
-  gap: 16px;
-  margin-right: 20px;
-}
-.tab {
-  font-size: 17px;
-  color: rgba(214, 238, 255, 0.45);
-}
-.tab.active {
-  color: #36e8ff;
-  text-shadow: 0 0 8px rgba(54, 232, 255, 0.3);
-}
-.capacity-body {
-  height: 100%;
-  min-height: 0;
-}
-.capacity-chart {
-  height: 100%;
-  min-height: 0;
-}
-
-/*部门办理排行*/
-.rank-list {
-  height: 100%;
-  overflow-y: auto;
-  display: grid;
-  gap: 10px;
-  align-content: flex-start;
-}
-.rank-item {
-  display: grid;
-  grid-template-columns: 40px 1fr 180px;
-  align-items: center;
-  padding: 10px 14px;
-  border: 1px solid rgba(89, 194, 255, 0.14);
-  border-radius: 10px;
-  background: rgba(6, 18, 48, 0.3);
-  margin-top: 20px;
-}
-.rank-index {
-  font-size: 30px;
-  color: rgba(214, 238, 255, 0.65);
-}
-.rank-name {
-  font-size: 20px;
-  color: rgba(214, 238, 255, 0.82);
-}
-.rank-value {
-  font-size: 20px;
-  color: #36e8ff;
-  text-align: right;
-}
-.rank-value .rate {
-  margin-left: 6px;
-  color: rgba(214, 238, 255, 0.65);
-}
-
-/*小件质量列表*/
-.quality-list {
-  height: 100%;
-  overflow-y: auto;
-  display: grid;
-  gap: 10px;
-  align-content: flex-start;
-}
-.quality-item {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-  padding: 10px 14px;
-  border: 1px solid rgba(89, 194, 255, 0.14);
-  border-radius: 10px;
-  background: rgba(6, 18, 48, 0.3);
-  margin-top: 20px;
-}
-.q-event {
-  font-size: 26px;
-  color: rgba(214, 238, 255, 0.82);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.q-unit {
-  font-size: 26px;
-  color: rgba(214, 238, 255, 0.65);
-  padding: 0 8px;
-}
-.q-star {
-  font-size: 26px;
-  color: #ffd740;
-  font-weight: bold;
-  text-align: right;
-}
-
-/*监管情况表格*/
-.supervise-list {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  margin-top: 60px;
 }
-.supervise-header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px 12px;
-  background: rgba(14, 40, 85, 0.4);
-  border-radius: 8px 8px 0 0;
+.panel-head {
+  position: relative;
+  padding: 14px 20px;
 }
-.supervise-row {
+.panel-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px #3b8fff;
+}
+.panel-title .sub {
+  color: #ffdd66;
+  margin-left: 8px;
+}
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 20px 20px;
+  overflow: hidden;
+}
+/* 年度热门事项排行榜修复 */
+.rank-table {
+  background-color: #071430;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.rank-table-head {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
+  grid-template-columns: 64px 1fr 100px;
+  padding: 12px 14px;
+  gap: 20px;
+  background: linear-gradient(90deg, #0f3477, #154294);
+  font-size: 30px;
+  color: #a6d8ff;
+}
+.rank-table-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 100px;
+  padding: 13px 14px;
+  font-size: 30px;
+  gap: 20px;
+  color: #e6f2ff;
+  border-bottom: 1px solid rgba(70, 140, 220, 0.18);
+  align-items: center;
   margin-top: 20px;
 }
-.sv-col {
+.rank-table-row:last-child {
+  border-bottom: none;
+}
+.r-index {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+.r-index-bar {
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(180deg, #34b8ff, #0e6fc9);
+  margin-right: 10px;
+  border-radius: 2px;
+}
+.r-name {
+  color: #e6f2ff;
+}
+.r-val {
+  text-align: right;
+  color: #ffffff;
+}
+/*辽事通平台 */
+.liaost-wrap {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  place-items: center;
+}
+.liaost-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.liaost-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  border: 1px solid rgba(80, 170, 255, 0.3);
+  background: radial-gradient(circle, rgba(54, 232, 255, 0.2), transparent);
+}
+.liaost-label {
+  font-size: 17px;
+  color: #82c8ff;
+}
+.liaost-num {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+}
+/*好差评主动评价率表格 */
+.rate-table {
+  height: 100%;
+  display: grid;
+  border: 1px solid rgba(84, 188, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.rate-table-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 10px 10px;
+  background: rgba(14, 40, 85, 0.45);
+  font-size: 30px;
+  color: #82c8ff;
+}
+.rate-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 9px 10px;
   font-size: 30px;
   color: rgba(214, 238, 255, 0.78);
+  border-bottom: 1px solid rgba(84, 188, 255, 0.1);
+  align-items: center;
+}
+.rate-table-row:last-child {
+  border-bottom: none;
+}
+.r-area {
+  color: #70ee70;
+}
+/*流程再造 */
+.rebuild-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.rebuild-tab {
+  padding: 4px 14px;
+  border: 1px solid rgba(84, 188, 255, 0.22);
+  background: rgba(14, 40, 85, 0.4);
+  border-radius: 4px;
+  color: #82c8ff;
+  font-size: 15px;
+}
+.chart-body {
+  height: 100%;
+}
+/*电子证照 */
+.cert-wrap {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  height: 100%;
+}
+.cert-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cert-card {
+  flex: 1;
+  border: 1px solid rgba(84, 188, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(10, 30, 65, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.cert-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  border: 1px solid rgba(80, 170, 255, 0.3);
+  background: radial-gradient(circle, rgba(54, 232, 255, 0.2), transparent);
+  margin-bottom: 8px;
+}
+.cert-text {
+  font-size: 16px;
+  color: #82c8ff;
   text-align: center;
 }
-.supervise-header .sv-col {
-  color: #54e8ff;
+.cert-big-num {
+  font-size: 32px;
   font-weight: bold;
+  color: #ffdd66;
+  margin: 6px 0;
+}
+.cert-unit {
+  font-size: 16px;
+  color: #82c8ff;
+}
+.cert-small-text {
+  font-size: 14px;
+  color: #82c8ff;
+  margin-top: 4px;
+  text-align: center;
+}
+.cert-small-num {
+  color: #ffdd66;
+}
+.cert-right {
+  display: flex;
+  flex-direction: column;
+}
+.chart-desc {
+  text-align: right;
+  font-size: 16px;
+  color: #82c8ff;
+}
+.chart-desc-sub {
+  text-align: right;
+  font-size: 14px;
+  color: #82c8ff;
+  margin-bottom: 6px;
 }
 </style>

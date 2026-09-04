@@ -1,216 +1,206 @@
 <template>
   <aside class="left">
-    <!-- 1 最新诉求 -->
+    <!-- 1 网上申报率|事项覆盖度 复刻截图布局 -->
     <section class="panel panel--electric">
       <div class="panel-head">
-        <div class="panel-title">最新诉求</div>
+        <div class="panel-title">申报率|覆盖度</div>
       </div>
       <div class="capacity-body">
-        <div class="demand-list">
-          <!--表头 -->
-          <div class="demand-header">
-            <div class="dh-col">事件名称</div>
-            <div class="dh-col">诉求时间</div>
+        <div class="rate-wrap">
+          <div class="rate-item">
+            <div class="rate-icon-block">
+              <div class="icon-bg icon-doc"></div>
+            </div>
+            <div class="rate-text">
+              <div class="rate-label">依申请网上申报率</div>
+              <div class="rate-val-row">
+                <span class="val-num">82.09%</span>
+                <span class="arrow red">↗</span>
+              </div>
+              <div class="rate-std">依申请网上申报率标准 <span class="std-num">56.24%</span></div>
+            </div>
           </div>
-          <div v-for="(item, idx) in latestDemandList" :key="idx" class="demand-item">
-            <div class="dh-col demand-name">{{ item.name }}</div>
-            <div class="dh-col demand-time">{{ item.time }}</div>
+          <div class="rate-item">
+            <div class="rate-icon-block">
+              <div class="icon-bg icon-file"></div>
+            </div>
+            <div class="rate-text">
+              <div class="rate-label">依申请事项覆盖度</div>
+              <div class="rate-val-row">
+                <span class="val-num">4.75%</span>
+                <span class="arrow green">↘</span>
+              </div>
+              <div class="rate-std">依申请事项覆盖度标准 <span class="std-num">14.88%</span></div>
+            </div>
+          </div>
+          <div class="rate-item">
+            <div class="rate-icon-block">
+              <div class="icon-bg icon-house"></div>
+            </div>
+            <div class="rate-text">
+              <div class="rate-label">公共服务网上申报率</div>
+              <div class="rate-val-row">
+                <span class="val-num">83.87%</span>
+                <span class="arrow red">↗</span>
+              </div>
+              <div class="rate-std">公共服务网上申报率标准 <span class="std-num">70.49%</span></div>
+            </div>
+          </div>
+          <div class="rate-item">
+            <div class="rate-icon-block">
+              <div class="icon-bg icon-book"></div>
+            </div>
+            <div class="rate-text">
+              <div class="rate-label">公共服务事项覆盖度</div>
+              <div class="rate-val-row">
+                <span class="val-num">2.71%</span>
+                <span class="arrow green">↘</span>
+              </div>
+              <div class="rate-std">公共服务事项覆盖度标准 <span class="std-num">17.66%</span></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
-    <!-- 2 近12月诉求量趋势 -->
+    <!-- 2 事项年度累计办理量 -->
     <section class="panel panel--capacity">
       <div class="panel-head">
-        <div class="panel-title">近12月诉求量趋势</div>
+        <div class="panel-title">事项年度办理量</div>
       </div>
       <div class="capacity-body">
-        <div class="capacity-chart">
-          <EChart :option="demandTrendOption" />
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="tc-col">序号</div>
+            <div class="tc-col">地区</div>
+            <div class="tc-col">事项数</div>
+            <div class="tc-col">实办事项数</div>
+            <div class="tc-col">办理量</div>
+          </div>
+          <div v-for="(item, idx) in handleTotalList" :key="idx" class="table-row">
+            <div class="tc-col">{{ item.no }}</div>
+            <div class="tc-col">{{ item.area }}</div>
+            <div class="tc-col">{{ item.itemCount }}</div>
+            <div class="tc-col">{{ item.realItem }}</div>
+            <div class="tc-col">{{ item.handleNum }}</div>
+          </div>
         </div>
       </div>
     </section>
-    <!--3 年度诉求数量分析 -->
+    <!--3 通办事项 -->
     <section class="panel panel--pop-state">
       <div class="panel-head">
-        <div class="panel-title">年度诉求数量分析</div>
+        <div class="panel-title">通办事项</div>
+        <div class="work-stat">
+          市本级通办事项:<span class="num">104</span>&nbsp;&nbsp;市本级办件数量:<span class="num"
+            >146817</span
+          >
+        </div>
       </div>
       <div class="capacity-body">
         <div class="capacity-chart">
-          <EChart :option="yearDemandBarOption" />
+          <EChart :option="tongBanOption" />
         </div>
       </div>
     </section>
-    <!--4 诉求类型分析 -->
+    <!--4 平均办理时间 -->
     <section class="panel panel--pile">
       <div class="panel-head">
-        <div class="panel-title">诉求类型分析</div>
+        <div class="panel-title">平均办理时间</div>
+        <div class="work-stat">
+          <span class="sort-btn">升序</span>
+          <span class="sort-btn">降序</span>
+        </div>
       </div>
       <div class="capacity-body">
-        <div class="demand-type-wrap">
-          <div v-for="item in demandTypeList" :key="item.key" class="demand-type-item">
-            <div class="demand-type-icon">
-              <div class="icon-circle"></div>
-            </div>
-            <div class="demand-type-percent">{{ item.percent }}</div>
-            <div class="demand-type-label">{{ item.label }}</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="tc-col">序号</div>
+            <div class="tc-col">地区</div>
+            <div class="tc-col">事项名称</div>
+            <div class="tc-col">办理时限</div>
+            <div class="tc-col">平均办理时间</div>
+          </div>
+          <div v-for="(item, idx) in avgTimeList" :key="idx" class="table-row">
+            <div class="tc-col">{{ item.no }}</div>
+            <div class="tc-col">{{ item.area }}</div>
+            <div class="tc-col">{{ item.itemName }}</div>
+            <div class="tc-col">{{ item.limitDay }}</div>
+            <div class="tc-col">{{ item.avgDay }}</div>
           </div>
         </div>
       </div>
     </section>
-    <!--5 渠道来源 -->
+    <!--5 一件事一次办 -->
     <section class="panel panel--resume">
       <div class="panel-head">
-        <div class="panel-title">渠道来源</div>
+        <div class="panel-title">一件事一次办</div>
       </div>
       <div class="capacity-body">
-        <div class="channel-list">
-          <div v-for="(item, idx) in channelSourceList" :key="idx" class="channel-item">
-            <div class="channel-index">{{ item.no }}</div>
-            <div class="channel-name">{{ item.name }}</div>
-            <div class="channel-count">{{ item.count }}</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="tc-col">序号</div>
+            <div class="tc-col">地区</div>
+            <div class="tc-col">一件事数量</div>
+            <div class="tc-col">实办件种类</div>
+            <div class="tc-col">实办件数量</div>
+          </div>
+          <div v-for="(item, idx) in oneThingList" :key="idx" class="table-row">
+            <div class="tc-col">{{ item.no }}</div>
+            <div class="tc-col">{{ item.area }}</div>
+            <div class="tc-col">{{ item.oneThingCount }}</div>
+            <div class="tc-col">{{ item.realType }}</div>
+            <div class="tc-col">{{ item.realNum }}</div>
           </div>
         </div>
       </div>
     </section>
-    <!--6 近12月疑难工单 -->
+    <!--6 超期办件 -->
     <section class="panel panel--steel">
       <div class="panel-head">
-        <div class="panel-title">近12月疑难工单</div>
-        <div class="work-stat">
-          处理中:<span class="num">4473</span>件 已办结:<span class="num">8</span>件
-        </div>
+        <div class="panel-title">超期办件</div>
       </div>
       <div class="capacity-body">
-        <div class="hard-work-list">
-          <div class="hard-work-header">
-            <div class="hw-col">诉求时间</div>
-            <div class="hw-col">事件名称</div>
-          </div>
-          <div v-for="(item, idx) in hardWorkOrderList" :key="idx" class="hard-work-row">
-            <div class="hw-col">{{ item.time }}</div>
-            <div class="hw-col">{{ item.name }}</div>
-          </div>
+        <div class="capacity-chart">
+          <EChart :option="overDateOption" />
         </div>
       </div>
     </section>
   </aside>
 </template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-// 最新诉求列表
-const latestDemandList = [
-  { name: '无具体诉求', time: '2023-04-08' },
-  { name: '查询工单', time: '2023-04-08' },
-  { name: '查询立山区太平自来水维修所电话', time: '2023-04-08' },
-  { name: '网络消费售后问题', time: '2023-04-08' },
-  { name: '海城市感王镇政府退休职工煤火费发放问题', time: '2023-04-08' },
-  { name: '鞍山市滴滴快车物品遗失问题', time: '2023-04-08' }
+// 事项年度累计办理量
+const handleTotalList = [
+  { no: 2, area: '海城市', itemCount: 987, realItem: 75, handleNum: 3930 },
+  { no: 3, area: '台安县', itemCount: 1940, realItem: 57, handleNum: 3194 },
+  { no: 4, area: '岫岩县', itemCount: 1686, realItem: 46, handleNum: 446 },
+  { no: 5, area: '铁东区', itemCount: 776, realItem: 22, handleNum: 551 },
+  { no: 6, area: '铁西区', itemCount: 603, realItem: 15, handleNum: 123 },
+  { no: 7, area: '立山区', itemCount: 1027, realItem: 24, handleNum: 113 }
 ]
-//诉求类型分析
-const demandTypeList = [
-  { key: 'consult', label: '咨询类', percent: '39.97%' },
-  { key: 'complain', label: '投诉类', percent: '59.26%' },
-  { key: 'advise', label: '意见建议类', percent: '0.77%' }
+//平均办理时间
+const avgTimeList = [
+  { no: 2, area: '鞍山市', itemName: '对职业病诊断争议的鉴定', limitDay: '40天', avgDay: '2天' },
+  { no: 3, area: '鞍山市', itemName: '认定', limitDay: '40天', avgDay: '7.5天' },
+  { no: 4, area: '鞍山市', itemName: '社会保障卡申领', limitDay: '30天', avgDay: '<1天' },
+  { no: 5, area: '鞍山市', itemName: '药品投诉举报受理服务', limitDay: '30天', avgDay: '<1天' },
+  { no: 6, area: '鞍山市', itemName: '申领', limitDay: '30天', avgDay: '<1天' },
+  { no: 7, area: '鞍山市', itemName: '人民调解申请', limitDay: '30天', avgDay: '<1天' }
 ]
-//渠道来源
-const channelSourceList = [
-  { no: 1, name: '无具体诉求', count: '1609件' },
-  { no: 2, name: '查询工单', count: '1609件' },
-  { no: 3, name: '省12345', count: '1609件' },
-  { no: 4, name: '辽事通', count: '1395件' },
-  { no: 5, name: '政务服务网', count: '1164件' },
-  { no: 6, name: 'In12345微信', count: '531件' },
-  { no: 7, name: '市民网(市长信箱)', count: '525件' },
-  { no: 8, name: '供暖直通车', count: '214件' },
-  { no: 9, name: '首长信箱', count: '160件' }
+//一件事一次办
+const oneThingList = [
+  { no: 2, area: '海城市', oneThingCount: 536, realType: 16, realNum: 627 },
+  { no: 3, area: '台安县', oneThingCount: 561, realType: 4, realNum: 56 },
+  { no: 4, area: '岫岩县', oneThingCount: 594, realType: 3, realNum: 24 },
+  { no: 5, area: '铁东区', oneThingCount: 412, realType: 6, realNum: 8 },
+  { no: 6, area: '铁西区', oneThingCount: 397, realType: 1, realNum: 13 },
+  { no: 7, area: '立山区', oneThingCount: 429, realType: 7, realNum: 11 }
 ]
-//疑难工单
-const hardWorkOrderList = [
-  { time: '2023-01-10', name: '夜晚噪音扰民' },
-  { time: '2023-01-10', name: '海城市析木镇盛世家园金池小区安全通道被害…' },
-  { time: '2023-01-11', name: '铁东区南中华路旧改后电线问题' },
-  { time: '2023-01-12', name: '海城市王石镇代千村圣源山庄11号楼供暖温度…' },
-  { time: '2023-01-12', name: '立山区灵山村宏福小区126栋井盖松动问题' },
-  { time: '2023-01-16', name: '【人民网市委书记留言板】临时电缆重大安全…' },
-  { time: '2023-01-18', name: '铁西区九道街510栋1单元下水井堵塞问题' }
-]
-//近12月诉求量趋势 折线面积图
-const demandTrendOption = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
-    },
-    grid: { left: 50, right: 20, top: 30, bottom: 60 },
-    xAxis: {
-      type: 'category',
-      data: [
-        '2022‑04',
-        '2022‑05',
-        '2022‑06',
-        '2022‑07',
-        '2022‑08',
-        '2022‑09',
-        '2022‑10',
-        '2022‑11',
-        '2022‑12',
-        '2023‑01',
-        '2023‑02',
-        '2023‑03',
-        '2023‑04'
-      ],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 35 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      name: '单位：件',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 11 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        name: '数量',
-        type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 6,
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(54, 232, 255,0.45)' },
-              { offset: 1, color: 'rgba(54, 232, 255,0.03)' }
-            ]
-          }
-        },
-        lineStyle: { color: '#36e8ff', width: 2 },
-        itemStyle: { color: '#36e8ff' },
-        data: [
-          124000, 134000, 110000, 109210, 122000, 172010, 150000, 90000, 70000, 53132, 50186, 62000
-        ]
-      }
-    ]
-  }
-})
-//年度诉求数量分析 横向柱状
-const yearDemandBarOption = computed(() => {
-  const xData = [38515, 8370, 7525, 70080, 33892, 28264, 4825, 7676, 5399, 538]
-  const yData = [
+//通办事项柱状图
+const tongBanOption = computed(() => {
+  const areaData = [
     '海城市',
     '台安县',
     '岫岩县',
@@ -219,56 +209,135 @@ const yearDemandBarOption = computed(() => {
     '立山区',
     '千山区',
     '高新区',
-    '经开区',
-    '风景区'
+    '经开区'
   ]
+  const tongBanData = [104, 12, 26, 8, 5, 6, 3, 2, 1]
+  const banJianData = [146817, 412, 352, 122, 94, 76, 43, 22, 18]
   return {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
-      textStyle: { color: 'rgba(240,251,255,0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 90, right: 30, top: 20, bottom: 40 },
+    grid: { left: 120, right: 30, top: 30, bottom: 160 },
     xAxis: {
-      type: 'value',
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 20 },
-      splitLine: { lineStyle: { color: 'rgba(120,220,255,0.12)' } },
-      axisLine: { show: false },
+      type: 'category',
+      data: areaData,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 24 },
+      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
-      type: 'category',
-      data: yData,
-      axisLabel: { color: 'rgba(214,238,255,0.75)', fontSize: 20 },
+      type: 'value',
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
     },
     series: [
       {
+        name: '通办事项',
         type: 'bar',
-        barWidth: 50,
-        data: xData,
+        data: tongBanData,
+        itemStyle: { color: '#86ccff' }
+      },
+      {
+        name: '办件数量',
+        type: 'bar',
+        data: banJianData,
+        itemStyle: { color: '#36e8ff' }
+      }
+    ]
+  }
+})
+//超期办件 双Y轴柱状+折线
+const overDateOption = computed(() => {
+  const areaData = [
+    '市本级',
+    '海城市',
+    '台安县',
+    '岫岩县',
+    '铁东区',
+    '铁西区',
+    '立山区',
+    '千山区',
+    '高新区',
+    '经开区'
+  ]
+  const overNum = [5800, 2100, 705, 320, 210, 120, 90, 60, 30, 22]
+  const overRate = [62, 26, 6.85, 12, 8, 5, 3, 2, 1, 0.5]
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+    },
+    grid: { left: 90, right: 60, top: 30, bottom: 190 },
+    xAxis: {
+      type: 'category',
+      data: areaData,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 24 },
+      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
+      axisTick: { show: false }
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '超期办件数量',
+        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+        splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      {
+        type: 'value',
+        name: '超期办件占比(%)',
+        position: 'right',
+        axisLabel: { color: '#ffd454' },
+        splitLine: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      }
+    ],
+    series: [
+      {
+        name: '超期办件数量',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: overNum,
         itemStyle: {
-          borderRadius: [0, 8, 8, 0],
           color: {
             type: 'linear',
             x: 0,
             y: 0,
-            x2: 1,
-            y2: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(24,130,255,0.2)' },
-              { offset: 1, color: 'rgba(54, 232, 255,0.95)' }
+              { offset: 0, color: '#36e8ff' },
+              { offset: 1, color: 'rgba(30,140,255,0.2)' }
             ]
           }
         }
+      },
+      {
+        name: '超期办件占比',
+        type: 'line',
+        yAxisIndex: 1,
+        smooth: true,
+        symbol: 'circle',
+        itemStyle: { color: '#ffd454' },
+        lineStyle: { color: '#ffd454' },
+        data: overRate
       }
     ]
   }
 })
 </script>
+
 <style scoped>
 .left {
   min-height: 0;
@@ -344,205 +413,138 @@ const yearDemandBarOption = computed(() => {
 .capacity-body {
   height: 100%;
   min-height: 0;
+  margin-top: 60px;
 }
 .capacity-chart {
   height: 100%;
   min-height: 0;
 }
-/*最新诉求列表 参照截图样式，带表头，双列布局*/
-.demand-list {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-.demand-header {
-  display: grid;
-  grid-template-columns: 1fr 220px;
-  padding: 10px 14px;
-  background: rgba(14, 40, 85, 0.4);
-  border-radius: 8px 8px 0 0;
-}
-.demand-item {
-  display: grid;
-  grid-template-columns: 1fr 220px;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.3);
-  margin-top: 30px;
-}
-.dh-col {
-  font-size: 30px;
-  color: rgba(214, 238, 255, 0.78);
-}
-.demand-header .dh-col {
-  color: #54e8ff;
-  font-weight: bold;
-}
-.demand-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-right: 12px;
-}
-.demand-time {
-  color: #ffdd44;
-  font-weight: bold;
-  text-align: right;
-}
 
-/* ========== 诉求类型分析 完全对齐截图，占满容器高度 ========== */
-.demand-type-wrap {
+/*====网上申报率|事项覆盖度 截图样式 2行2列布局====*/
+.rate-wrap {
   height: 100%;
-  min-height: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 20px;
+  margin-top: -60px;
 }
-.demand-type-item {
-  height: 100%;
+.rate-item {
   display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
   align-items: center;
-  border: 1px solid rgba(70, 160, 255, 0.25);
-  border-radius: 10px;
-  background: rgba(8, 22, 52, 0.45);
-  position: relative;
-  /*四角小点模拟大屏边框效果*/
+  gap: 16px;
 }
-.demand-type-item::before {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 4px;
-  height: 4px;
-  background: #82c8ff;
+.rate-icon-block {
+  flex-shrink: 0;
+}
+.icon-bg {
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-}
-.demand-type-item::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 4px;
-  height: 4px;
-  background: #82c8ff;
-  border-radius: 50%;
-}
-.demand-type-item .demand-type-icon {
-  position: relative;
-  width: 90px;
-  height: 90px;
+  background: radial-gradient(
+    circle,
+    rgba(60, 180, 255, 0.35) 0%,
+    rgba(20, 90, 180, 0.1) 70%,
+    transparent 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-}
-/*模拟截图里面的双层圆环底座*/
-.demand-type-item .icon-circle {
-  width: 72px;
-  height: 72px;
-  border: 1px solid rgba(100, 190, 255, 0.35);
-  border-radius: 50%;
+  box-shadow: 0 0 22px rgba(40, 160, 255, 0.25);
   position: relative;
-  box-shadow: 0 0 12px rgba(40, 140, 255, 0.15);
 }
-.demand-type-item .icon-circle::before {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  border: 1px solid rgba(100, 190, 255, 0.22);
-  border-radius: 50%;
-}
-.demand-type-item .icon-circle::after {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background: rgba(160, 220, 255, 0.65);
-  border-radius: 50%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px #72d0ff;
-}
-/*百分比金色大字，和截图一致*/
-.demand-type-percent {
+/*简易模拟截图内图标占位，你后续可以替换成真实svg图片*/
+.icon-doc::before {
+  content: '📄';
   font-size: 42px;
-  font-weight: bold;
-  color: #ffd454;
-  text-shadow: 0 0 10px rgba(255, 200, 60, 0.35);
+  color: #72d8ff;
 }
-/*底部白色标签*/
-.demand-type-label {
-  font-size: 26px;
-  font-weight: bold;
-  color: #ffffff;
+.icon-file::before {
+  content: '📃';
+  font-size: 42px;
+  color: #72d8ff;
+}
+.icon-house::before {
+  content: '🏛';
+  font-size: 42px;
+  color: #72d8ff;
+}
+.icon-book::before {
+  content: '📖';
+  font-size: 42px;
+  color: #72d8ff;
 }
 
-/*渠道来源列表*/
-.channel-list {
-  height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  gap: 10px;
-  align-content: flex-start;
+.rate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.channel-item {
-  display: grid;
-  grid-template-columns: 40px 1fr 120px;
+.rate-label {
+  font-size: 24px;
+  color: rgba(214, 238, 255, 0.72);
+}
+.rate-val-row {
+  display: flex;
   align-items: center;
-  padding: 10px 14px;
-  border: 1px solid rgba(89, 194, 255, 0.14);
-  border-radius: 10px;
-  background: rgba(6, 18, 48, 0.3);
-  margin-top: 20px;
+  gap: 8px;
 }
-.channel-index {
-  font-size: 30px;
-  color: rgba(214, 238, 255, 0.65);
-}
-.channel-name {
-  font-size: 30px;
-  color: rgba(214, 238, 255, 0.82);
-}
-.channel-count {
-  font-size: 30px;
+.val-num {
+  font-size: 36px;
   color: #36e8ff;
-  text-align: right;
+  font-weight: bold;
 }
-/*疑难工单*/
-.hard-work-list {
+.arrow.red {
+  color: #ff4444;
+  font-size: 30px;
+}
+.arrow.green {
+  color: #32e978;
+  font-size: 30px;
+}
+.rate-std {
+  font-size: 22px;
+  color: rgba(214, 238, 255, 0.58);
+}
+.std-num {
+  color: #36e8ff;
+}
+
+/*====通用表格样式====*/
+.table-wrap {
   height: 100%;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
-.hard-work-header {
+.table-header {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  padding: 10px 12px;
+  grid-template-columns: 1fr 1fr 400px 1fr 1fr;
+  padding: 10px 14px;
   background: rgba(14, 40, 85, 0.4);
   border-radius: 8px 8px 0 0;
 }
-.hard-work-row {
+.table-row {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  padding: 10px 12px;
+  grid-template-columns: 1fr 1fr 400px 1fr 1fr;
+  padding: 10px 14px;
   border-bottom: 1px solid rgba(89, 194, 255, 0.12);
+  background: rgba(6, 18, 48, 0.3);
   margin-top: 20px;
 }
-.hw-col {
-  font-size: 30px;
+.tc-col {
+  font-size: 24px;
   color: rgba(214, 238, 255, 0.78);
 }
-.hard-work-header .hw-col {
+.table-header .tc-col {
   color: #54e8ff;
   font-weight: bold;
+}
+.sort-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(84, 188, 255, 0.25);
+  border-radius: 6px;
+  margin-left: 8px;
+  color: rgba(214, 238, 255, 0.75);
 }
 </style>
