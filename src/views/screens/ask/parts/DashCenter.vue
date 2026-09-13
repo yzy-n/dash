@@ -37,42 +37,47 @@
           </div>
           <div class="sub-title">热线数据</div>
           <div class="time-tabs">
-            <div class="time-tab">年</div>
-            <div class="time-tab">季</div>
-            <div class="time-tab">月</div>
-            <div class="time-tab">周</div>
-            <div class="time-tab time-tab--active">日</div>
+            <button
+              v-for="tab in hotlineTabs"
+              :key="tab.value"
+              type="button"
+              class="time-tab"
+              :class="{ 'time-tab--active': tab.value === activeHotlineTab }"
+              @click="activeHotlineTab = tab.value"
+            >
+              {{ tab.label }}
+            </button>
           </div>
           <div class="stat-grid stat-grid--col2">
             <div class="stat-item">
               <div class="stat-icon stat-icon--callin"></div>
               <div class="stat-text">呼入量</div>
-              <div class="stat-val">185414个</div>
+              <div class="stat-val">{{ formatCount(hotlineStats.breathAmount) }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-icon stat-icon--pickup"></div>
               <div class="stat-text">接通量</div>
-              <div class="stat-val">182992个</div>
+              <div class="stat-val">{{ formatCount(hotlineStats.onAmount) }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-icon stat-icon--rate1"></div>
               <div class="stat-text">接通率</div>
-              <div class="stat-val">98.69%</div>
+              <div class="stat-val">{{ formatPercent(hotlineStats.onRate) }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-icon stat-icon--rate2"></div>
               <div class="stat-text">直接答复率</div>
-              <div class="stat-val">80.27%</div>
+              <div class="stat-val">{{ formatPercent(hotlineStats.answerRate) }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-icon stat-icon--eval"></div>
               <div class="stat-text">评价率</div>
-              <div class="stat-val">39.83%</div>
+              <div class="stat-val">{{ formatPercent(hotlineStats.appraiseRate) }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-icon stat-icon--good"></div>
               <div class="stat-text">好评率</div>
-              <div class="stat-val">98.2%</div>
+              <div class="stat-val">{{ formatPercent(hotlineStats.esteemRate) }}</div>
             </div>
           </div>
           <div class="sub-title">热点问题</div>
@@ -169,27 +174,27 @@
             <div class="effect-item">
               <div class="effect-icon">%</div>
               <div class="effect-name">满意率</div>
-              <div class="effect-value">93.25%</div>
+              <div class="effect-value">{{ hotlineStats.esteemRate }}%</div>
             </div>
             <div class="effect-item">
-              <div class="effect-icon">💬</div>
-              <div class="effect-name">办结率</div>
-              <div class="effect-value">84.55%</div>
+              <div class="effect-icon">通</div>
+              <div class="effect-name">接通率</div>
+              <div class="effect-value">{{ hotlineStats.onRate }}%</div>
             </div>
             <div class="effect-item">
-              <div class="effect-icon">💓</div>
-              <div class="effect-name">有效回访率</div>
-              <div class="effect-value">99.71%</div>
+              <div class="effect-icon">答</div>
+              <div class="effect-name">直接答复率</div>
+              <div class="effect-value">{{ hotlineStats.answerRate }}%</div>
             </div>
             <div class="effect-item">
-              <div class="effect-icon">☺</div>
-              <div class="effect-name">即时分转率</div>
-              <div class="effect-value">83.43%</div>
+              <div class="effect-icon">评</div>
+              <div class="effect-name">评价率</div>
+              <div class="effect-value">{{ hotlineStats.appraiseRate }}%</div>
             </div>
             <div class="effect-item">
-              <div class="effect-icon">📞</div>
-              <div class="effect-name">办件时长</div>
-              <div class="effect-value">5.36天</div>
+              <div class="effect-icon">呼</div>
+              <div class="effect-name">呼入量</div>
+              <div class="effect-value">{{ hotlineStats.breathAmount }}</div>
             </div>
           </div>
 
@@ -232,11 +237,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Tooltip, Legend } from 'echarts/components'
 import CityMapChart from '../charts/CityMapChart.vue'
 import PieChart from '../charts/pie.vue'
 import type { GridInfoRow } from '../types'
+import { getHotlineStats, getHotProblemList } from '@/api/ask'
 const selectedAreaName = ref('铁东区')
 const gridInfoRows: GridInfoRow[] = [
   { name: '铁东区', town: 0, village: 0, grid: 12 },
@@ -248,6 +254,60 @@ const gridInfoRows: GridInfoRow[] = [
   { name: '海城市', town: 0, village: 0, grid: 14 },
   { name: '岫岩县', town: 0, village: 0, grid: 7 }
 ]
+
+const hotlineTabs = [
+  { label: '年', value: 'year' },
+  { label: '季', value: 'season' },
+  { label: '月', value: 'month' },
+  { label: '周', value: 'week' },
+  { label: '日', value: 'day' }
+] as const
+type HotlineStats = {
+  answerRate?: string | number
+  appraiseRate?: string | number
+  breathAmount?: string | number
+  dateType?: string | number
+  esteemRate?: string | number
+  onAmount?: string | number
+  onRate?: string | number
+}
+
+const hotlineStats = ref<HotlineStats>({})
+const activeHotlineTab = ref<(typeof hotlineTabs)[number]['value']>('day')
+
+const formatPercent = (value: unknown) => {
+  if (value === null || value === undefined) return '--'
+  const text = String(value).trim()
+  if (!text) return '--'
+  return text.includes('%') ? text : `${text}%`
+}
+
+const formatCount = (value: unknown) => {
+  if (value === null || value === undefined) return '--'
+  const text = String(value).trim()
+  if (!text) return '--'
+  return text.endsWith('个') || text.endsWith('件') ? text : `${text}个`
+}
+const hotProblemList = ref([])
+const getHotProblemList = async () => {
+  try {
+    const res = await getHotProblemList()
+    hotProblemList.value = res.dataList || []
+  } catch {}
+}
+onMounted(() => {
+  getHotProblemList()
+})
+watch(
+  activeHotlineTab,
+  async (dateType) => {
+    try {
+      const res = await getHotlineStats({ dateType })
+      hotlineStats.value = res.dataList[0]
+    } catch {}
+  },
+  { immediate: true }
+)
 </script>
 <style scoped>
 .center-shell {
@@ -380,6 +440,8 @@ const gridInfoRows: GridInfoRow[] = [
   border: 1px solid rgba(84, 188, 255, 0.18);
   border-radius: 4px;
   background: rgba(10, 30, 65, 0.4);
+  cursor: pointer;
+  font: inherit;
 }
 .time-tab--active {
   color: #fff;

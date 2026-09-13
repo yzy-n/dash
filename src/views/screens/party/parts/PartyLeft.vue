@@ -52,6 +52,8 @@
 <script setup lang="ts">
 import PartyStructure from './PartyStructure.vue'
 import type { PartyLeftData } from '../data'
+import { getPartyList } from '@/api/party'
+import { ref, onMounted } from 'vue'
 
 defineProps<{
   data: PartyLeftData
@@ -109,6 +111,11 @@ const getStarRowStyle = (index: number) =>
     width: layout.starRows.width,
     height: layout.starRows.height
   })
+const partyList = ref([])
+onMounted(async () => {
+  partyList.value = await getPartyList()
+  console.log(partyList.value)
+})
 </script>
 
 <style scoped>

@@ -10,10 +10,16 @@ import PeopleScreen from '@/views/screens/people/index.vue'
 import AskScreen from '@/views/screens/ask/index.vue'
 import WeatherScreen from '@/views/screens/weather/index.vue'
 import BusinessScreen from '@/views/screens/business/index.vue'
+import HomeScreen from '@/views/screens/home/index.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'home',
+    component: HomeScreen
+  },
+  {
+    path: '/dash',
     name: 'big-screen',
     component: DashScreen
   },

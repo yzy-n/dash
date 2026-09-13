@@ -24,6 +24,18 @@ export default defineConfig(({ mode }) => {
               changeOrigin: true,
               timeout: 5000,
               proxyTimeout: 5000
+            },
+            '/partybuilding': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
+            },
+            '/appeal': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
             }
           }
         }

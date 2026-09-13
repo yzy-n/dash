@@ -48,7 +48,7 @@
       </div>
       <div class="capacity-body">
         <div class="demand-type-wrap">
-          <div v-for="item in demandTypeList" :key="item.key" class="demand-type-item">
+          <div v-for="(item, idx) in demandTypeList" :key="idx" class="demand-type-item">
             <div class="demand-type-icon">
               <div class="icon-circle"></div>
             </div>
@@ -97,47 +97,105 @@
   </aside>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import {
+  getAskList,
+  getDemandTypeList as getDemandTypeListApi,
+  getYearTrendList as getYearTrendListApi,
+  getAppealTypeAnalysisList as getAppealTypeAnalysisListApi,
+  getChannelSourceList as getChannelSourceListApi,
+  getHardWorkOrderList as getHardWorkOrderListApi
+} from '@/api/ask'
 // 最新诉求列表
-const latestDemandList = [
-  { name: '无具体诉求', time: '2023-04-08' },
-  { name: '查询工单', time: '2023-04-08' },
-  { name: '查询立山区太平自来水维修所电话', time: '2023-04-08' },
-  { name: '网络消费售后问题', time: '2023-04-08' },
-  { name: '海城市感王镇政府退休职工煤火费发放问题', time: '2023-04-08' },
-  { name: '鞍山市滴滴快车物品遗失问题', time: '2023-04-08' }
-]
+const latestDemandList = ref([])
+onMounted(() => {
+  getLatestDemandList()
+  fetchDemandTrend()
+  fetchYearTrend()
+  fetchDemandTypeList()
+  fetchChannelSourceList()
+  fetchHardWorkOrderList()
+})
+const getLatestDemandList = () => {
+  getAskList().then((res) => {
+    latestDemandList.value = res.dataList.map((item) => ({
+      name: item.appealName,
+      time: item.appealTime
+    }))
+    console.log(latestDemandList.value)
+  })
+}
 //诉求类型分析
-const demandTypeList = [
-  { key: 'consult', label: '咨询类', percent: '39.97%' },
-  { key: 'complain', label: '投诉类', percent: '59.26%' },
-  { key: 'advise', label: '意见建议类', percent: '0.77%' }
-]
+const demandTypeList = ref([])
+const fetchDemandTypeList = () => {
+  getAppealTypeAnalysisListApi().then((res: any) => {
+    demandTypeList.value = res.dataList.map((item) => ({
+      label: item.typeName,
+      percent: item.ratio
+    }))
+  })
+}
 //渠道来源
-const channelSourceList = [
-  { no: 1, name: '无具体诉求', count: '1609件' },
-  { no: 2, name: '查询工单', count: '1609件' },
-  { no: 3, name: '省12345', count: '1609件' },
-  { no: 4, name: '辽事通', count: '1395件' },
-  { no: 5, name: '政务服务网', count: '1164件' },
-  { no: 6, name: 'In12345微信', count: '531件' },
-  { no: 7, name: '市民网(市长信箱)', count: '525件' },
-  { no: 8, name: '供暖直通车', count: '214件' },
-  { no: 9, name: '首长信箱', count: '160件' }
-]
+const channelSourceList = ref([])
+const fetchChannelSourceList = () => {
+  getChannelSourceListApi().then((res: any) => {
+    channelSourceList.value = res.dataList.map((item) => ({
+      no: item.channelNo,
+      name: item.channelName,
+      count: item.num
+    }))
+  })
+}
 //疑难工单
-const hardWorkOrderList = [
-  { time: '2023-01-10', name: '夜晚噪音扰民' },
-  { time: '2023-01-10', name: '海城市析木镇盛世家园金池小区安全通道被害…' },
-  { time: '2023-01-11', name: '铁东区南中华路旧改后电线问题' },
-  { time: '2023-01-12', name: '海城市王石镇代千村圣源山庄11号楼供暖温度…' },
-  { time: '2023-01-12', name: '立山区灵山村宏福小区126栋井盖松动问题' },
-  { time: '2023-01-16', name: '【人民网市委书记留言板】临时电缆重大安全…' },
-  { time: '2023-01-18', name: '铁西区九道街510栋1单元下水井堵塞问题' }
-]
+const hardWorkOrderList = ref([])
+const fetchHardWorkOrderList = () => {
+  getHardWorkOrderListApi().then((res: any) => {
+    hardWorkOrderList.value = res.dataList.map((item) => ({
+      time: item.appealTime,
+      name: item.appealName
+    }))
+  })
+}
+
+const demandTrendList = ref<Array<{ date?: string; num?: number }>>([])
+
+const fetchDemandTrend = () => {
+  getDemandTypeListApi().then((res: any) => {
+    demandTrendList.value = res.dataList
+  })
+}
 //近12月诉求量趋势 折线面积图
 const demandTrendOption = computed(() => {
+  const rows = demandTrendList.value
+  const normalized = rows
+    .map((item) => {
+      const date = String(item?.date ?? '').trim()
+      const num = Number(item?.num)
+      if (!date) return null
+      return { date, num: Number.isFinite(num) ? num : 0 }
+    })
+    .filter(Boolean) as Array<{ date: string; num: number }>
+
+  normalized.sort((a, b) => a.date.localeCompare(b.date))
+
+  const source = normalized.length
+    ? normalized
+    : [
+        { date: '2022-04', num: 124000 },
+        { date: '2022-05', num: 134000 },
+        { date: '2022-06', num: 110000 },
+        { date: '2022-07', num: 109210 },
+        { date: '2022-08', num: 122000 },
+        { date: '2022-09', num: 172010 },
+        { date: '2022-10', num: 150000 },
+        { date: '2022-11', num: 90000 },
+        { date: '2022-12', num: 70000 },
+        { date: '2023-01', num: 53132 },
+        { date: '2023-02', num: 50186 },
+        { date: '2023-03', num: 62000 }
+      ]
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -148,23 +206,11 @@ const demandTrendOption = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     grid: { left: 50, right: 20, top: 30, bottom: 60 },
+    dataset: {
+      source
+    },
     xAxis: {
       type: 'category',
-      data: [
-        '2022‑04',
-        '2022‑05',
-        '2022‑06',
-        '2022‑07',
-        '2022‑08',
-        '2022‑09',
-        '2022‑10',
-        '2022‑11',
-        '2022‑12',
-        '2023‑01',
-        '2023‑02',
-        '2023‑03',
-        '2023‑04'
-      ],
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 35 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
@@ -200,28 +246,23 @@ const demandTrendOption = computed(() => {
         },
         lineStyle: { color: '#36e8ff', width: 2 },
         itemStyle: { color: '#36e8ff' },
-        data: [
-          124000, 134000, 110000, 109210, 122000, 172010, 150000, 90000, 70000, 53132, 50186, 62000
-        ]
+        encode: { x: 'date', y: 'num' }
       }
     ]
   }
 })
 //年度诉求数量分析 横向柱状
+const yearTrendList = ref([])
+const fetchYearTrend = () => {
+  getYearTrendListApi().then((res: any) => {
+    yearTrendList.value = res.dataList.map((item) => ({
+      name: item.year,
+      value: item.num
+    }))
+  })
+}
 const yearDemandBarOption = computed(() => {
-  const xData = [38515, 8370, 7525, 70080, 33892, 28264, 4825, 7676, 5399, 538]
-  const yData = [
-    '海城市',
-    '台安县',
-    '岫岩县',
-    '铁东区',
-    '铁西区',
-    '立山区',
-    '千山区',
-    '高新区',
-    '经开区',
-    '风景区'
-  ]
+  const source = yearTrendList.value
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -231,6 +272,9 @@ const yearDemandBarOption = computed(() => {
       textStyle: { color: 'rgba(240,251,255,0.9)' }
     },
     grid: { left: 90, right: 30, top: 20, bottom: 40 },
+    dataset: {
+      source
+    },
     xAxis: {
       type: 'value',
       axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 20 },
@@ -240,7 +284,6 @@ const yearDemandBarOption = computed(() => {
     },
     yAxis: {
       type: 'category',
-      data: yData,
       axisLabel: { color: 'rgba(214,238,255,0.75)', fontSize: 20 },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -249,7 +292,7 @@ const yearDemandBarOption = computed(() => {
       {
         type: 'bar',
         barWidth: 50,
-        data: xData,
+        encode: { x: 'value', y: 'name' },
         itemStyle: {
           borderRadius: [0, 8, 8, 0],
           color: {
