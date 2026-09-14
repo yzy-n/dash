@@ -89,33 +89,16 @@
               <span>热点问题(前)</span>
               <span>热点数量(前)</span>
             </div>
-            <div class="hot-table-row">
-              <span>年</span>
-              <span>11960</span>
-              <span>故障维修</span>
-              <span>隔离要求</span>
-              <span>433586</span>
-            </div>
-            <div class="hot-table-row">
-              <span>季</span>
-              <span>2763</span>
-              <span>参保缴费</span>
-              <span>供暖报修</span>
-              <span>16300</span>
-            </div>
-            <div class="hot-table-row">
-              <span>月</span>
-              <span>598</span>
-              <span>物业维修服务</span>
-              <span>参保缴费</span>
-              <span>2374</span>
-            </div>
-            <div class="hot-table-row">
-              <span>周</span>
-              <span>567</span>
-              <span>物业维修服务</span>
-              <span>物业维修服务</span>
-              <span>112</span>
+            <div
+              v-for="row in hotProblemList"
+              :key="row.index ?? row.hotDateType"
+              class="hot-table-row"
+            >
+              <span>{{ row.hotDateType }}</span>
+              <span>{{ row.nowNum }}</span>
+              <span>{{ row.nowHot }}</span>
+              <span>{{ row.preHot }}</span>
+              <span>{{ row.preNum }}</span>
             </div>
           </div>
         </div>
@@ -174,27 +157,27 @@
             <div class="effect-item">
               <div class="effect-icon">%</div>
               <div class="effect-name">满意率</div>
-              <div class="effect-value">{{ hotlineStats.esteemRate }}%</div>
+              <div class="effect-value">{{ effectivenessAnalysis.satisfied }}%</div>
             </div>
             <div class="effect-item">
               <div class="effect-icon">通</div>
-              <div class="effect-name">接通率</div>
-              <div class="effect-value">{{ hotlineStats.onRate }}%</div>
+              <div class="effect-name">办结率</div>
+              <div class="effect-value">{{ effectivenessAnalysis.conclude }}%</div>
             </div>
             <div class="effect-item">
               <div class="effect-icon">答</div>
-              <div class="effect-name">直接答复率</div>
-              <div class="effect-value">{{ hotlineStats.answerRate }}%</div>
+              <div class="effect-name">有效回访率</div>
+              <div class="effect-value">{{ effectivenessAnalysis.returnvisit }}%</div>
             </div>
             <div class="effect-item">
               <div class="effect-icon">评</div>
-              <div class="effect-name">评价率</div>
-              <div class="effect-value">{{ hotlineStats.appraiseRate }}%</div>
+              <div class="effect-name">及时分辨率</div>
+              <div class="effect-value">{{ effectivenessAnalysis.instantsplitrate }}%</div>
             </div>
             <div class="effect-item">
               <div class="effect-icon">呼</div>
-              <div class="effect-name">呼入量</div>
-              <div class="effect-value">{{ hotlineStats.breathAmount }}</div>
+              <div class="effect-name">办件时长</div>
+              <div class="effect-value">{{ effectivenessAnalysis.processingtime }}</div>
             </div>
           </div>
 
@@ -242,7 +225,11 @@ import { Tooltip, Legend } from 'echarts/components'
 import CityMapChart from '../charts/CityMapChart.vue'
 import PieChart from '../charts/pie.vue'
 import type { GridInfoRow } from '../types'
-import { getHotlineStats, getHotProblemList } from '@/api/ask'
+import {
+  getHotlineStats,
+  getHotProblemList as getHotProblemListApi,
+  getEffectivenessAnalysis
+} from '@/api/ask'
 const selectedAreaName = ref('铁东区')
 const gridInfoRows: GridInfoRow[] = [
   { name: '铁东区', town: 0, village: 0, grid: 12 },
@@ -288,23 +275,61 @@ const formatCount = (value: unknown) => {
   if (!text) return '--'
   return text.endsWith('个') || text.endsWith('件') ? text : `${text}个`
 }
-const hotProblemList = ref([])
-const getHotProblemList = async () => {
+
+const hotProblemList = ref<any[]>([])
+const activeHotProblemTab = ref<'year' | 'season' | 'month' | 'week' | 'day'>('week')
+const effectivenessAnalysis = ref<any>({})
+const fetchEffectivenessAnalysis = async () => {
   try {
-    const res = await getHotProblemList()
-    hotProblemList.value = res.dataList || []
-  } catch {}
+    const res: any = await getEffectivenessAnalysis()
+    effectivenessAnalysis.value = res.dataList[0]
+  } catch (e) {
+    console.error(e)
+  }
 }
+const fetchHotProblemList = async () => {
+  try {
+    const res: any = await getHotProblemListApi({ hotDateType: 'year' })
+    const list = Array.isArray(res?.dataList)
+      ? res.dataList
+      : Array.isArray(res?.list)
+        ? res.list
+        : Array.isArray(res?.rows)
+          ? res.rows
+          : Array.isArray(res?.data?.dataList)
+            ? res.data.dataList
+            : Array.isArray(res?.data?.list)
+              ? res.data.list
+              : []
+    hotProblemList.value = list
+    console.log(hotProblemList.value)
+  } catch (e) {
+    hotProblemList.value = []
+    console.error(e)
+  }
+}
+
 onMounted(() => {
-  getHotProblemList()
+  fetchHotProblemList()
+  fetchEffectivenessAnalysis()
 })
+
+watch(activeHotProblemTab, () => fetchHotProblemList())
 watch(
   activeHotlineTab,
-  async (dateType) => {
+  async (period) => {
     try {
-      const res = await getHotlineStats({ dateType })
-      hotlineStats.value = res.dataList[0]
-    } catch {}
+      const res: any = await getHotlineStats({ period })
+      if (Array.isArray(res?.dataList)) {
+        hotlineStats.value = res.dataList[0] ?? {}
+      } else if (res?.data && typeof res.data === 'object') {
+        hotlineStats.value = res.data
+      } else {
+        hotlineStats.value = res ?? {}
+      }
+    } catch (e) {
+      console.error(e)
+    }
   },
   { immediate: true }
 )

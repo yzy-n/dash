@@ -123,7 +123,6 @@ const getLatestDemandList = () => {
       name: item.appealName,
       time: item.appealTime
     }))
-    console.log(latestDemandList.value)
   })
 }
 //诉求类型分析

@@ -16,7 +16,7 @@ const props = defineProps<{
 const defaultData: MapDataItem[] = [
   { name: '海城市', value: 410 },
   { name: '台安县', value: 256 },
-  { name: '岫岩满族自治县', value: 110 },
+  { name: '岫岩县', value: 110 },
   { name: '铁东区', value: 3654 },
   { name: '铁西区', value: 2103 },
   { name: '立山区', value: 2552 },

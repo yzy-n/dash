@@ -9,7 +9,7 @@
       </div>
       <div class="capacity-body">
         <div class="capacity-chart">
-          <Five />
+          <Five :list="popuList" :series-names="['总户数', '总人数']" />
         </div>
       </div>
     </section>
@@ -32,13 +32,13 @@
             <div class="pop-metric-label">{{ item.label }}</div>
             <div class="pop-metric-value">
               <span class="num">{{ item.value }}</span>
-              <span class="unit">{{ item.unit }}</span>
+              <span class="unit">万人</span>
             </div>
             <div class="pop-metric-icon"></div>
           </div>
         </div>
         <div class="capacity-chart">
-          <County />
+          <County :list="urbanRuralList" />
         </div>
       </div>
     </section>
@@ -46,7 +46,7 @@
     <section class="panel panel--pop-state">
       <div class="panel-head">
         <div class="panel-title">城乡人口情况</div>
-        <select v-model="dateInvest" class="panel-date">
+        <select v-model="dateInvest" class="panel-date" @change="getTownPopuList">
           <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
@@ -60,8 +60,8 @@
             </div>
           </div>
           <div class="pop-side-list">
-            <div v-for="row in popIncreaseRows" :key="row.label" class="pop-side-row">
-              <div class="pop-side-row-label">{{ row.label }}</div>
+            <div v-for="row in popIncreaseRows" :key="row.name" class="pop-side-row">
+              <div class="pop-side-row-label">{{ row.name }}</div>
               <div class="pop-side-row-value">
                 <span class="num">{{ row.value }}</span>
                 <span class="unit">人</span>
@@ -86,8 +86,8 @@
             </div>
           </div>
           <div class="pop-side-list">
-            <div v-for="row in popDecreaseRows" :key="row.label" class="pop-side-row">
-              <div class="pop-side-row-label">{{ row.label }}</div>
+            <div v-for="row in popDecreaseRows" :key="row.name" class="pop-side-row">
+              <div class="pop-side-row-label">{{ row.name }}</div>
               <div class="pop-side-row-value">
                 <span class="num">{{ row.value }}</span>
                 <span class="unit">人</span>
@@ -106,7 +106,7 @@
         </select>
       </div>
       <div class="capacity-chart">
-        <Total :x-axis-data="xData" :data1="houseData" :data2="peopleData" />
+        <Total :list="areaPopuList" />
       </div>
     </section>
 
@@ -118,7 +118,7 @@
         </select>
       </div>
       <div class="capacity-chart">
-        <Map :data="MapData" />
+        <Map :data="scaleDensityList" />
       </div>
     </section>
 
@@ -130,14 +130,14 @@
         </select>
       </div>
       <div class="capacity-chart">
-        <Scale />
+        <Scale :list="houseScaleList" />
       </div>
     </section>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import Five from '../charts/five.vue'
@@ -145,396 +145,102 @@ import County from '../charts/county.vue'
 import Total from '../charts/total.vue'
 import Map from '../charts/map.vue'
 import Scale from '../charts/scale.vue'
+import {
+  getPopu,
+  getUrbanRural,
+  getTownPopu,
+  getAreaPopu,
+  getScaleDensity,
+  getHouseScale
+} from '@/api/people'
+const popuList = ref<ChartListItem[]>([])
+const getPopuList = async () => {
+  const res = await getPopu()
+  popuList.value = res.dataList.map((item) => ({
+    name: item.year,
+    总户数: item.houseNum,
+    总人数: item.popuNum
+  }))
+}
+const urbanRuralList = ref<ChartListItem[]>([])
+const getUrbanRuralList = async () => {
+  const res = await getUrbanRural()
+  popMetrics.value = res.summary
+  urbanRuralList.value = res.dataList.map((item) => ({
+    name: item.areaName,
+    农村人口数: item.countyNum,
+    城镇人口数: item.cityNum
+  }))
+}
+const townPopuList = ref([])
+const getTownPopuList = async () => {
+  const res = await getTownPopu(dateInvest.value)
+  townPopuList.value = res.dataList[0]
+  popIncreaseTotal.value = townPopuList.value.addTotal
+  popDecreaseTotal.value = townPopuList.value.lowerTotal
+  popIncreaseRows.value = [
+    { name: '出生人口', value: townPopuList.value.birthTotal },
+    { name: '迁入人口', value: townPopuList.value.inTotal },
+    { name: '并入人口', value: townPopuList.value.joinTotal },
+    { name: '其他增加', value: townPopuList.value.addOtherTotal }
+  ]
+  popDecreaseRows.value = [
+    { name: '死亡人口', value: townPopuList.value.dieTotal },
+    { name: '迁出注销', value: townPopuList.value.exitTotal },
+    { name: '其他减少', value: townPopuList.value.otherTotal }
+  ]
+}
+const areaPopuList = ref([])
+const getAreaPopuList = async () => {
+  const res = await getAreaPopu()
+  areaPopuList.value = res.dataList.map((item) => ({
+    name: item.areaName,
+    总户数: item.houseNum,
+    总人数: item.popuNum
+  }))
+}
+const scaleDensityList = ref([])
+const getScaleDensityList = async () => {
+  const res = await getScaleDensity()
+  scaleDensityList.value = res.dataList.map((item) => ({
+    name: item.areaName,
+    value: item.scaleDensity
+  }))
+}
+onMounted(() => {
+  getPopuList()
+  getUrbanRuralList()
+  getTownPopuList()
+  getAreaPopuList()
+  getScaleDensityList()
+  getHouseScaleList()
+})
 const electricTabs = ['地区', '行业', '园区']
-const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
+const dateOptions = ['2024年统计年鉴', '2023年统计年鉴', '2022年统计数据']
 const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
-//截图原始数据
-const xData = ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区']
-//总户数 万户
-const houseData = [34, 13.8, 15.3, 19.8, 14.4, 20.3, 3.2]
-//总人数 万人
-const peopleData = [104, 33, 48, 50, 31, 47, 10]
-const MapData = [
-  { name: '海城市', value: 410 },
-  { name: '台安县', value: 256 },
-  { name: '岫岩满族自治县', value: 110 },
-  { name: '铁东区', value: 3654 },
-  { name: '铁西区', value: 2103 },
-  { name: '立山区', value: 2552 },
-  { name: '千山区', value: 567 }
-]
-const dateElectric = ref(dateOptions[0])
+
+const dateElectric = ref('')
 const dateCapacity = ref(dateOptions[0])
-const dateInvest = ref(dateOptions[1])
+const dateInvest = ref(dateOptions[0])
 const datePile = ref(dateOptions[2])
 const dateProject = ref(dateOptions[0])
 const dateEnergy = ref(dateOptions[0])
 const dateSteel = ref('')
-// 模拟截图里表格数据
-const steelTableData = ref([
-  { id: 1, category: '工字钢', spec: '25A', price: 4150, lastWeekPrice: 4150, change: 0 },
-  { id: 2, category: '槽钢', spec: '16#', price: 4400, lastWeekPrice: 4340, change: -60 },
-  { id: 3, category: '槽钢', spec: '25#', price: 4150, lastWeekPrice: 4150, change: 0 },
-  { id: 4, category: '角钢', spec: '50*5', price: 4350, lastWeekPrice: 4290, change: -60 },
-  { id: 5, category: '角钢', spec: '160*10', price: 4110, lastWeekPrice: 4110, change: 0 }
-])
+const houseScaleList = ref([])
+const getHouseScaleList = async () => {
+  const res = await getHouseScale()
+  houseScaleList.value = res.dataList.map((item) => ({
+    name: item.areaName,
+    value: item.scaleDensity
+  }))
+}
 
-const popMetrics = [
-  { key: 'total', label: '总人口数量', value: '333.44', unit: '万人', tone: 'gold' },
-  { key: 'urban', label: '城镇总人口数', value: '178.71', unit: '万人', tone: 'cyan' },
-  { key: 'rural', label: '农村总人口数', value: '154.73', unit: '万人', tone: 'blue' }
-]
+const popMetrics = ref([])
 
-const popIncreaseTotal = '18065'
-const popDecreaseTotal = '30920'
-const popIncreaseRows = [
-  { label: '出生人数', value: '6655' },
-  { label: '退出规模', value: '913' },
-  { label: '回归人数', value: '5' }
-]
-const popDecreaseRows = [
-  { label: '死亡人数', value: '17926' },
-  { label: '脱现役人数', value: '230' },
-  { label: '出县人数', value: '31' },
-  { label: '城镇人口迁出', value: '12624' },
-  { label: '其它人数', value: '109' }
-]
-
-const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
-const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
-const capacityMetrics = computed(() => {
-  const map = {
-    全社会用电容量: [
-      { label: '第三产业', value: '408.46', unit: '万千瓦' },
-      { label: '同比', value: '3.95', unit: '%' },
-      { label: '环比', value: '1.24', unit: '%' }
-    ],
-    全行业实际用电容量: [
-      { label: '第二产业', value: '962.25', unit: '万千瓦' },
-      { label: '同比', value: '4.89', unit: '%' },
-      { label: '环比', value: '1.31', unit: '%' }
-    ]
-  } as const
-  return map[activeCapacityTab.value]
-})
-const capacityRingOption = computed(() => {
-  const rings =
-    activeCapacityTab.value === '全行业实际用电容量'
-      ? [
-          { name: '城市居民用电量', value: 48.9, color: '#33d5ff' },
-          { name: '第一产业', value: 12.1, color: '#ffe24a' },
-          { name: '第二产业', value: 66.5, color: '#40f3b8' },
-          { name: '第三产业', value: 35.8, color: '#ffb84a' }
-        ]
-      : [
-          { name: '城市居民用电量', value: 42.6, color: '#33d5ff' },
-          { name: '第一产业', value: 10.8, color: '#ffe24a' },
-          { name: '第二产业', value: 58.4, color: '#40f3b8' },
-          { name: '第三产业', value: 32.3, color: '#ffb84a' }
-        ]
-  const makeRing = (item: (typeof rings)[number], idx: number) => {
-    const outer = 78 - idx * 14
-    const inner = outer - 8
-    return {
-      type: 'pie',
-      radius: [`${inner}%`, `${outer}%`],
-      center: ['58%', '56%'],
-      silent: true,
-      label: {
-        show: true,
-        position: 'outside',
-        formatter: `${item.name}\n{v|${item.value}}`,
-        rich: { v: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 14, fontWeight: 800 } },
-        color: 'rgba(214, 238, 255, 0.7)',
-        fontSize: 12
-      },
-      labelLine: { length: 10, length2: 10, lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
-      data: [
-        { value: item.value, name: item.name, itemStyle: { color: item.color } },
-        {
-          value: 100 - item.value,
-          name: '',
-          itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
-          label: { show: false },
-          labelLine: { show: false }
-        }
-      ]
-    }
-  }
-  return { backgroundColor: 'transparent', tooltip: { show: false }, series: rings.map(makeRing) }
-})
-
-// 固定资产投资
-const investTabs = ['地区', '行业', '园区']
-const activeInvestTab = ref<string>(investTabs[0])
-const investDistrictX = [
-  '海城市',
-  '台安县',
-  '岫岩县',
-  '铁东区',
-  '铁西区',
-  '立山区',
-  '千山区',
-  '高新区',
-  '经开区',
-  '凤城区'
-]
-const investDistrictY = [25.8, 42.3, 11.6, 20, 25.8, 14.4, 39.8, 71, 148, -57.8]
-const investOption = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
-    },
-    grid: { left: 60, right: 24, top: 24, bottom: 80 },
-    xAxis: {
-      type: 'category',
-      data: investDistrictX,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 40 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        type: 'bar',
-        barWidth: 24,
-        data: investDistrictY,
-        itemStyle: {
-          borderRadius: [6, 6, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: '#54e8ff' },
-              { offset: 1, color: '#1966ff' }
-            ]
-          }
-        },
-        markLine: { silent: true, data: [{ yAxis: 0 }], lineStyle: { color: '#ff4444', width: 2 } }
-      }
-    ]
-  }
-})
-const investDistrictX2 = [
-  '钢铁行业',
-  '菱镁行业',
-  '建材行业',
-  '装备制造',
-  '化工行业',
-  '消费品',
-  '电子信息',
-  '铁矿行业',
-  '工业辅助'
-]
-const investOption2 = computed(() => {
-  return {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
-    },
-    grid: { left: 60, right: 24, top: 24, bottom: 80 },
-    xAxis: {
-      type: 'category',
-      data: investDistrictX2,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 40 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        type: 'bar',
-        barWidth: 50,
-        data: investDistrictY,
-        itemStyle: {
-          borderRadius: [6, 6, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: '#54e8ff' },
-              { offset: 1, color: '#1966ff' }
-            ]
-          }
-        },
-        markLine: { silent: true, data: [{ yAxis: 0 }], lineStyle: { color: '#ff4444', width: 2 } }
-      }
-    ]
-  }
-})
-const fourReformMetrics = computed(() => [
-  { label: '累计完成投资', value: '7.07', unit: '亿元' },
-  { label: '较去年同期增长', value: '2.9', unit: '%' },
-  { label: '占工业投资比重', value: '48.5', unit: '%' },
-  { label: '较去年同期提升', value: '1.2', unit: '%' }
-])
-const fourReformMetrics2 = computed(() => [
-  { label: '营业收入', value: '3014', unit: '亿元' },
-  { label: '税金总额', value: '83', unit: '亿元' },
-  { label: '平均用工人数', value: '149580', unit: '人' },
-  { label: '利润总额', value: '161', unit: '亿元' }
-])
-const pileOption = computed(() => {
-  const districts = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
-  const privateVals = [14, 65, 6, 18, 9, 10, 4, 7]
-  const publicVals = [8, 12, 3, 10, 6, 7, 3, 5]
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 70, right: 26, top: 26, bottom: 34 },
-    legend: {
-      bottom: 6,
-      left: 'center',
-      itemWidth: 10,
-      itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
-    },
-    xAxis: {
-      type: 'category',
-      data: districts,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        name: '商用充电站',
-        type: 'bar',
-        data: publicVals,
-        barWidth: 10,
-        itemStyle: {
-          borderRadius: [10, 10, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(51, 213, 255, 0.95)' },
-              { offset: 1, color: 'rgba(51, 213, 255, 0.15)' }
-            ]
-          }
-        }
-      },
-      {
-        name: '民用充电站',
-        type: 'bar',
-        data: privateVals,
-        barWidth: 10,
-        itemStyle: {
-          borderRadius: [10, 10, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(255, 226, 74, 0.95)' },
-              { offset: 1, color: 'rgba(255, 226, 74, 0.15)' }
-            ]
-          }
-        }
-      }
-    ]
-  }
-})
-
-const projectTabs = ['项目报装情况', '已报装项目详情']
-const activeProjectTab = ref<(typeof projectTabs)[number]>(projectTabs[0])
-const projectTotal = computed(() => (activeProjectTab.value === '项目报装情况' ? 35 : 35))
-const projectDone = computed(() => (activeProjectTab.value === '项目报装情况' ? 25 : 25))
-const projectTodo = computed(() => (activeProjectTab.value === '项目报装情况' ? 10 : 10))
-const projectDoneRate = computed(() => Math.round((projectDone.value / projectTotal.value) * 100))
-const projectTodoRate = computed(() => 100 - projectDoneRate.value)
-
-const energyTabs = ['能源发电量', '能源分布情况']
-const activeEnergyTab = ref<(typeof energyTabs)[number]>(energyTabs[0])
-const energyTotal = computed(() => (activeEnergyTab.value === '能源发电量' ? '618032' : '618032'))
-const energyOption = computed(() => {
-  const categories = ['火电', '水电', '风电', '太阳能', '生物质']
-  const values =
-    activeEnergyTab.value === '能源分布情况' ? [55, 12, 20, 6, 7] : [558130, 714, 20114, 2697, 1269]
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 80, right: 26, top: 16, bottom: 18 },
-    xAxis: {
-      type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'category',
-      data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 14 },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        type: 'bar',
-        data: values,
-        barWidth: 18,
-        itemStyle: {
-          borderRadius: [0, 10, 10, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 1,
-            y2: 0,
-            colorStops: [
-              { offset: 0, color: 'rgba(255, 120, 120, 0.25)' },
-              { offset: 1, color: 'rgba(255, 120, 120, 0.95)' }
-            ]
-          }
-        }
-      }
-    ]
-  }
-})
+const popIncreaseTotal = ref('')
+const popDecreaseTotal = ref('')
+const popIncreaseRows = ref([])
+const popDecreaseRows = ref([])
 </script>
 
 <style scoped>
@@ -741,11 +447,11 @@ const energyOption = computed(() => {
   align-content: stretch;
 }
 .pop-side--left .pop-side-list {
-  grid-template-rows: repeat(3, minmax(44px, 1fr));
+  grid-template-rows: repeat(4, minmax(44px, 1fr));
   gap: 18px;
 }
 .pop-side--right .pop-side-list {
-  grid-template-rows: repeat(5, minmax(44px, 1fr));
+  grid-template-rows: repeat(3, minmax(44px, 1fr));
   gap: 10px;
 }
 .pop-side-row {

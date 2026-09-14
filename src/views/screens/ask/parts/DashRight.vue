@@ -30,7 +30,7 @@
       </div>
       <div class="capacity-body">
         <div class="rank-list">
-          <div v-for="(item, idx) in deptRankList" :key="idx" class="rank-item">
+          <div v-for="(item, idx) in depthVTop" :key="idx" class="rank-item">
             <div class="rank-index">{{ item.no }}</div>
             <div class="rank-name">{{ item.name }}</div>
             <div class="rank-value">
@@ -58,7 +58,7 @@
       </div>
       <div class="capacity-body">
         <div class="quality-list">
-          <div v-for="(item, idx) in qualityList" :key="idx" class="quality-item">
+          <div v-for="(item, idx) in handlingQualityList" :key="idx" class="quality-item">
             <div class="q-event">{{ item.eventName }}</div>
             <div class="q-unit">{{ item.dutyUnit }}</div>
             <div class="q-star">★×{{ item.star }}</div>
@@ -109,31 +109,77 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
+import {
+  getRepaymentPeople,
+  getAcceptanceDeptParticipation,
+  getDepthVTop,
+  getEarlyWarningProblems,
+  getHandlingQuality
+} from '@/api/ask'
+const repaymentPeople = ref([])
+const getRepaymentPeopleList = async () => {
+  const res = await getRepaymentPeople()
+  repaymentPeople.value = res.dataList
+    .map((item) => ({
+      name: item.deptName,
+      value: item.money
+    }))
+    .slice(0, 10)
+}
+const acceptUnitTrend = ref([])
+const getAcceptanceDeptParticipationList = async () => {
+  const res = await getAcceptanceDeptParticipation()
+  acceptUnitTrend.value = res.dataList.map((item) => ({
+    date: item.date,
+    value: item.num
+  }))
+}
+const depthVTop = ref([])
+const getDepthVTopList = async () => {
+  const res = await getDepthVTop()
+  depthVTop.value = res.dataList
+    .map((item) => ({
+      no: item.index,
+      name: item.deptName,
+      count: item.num,
+      rate: item.ratio
+    }))
+    .slice(0, 10)
+}
+const warnRingOptionList = ref([])
+const getWarnWarningProblemsList = async () => {
+  const res = await getEarlyWarningProblems()
+  warnRingOptionList.value = res.dataList
+    .map((item) => ({
+      name: item.type,
+      value: item.num,
+      percent: item.proportion
+    }))
+    .slice(0, 10)
+}
+const handlingQualityList = ref([])
+const getHandlingQualityList = async () => {
+  const res = await getHandlingQuality()
+  handlingQualityList.value = res.dataList
+    .map((item) => ({
+      eventName: item.appealName,
+      dutyUnit: item.appealDept,
+      star: item.starRating
+    }))
+    .slice(0, 10)
+}
+onMounted(() => {
+  getRepaymentPeopleList()
+  getAcceptanceDeptParticipationList()
+  getDepthVTopList()
+  getWarnWarningProblemsList()
+  getHandlingQualityList()
+})
 const socialAssistTabs = ['质量监管', '超期监管']
 const activeAssistTab = ref<(typeof socialAssistTabs)[number]>('质量监管')
-// 部门办理量排行
-const deptRankList = [
-  { no: 1, name: '鞍山市交通运输局', count: 2117, rate: '11.17%' },
-  { no: 2, name: '鞍山市交通运输集团有限公司', count: 1318, rate: '6.96%' },
-  { no: 3, name: '鞍山市公安局交管支队', count: 1216, rate: '6.42%' },
-  { no: 4, name: '鞍山市东房房产管修有限公司', count: 1177, rate: '6.21%' },
-  { no: 5, name: '鞍山华润燃气有限公司', count: 1110, rate: '5.86%' },
-  { no: 6, name: '鞍山市邮政管理局', count: 911, rate: '4.81%' },
-  { no: 7, name: '鞍山市医疗保障事务服务中心', count: 790, rate: '4.17%' }
-]
-
-//小件质量高星件统计
-const qualityList = [
-  { eventName: '铁西区鞍山小潘君子兰...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 },
-  { eventName: '海城市巨伦广场5层江苏...', dutyUnit: '鞍山海城市人社局', star: 5 },
-  { eventName: '铁西区某米线餐饮业食...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 },
-  { eventName: '台安县物资大市场下水...', dutyUnit: '鞍山台安县八角台街道办.', star: 5 },
-  { eventName: '台安县西佛镇小红旗村...', dutyUnit: '鞍山台安县西佛镇政府', star: 5 },
-  { eventName: '铁西区三街口的某陶瓷...', dutyUnit: '鞍山市铁西区市场监管管', star: 5 }
-]
 
 //监管情况
 const superviseList = [
@@ -189,6 +235,7 @@ const superviseList = [
 
 //还利于民柱状图
 const benefitBarOption = computed(() => {
+  const source = repaymentPeople.value
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -199,20 +246,11 @@ const benefitBarOption = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     grid: { left: 50, right: 20, top: 40, bottom: 120 },
+    dataset: {
+      source
+    },
     xAxis: {
       type: 'category',
-      data: [
-        '鞍山市公安局',
-        '鞍山市财政局',
-        '鞍山市人社局',
-        '鞍山市住建局',
-        '鞍山市市场监管局',
-        '鞍山市交通运输...',
-        '鞍山市文旅广电局',
-        '鞍山市税务局',
-        '鞍山市铁东区人民法院',
-        '鞍山市铁西区人民法院'
-      ],
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 38 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
@@ -231,7 +269,7 @@ const benefitBarOption = computed(() => {
         name: '金额',
         type: 'bar',
         barWidth: 40,
-        data: [285, 38.8, 32, 26, 22, 18, 15, 12, 9, 7],
+        encode: { x: 'name', y: 'value' },
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
@@ -253,6 +291,7 @@ const benefitBarOption = computed(() => {
 
 //受理单位参与度 面积折线图
 const acceptUnitTrendOption = computed(() => {
+  const source = acceptUnitTrend.value
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -263,23 +302,11 @@ const acceptUnitTrendOption = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     grid: { left: 50, right: 20, top: 60, bottom: 60 },
+    dataset: {
+      source
+    },
     xAxis: {
       type: 'category',
-      data: [
-        '2022‑04',
-        '2022‑05',
-        '2022‑06',
-        '2022‑07',
-        '2022‑08',
-        '2022‑09',
-        '2022‑10',
-        '2022‑11',
-        '2022‑12',
-        '2023‑01',
-        '2023‑02',
-        '2023‑03',
-        '2023‑04'
-      ],
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 35 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
@@ -315,7 +342,7 @@ const acceptUnitTrendOption = computed(() => {
         },
         lineStyle: { color: '#44b8ff', width: 2 },
         itemStyle: { color: '#44b8ff' },
-        data: [434, 452, 470, 460, 475, 452, 453, 461, 432, 424, 442, 467, 375]
+        encode: { x: 'date', y: 'value' }
       }
     ]
   }
@@ -349,14 +376,7 @@ const warnRingOption = computed(() => {
           color: 'rgba(214,238,255,0.8)',
           fontSize: 11
         },
-        data: [
-          { value: 467, name: '物业维修服务不到位、不及时', percent: '38.59%' },
-          { value: 283, name: '商铺办公电话', percent: '23.39%' },
-          { value: 227, name: '自来水供应', percent: '18.76%' },
-          { value: 131, name: '健康诉求', percent: '10.83%' },
-          { value: 43, name: '隔离要求', percent: '3.55%' },
-          { value: 60, name: '其他', percent: '4.88%' }
-        ]
+        data: warnRingOptionList.value
       }
     ]
   }
@@ -448,43 +468,40 @@ const warnRingOption = computed(() => {
   justify-content: center;
 }
 .tab {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 170px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.38);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
-  opacity: 0.55;
-  filter: grayscale(1) brightness(0.75);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.12),
-    0 0 0 rgba(54, 232, 255, 0);
-  transition:
-    opacity 160ms ease,
-    filter 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease,
-    color 160ms ease;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 .tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  text-shadow:
-    0 0 12px rgba(54, 232, 255, 0.35),
-    0 0 20px rgba(54, 232, 255, 0.18);
+  color: #eaf4ff;
   opacity: 1;
-  filter: none;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.38),
-    0 0 16px rgba(54, 232, 255, 0.22);
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 .total-text {
   font-size: 18px;
@@ -600,7 +617,7 @@ const warnRingOption = computed(() => {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  margin-top: 60px;
+  margin-top: 120px;
 }
 .supervise-header {
   display: grid;

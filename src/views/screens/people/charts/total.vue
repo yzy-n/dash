@@ -1,15 +1,19 @@
 <template>
   <div ref="chartRef" class="echarts-double-bar"></div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
 
+// 传入的list每一项：name为x轴名称，两个指标字段
+interface ChartListItem {
+  name: string
+  总户数: number
+  总人数: number
+}
+
 interface Props {
-  xAxisData: string[]
-  data1: number[] //总户数 万户 左Y轴
-  data2: number[] //总人数 万人 右Y轴
+  list?: ChartListItem[]
 }
 const props = defineProps<Props>()
 
@@ -17,7 +21,13 @@ const chartRef = ref<HTMLElement | null>(null)
 let chartInstance: echarts.ECharts | null = null
 
 const renderChart = () => {
-  if (!chartInstance || !chartRef.value) return
+  if (!chartInstance || !chartRef.value || !props.list?.length) return
+
+  // 从list自动拆分x轴、两组数据
+  const xAxisData = props.list.map((item) => item.name)
+  const data1 = props.list.map((item) => item.总户数)
+  const data2 = props.list.map((item) => item.总人数)
+
   const option: echarts.EChartsOption = {
     backgroundColor: '#091835',
     tooltip: {
@@ -37,7 +47,7 @@ const renderChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: props.xAxisData,
+      data: xAxisData,
       axisLine: { lineStyle: { color: '#335488' } },
       axisLabel: { color: '#ffffff', fontSize: 14 }
     },
@@ -80,7 +90,7 @@ const renderChart = () => {
           }
         },
         barWidth: 22,
-        data: props.data1
+        data: data1
       },
       {
         name: '总人数',
@@ -100,38 +110,32 @@ const renderChart = () => {
           }
         },
         barWidth: 22,
-        data: props.data2
+        data: data2
       }
     ]
   }
   chartInstance.setOption(option)
 }
-
 const initChart = () => {
   if (!chartRef.value) return
   chartInstance = echarts.init(chartRef.value)
   renderChart()
 }
-
 const resize = () => chartInstance?.resize()
-
 onMounted(() => {
   initChart()
   window.addEventListener('resize', resize)
 })
-
 watch(
-  () => [props.xAxisData, props.data1, props.data2],
+  () => props.list,
   () => renderChart(),
   { deep: true }
 )
-
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resize)
   chartInstance?.dispose()
 })
 </script>
-
 <style scoped>
 .echarts-double-bar {
   width: 100%;

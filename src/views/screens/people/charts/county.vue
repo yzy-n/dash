@@ -2,31 +2,68 @@
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 
-interface SeriesItem {
+// 每条数据：name对应x轴类目，其余字段为指标
+interface ChartListItem {
   name: string
-  data: number[]
-}
-interface ChartData {
-  xAxisData: string[]
-  series: SeriesItem[]
+  [key: string]: number
 }
 
 const props = defineProps<{
-  data?: ChartData
+  list?: ChartListItem[]
 }>()
 
-// 截图里鞍山各区县模拟数据
-const defaultData: ChartData = {
-  xAxisData: ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区'],
-  series: [
-    { name: '农村人口数', data: [76, 29, 36, 2, 6, 2, 10] },
-    { name: '城镇人口数', data: [31, 8, 15, 52, 24, 47, 4] }
-  ]
-}
+// 默认模拟数据（鞍山各区县）
+const defaultList: ChartListItem[] = [
+  { name: '海城市', 农村人口数: 76, 城镇人口数: 31 },
+  { name: '台安县', 农村人口数: 29, 城镇人口数: 8 },
+  { name: '岫岩县', 农村人口数: 36, 城镇人口数: 15 },
+  { name: '铁东区', 农村人口数: 2, 城镇人口数: 52 },
+  { name: '铁西区', 农村人口数: 6, 城镇人口数: 24 },
+  { name: '立山区', 农村人口数: 2, 城镇人口数: 47 },
+  { name: '千山区', 农村人口数: 10, 城镇人口数: 4 }
+]
 
-const chartData = computed(() => props.data ?? defaultData)
+const chartList = computed(() => props.list ?? defaultList)
 
 const option = computed(() => {
+  // 提取x轴类目
+  const xAxisData = chartList.value.map((item) => item.name)
+  // 自动提取指标名称（排除name字段）
+  const seriesNames = Object.keys(chartList.value[0] ?? {}).filter((key) => key !== 'name')
+
+  // 颜色映射
+  const colorMap: Record<string, Array<{ offset: number; color: string }>> = {
+    农村人口数: [
+      { offset: 0, color: '#ffdd44' },
+      { offset: 1, color: '#b89c20' }
+    ],
+    城镇人口数: [
+      { offset: 0, color: '#33c8ff' },
+      { offset: 1, color: '#1772d8' }
+    ]
+  }
+
+  // 生成series
+  const series = seriesNames.map((name) => {
+    return {
+      name,
+      type: 'bar',
+      barWidth: 16,
+      itemStyle: {
+        borderRadius: [6, 6, 0, 0],
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: colorMap[name]
+        }
+      },
+      data: chartList.value.map((item) => item[name])
+    }
+  })
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -37,7 +74,7 @@ const option = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     legend: {
-      data: ['农村人口数', '城镇人口数'],
+      data: seriesNames,
       top: 4,
       right: 10,
       textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 },
@@ -53,7 +90,7 @@ const option = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: chartData.value.xAxisData,
+      data: xAxisData,
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.6)',
         fontSize: 12,
@@ -72,48 +109,7 @@ const option = computed(() => {
       axisLine: { show: false },
       axisTick: { show: false }
     },
-    series: [
-      {
-        name: '农村人口数',
-        type: 'bar',
-        barWidth: 16,
-        itemStyle: {
-          borderRadius: [6, 6, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: '#ffdd44' },
-              { offset: 1, color: '#b89c20' }
-            ]
-          }
-        },
-        data: chartData.value.series[0].data
-      },
-      {
-        name: '城镇人口数',
-        type: 'bar',
-        barWidth: 16,
-        itemStyle: {
-          borderRadius: [6, 6, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: '#33c8ff' },
-              { offset: 1, color: '#1772d8' }
-            ]
-          }
-        },
-        data: chartData.value.series[1].data
-      }
-    ]
+    series
   }
 })
 </script>

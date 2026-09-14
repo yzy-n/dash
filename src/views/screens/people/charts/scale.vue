@@ -2,36 +2,63 @@
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 
-interface BarSeriesItem {
+// list每一项：name是x轴类目，后面属性为指标
+interface ChartListItem {
   name: string
-  data: number[]
-}
-interface ChartPropData {
-  xAxisData: string[]
-  series: BarSeriesItem[]
+  [key: string]: number
 }
 
 const props = defineProps<{
-  data?: ChartPropData
+  list?: ChartListItem[]
 }>()
 
-// 截图鞍山区县模拟数据
-const defaultData: ChartPropData = {
-  xAxisData: ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区'],
-  series: [
-    {
-      name: '每户平均人数',
-      data: [3.12, 2.62, 3.28, 2.6, 2.12, 2.15, 5.6]
-    }
-  ]
-}
+// 默认模拟数据
+const defaultList: ChartListItem[] = [
+  { name: '海城市', 每户平均人数: 3.12 },
+  { name: '台安县', 每户平均人数: 2.62 },
+  { name: '岫岩县', 每户平均人数: 3.28 },
+  { name: '铁东区', 每户平均人数: 2.6 },
+  { name: '铁西区', 每户平均人数: 2.12 },
+  { name: '立山区', 每户平均人数: 2.15 },
+  { name: '千山区', 每户平均人数: 5.6 }
+]
 
-const chartData = computed(() => props.data ?? defaultData)
+const chartList = computed(() => props.list ?? defaultList)
 
 const option = computed(() => {
+  const list = chartList.value
+  // x轴类目
+  const xAxisData = list.map((item) => item.name)
+  // 提取指标名称（排除name）
+  const seriesNames = Object.keys(list[0] ?? {}).filter((k) => k !== 'name')
+
+  // 生成series数组
+  const series = seriesNames.map((name) => {
+    return {
+      name: '每户平均人数',
+      type: 'bar',
+      barWidth: 26,
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: '#22c8ff' },
+            { offset: 1, color: '#084894' }
+          ]
+        },
+        borderRadius: [3, 3, 0, 0]
+      },
+      data: list.map((item) => item[name])
+    }
+  })
+
   return {
     backgroundColor: 'transparent',
-    // 重点：aria.decal 实现柱子内部斜向光栅纹理，就是截图里的斜条纹效果
+    // 柱子斜向光栅纹理
     aria: {
       enabled: true,
       decal: {
@@ -55,7 +82,7 @@ const option = computed(() => {
       formatter: '{b}<br/>● {a}: {c}'
     },
     legend: {
-      data: chartData.value.series.map((s) => s.name),
+      data: seriesNames,
       top: 8,
       right: 12,
       textStyle: { color: '#fff', fontSize: 13 },
@@ -71,7 +98,7 @@ const option = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: chartData.value.xAxisData,
+      data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(120,200,255,0.35)' } },
       axisLabel: { color: '#fff', fontSize: 14 },
       axisTick: { show: false },
@@ -88,28 +115,7 @@ const option = computed(() => {
       axisLabel: { color: '#fff', fontSize: 14 },
       splitLine: { lineStyle: { color: 'rgba(120,200,255,0.15)' } }
     },
-    series: [
-      {
-        name: chartData.value.series[0].name,
-        type: 'bar',
-        barWidth: 26,
-        itemStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: '#22c8ff' },
-              { offset: 1, color: '#084894' }
-            ]
-          },
-          borderRadius: [3, 3, 0, 0]
-        },
-        data: chartData.value.series[0].data
-      }
-    ]
+    series
   }
 })
 </script>
