@@ -273,7 +273,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;
@@ -349,7 +348,7 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
   min-height: 0;
   display: grid;
   gap: 12px;
-  font-size: 16px;
+  font-size: 36px;
   color: rgba(214, 238, 255, 0.84);
 }
 

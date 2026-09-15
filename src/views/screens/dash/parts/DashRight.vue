@@ -180,7 +180,6 @@ const props = defineProps<{
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;
@@ -256,7 +255,7 @@ const props = defineProps<{
   min-height: 0;
   display: grid;
   gap: 12px;
-  font-size: 20px;
+  font-size: 34px;
   color: rgba(214, 238, 255, 0.84);
   margin-top: 100px;
 }

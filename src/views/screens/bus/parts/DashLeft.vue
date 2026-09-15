@@ -220,7 +220,6 @@ const currentParkingChart = computed(() => {
   justify-content: center;
   font-size: 42px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  font-style: italic;
   font-weight: 700;
   letter-spacing: 2px;
   color: rgba(240, 251, 255, 0.96);

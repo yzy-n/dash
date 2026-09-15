@@ -383,7 +383,6 @@ const overList = [
   display: inline-flex;
   align-items: center;
   font-size: 40px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;

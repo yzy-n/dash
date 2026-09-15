@@ -25,7 +25,7 @@ const option = computed(() => {
       data: props.data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 20 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 36 }
     },
     series: [
       {
@@ -39,7 +39,7 @@ const option = computed(() => {
           position: 'right',
           formatter: (p: any) => `${Number(p.value).toFixed(2)}%`,
           color: '#dff3ff',
-          fontSize: 20
+          fontSize: 36
         },
         itemStyle: {
           borderRadius: 8,

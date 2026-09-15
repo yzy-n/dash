@@ -2,7 +2,6 @@
   <div class="dash-center">
     <div class="wrap">
       <div class="space-grid"></div>
-
       <div class="top-metrics">
         <div class="top-metric">
           <div class="top-metric-label">总人口数</div>
@@ -26,7 +25,6 @@
           </div>
         </div>
       </div>
-
       <div class="map-stage">
         <PeopleMap
           class="anshan-map"
@@ -35,29 +33,35 @@
           @region-change="handleRegionChange"
         />
         <div class="map-base-ring"></div>
+        <!-- ========== 新增右上角下拉框 ========== -->
+        <div class="map-select-wrap">
+          <el-select
+            v-model="activeRegion"
+            popper-class="map-select-popper"
+            @change="handleSelectChange"
+          >
+            <el-option v-for="item in regionList" :key="item" :label="item" :value="item" />
+          </el-select>
+        </div>
       </div>
-
       <section class="corner-panel corner-panel--lt">
         <div class="corner-title">性别构成</div>
         <div class="corner-chart">
           <EChart :option="genderOption" />
         </div>
       </section>
-
       <section class="corner-panel corner-panel--rt">
         <div class="corner-title">年龄构成</div>
         <div class="corner-chart">
           <EChart :option="ageOption" />
         </div>
       </section>
-
       <section class="corner-panel corner-panel--lb">
         <div class="corner-title">计划生育</div>
         <div class="corner-chart">
           <EChart :option="birthOption" />
         </div>
       </section>
-
       <section class="corner-panel corner-panel--rb">
         <div class="corner-title">机械变动情况</div>
         <div class="corner-chart">
@@ -67,15 +71,15 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import PeopleMap from '../charts/center.vue'
+// 引入element-plus Select组件
+import { ElSelect, ElOption } from 'element-plus'
 
 type RegionKey =
   '全市' | '海城市' | '台安县' | '岫岩满族自治县' | '铁东区' | '铁西区' | '立山区' | '千山区'
-
 const REGION_ALIAS: Record<string, RegionKey> = {
   岫岩县: '岫岩满族自治县',
   岫岩满族自治县: '岫岩满族自治县',
@@ -86,7 +90,6 @@ const REGION_ALIAS: Record<string, RegionKey> = {
   立山区: '立山区',
   千山区: '千山区'
 }
-
 const regionList: RegionKey[] = [
   '全市',
   '海城市',
@@ -97,7 +100,6 @@ const regionList: RegionKey[] = [
   '立山区',
   '千山区'
 ]
-
 const regionData: Record<
   RegionKey,
   {
@@ -321,20 +323,21 @@ const regionData: Record<
     mapValue: 567
   }
 }
-
 const activeRegion = ref<RegionKey>('全市')
 const activeRegionLabel = computed(() => activeRegion.value)
 const activeMetrics = computed(() => regionData[activeRegion.value])
-
 const mapSeriesData = computed(() =>
   regionList.filter((n) => n !== '全市').map((name) => ({ name, value: regionData[name].mapValue }))
 )
-
+// 地图点击切换
 const handleRegionChange = (name: string) => {
   const hit = REGION_ALIAS[name]
   if (hit) activeRegion.value = hit
 }
-
+// 下拉框选择切换
+const handleSelectChange = (val: RegionKey) => {
+  activeRegion.value = val
+}
 const genderOption = computed(() => {
   const d = activeMetrics.value
   const total = d.male + d.female
@@ -385,7 +388,6 @@ const genderOption = computed(() => {
     ]
   }
 })
-
 const ageOption = computed(() => {
   const list = activeMetrics.value.age
   return {
@@ -413,7 +415,6 @@ const ageOption = computed(() => {
     ]
   }
 })
-
 const birthOption = computed(() => {
   const x = activeMetrics.value.births.map((i) => i.label)
   const y = activeMetrics.value.births.map((i) => i.value)
@@ -446,7 +447,6 @@ const birthOption = computed(() => {
     ]
   }
 })
-
 const moveOption = computed(() => {
   const x = activeMetrics.value.moves.map((i) => i.label)
   const y = activeMetrics.value.moves.map((i) => i.value)
@@ -480,7 +480,6 @@ const moveOption = computed(() => {
   }
 })
 </script>
-
 <style scoped>
 .dash-center {
   width: 100%;
@@ -573,32 +572,13 @@ const moveOption = computed(() => {
   height: 1280px;
   z-index: 5;
 }
-.map-tag {
+/* 下拉框容器 */
+.map-select-wrap {
   position: absolute;
-  right: 300px;
-  top: 120px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(89, 194, 255, 0.18);
-  background: rgba(6, 18, 48, 0.35);
-  padding: 0 16px;
-  box-shadow: inset 0 0 18px rgba(54, 232, 255, 0.08);
-  z-index: 6;
-}
-.map-tag-label {
-  font-size: 14px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.6);
-  letter-spacing: 1px;
-}
-.map-tag-value {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.92);
-  letter-spacing: 1px;
+  right: 30px;
+  top: 100px;
+  z-index: 20;
+  width: 220px;
 }
 .anshan-map {
   position: absolute;
@@ -676,5 +656,36 @@ const moveOption = computed(() => {
 .corner-panel--rb {
   right: 36px;
   bottom: 52px;
+}
+</style>
+<style>
+/* 全局覆盖下拉样式，大屏蓝色风格 */
+:deep(.map-select-popper) {
+  background: rgba(6, 18, 48, 0.92);
+  border: 1px solid rgba(84, 188, 255, 0.22);
+}
+:deep(.map-select-popper .el-select__item) {
+  color: rgba(214, 238, 255, 0.75);
+}
+:deep(.map-select-popper .el-select__item:hover) {
+  background: rgba(30, 120, 220, 0.25);
+}
+:deep(.map-select-popper .el-select__item.is-selected) {
+  color: #fff;
+  background: rgba(24, 110, 210, 0.35);
+}
+:deep(.map-select-wrap .el-select__wrapper) {
+  background: linear-gradient(90deg, rgba(16, 66, 130, 0.22), rgba(6, 18, 48, 0.45));
+  border: 1px solid rgba(89, 194, 255, 0.18);
+  border-radius: 8px;
+}
+:deep(
+  .map-select-wrap .el-select__wrapper .el-select__placeholder,
+  .map-select-wrap .el-select__wrapper .el-select__label
+) {
+  color: rgba(240, 251, 255, 0.9);
+}
+:deep(.map-select-wrap .el-select__wrapper .el-select__caret) {
+  color: rgba(160, 210, 255, 0.7);
 }
 </style>

@@ -106,7 +106,8 @@ onMounted(async () => {
       }
     }
     if (!geoJson) throw new Error('map geojson not loaded')
-    echarts.registerMap('anshan', geoJson)
+    // 与基准一致：先判断再注册，避免多实例重复注册
+    if (!echarts.getMap('anshan')) echarts.registerMap('anshan', geoJson)
     mapReady.value = true
   } catch (err) {
     mapReady.value = false
@@ -116,6 +117,7 @@ onMounted(async () => {
 
 const option = computed(() => {
   if (!mapReady.value) return {}
+
   const topColor = 'rgba(20, 140, 220, 0.65)'
   const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
   const activeColor = 'rgba(80, 200, 255, 0.92)'
@@ -139,10 +141,7 @@ const option = computed(() => {
     .map((item) => {
       const coord = REGION_COORDS[item.name]
       if (!coord) return null
-      return {
-        name: item.name,
-        value: [coord[0], coord[1], item.value]
-      }
+      return { name: item.name, value: [coord[0], coord[1], item.value] }
     })
     .filter(Boolean)
 
@@ -156,13 +155,17 @@ const option = computed(() => {
 
   return {
     backgroundColor: 'transparent',
+    // ⬇ 与基准一致的 tooltip 样式
     tooltip: {
       trigger: 'item',
+      backgroundColor: 'rgba(6, 36, 68, 0.85)',
+      borderColor: 'rgba(78, 184, 255, 0.4)',
+      borderWidth: 1,
+      textStyle: { color: '#eaf4ff' },
       formatter: (p: any) => {
         if (Array.isArray(p?.value)) return p?.name ?? ''
         return `${p?.name ?? ''}<br>数据：${p?.value ?? ''}`
-      },
-      textStyle: { color: '#fff' }
+      }
     },
     geo3D: {
       map: 'anshan',
@@ -190,9 +193,7 @@ const option = computed(() => {
         textShadowColor: 'rgba(0, 120, 200, 0.6)'
       },
       emphasis: {
-        label: {
-          color: '#ffffff'
-        },
+        label: { color: '#ffffff' },
         itemStyle: {
           color: topColorEmphasis,
           borderColor: 'rgba(255, 180, 80, 1)',
@@ -201,7 +202,7 @@ const option = computed(() => {
       },
       viewControl: {
         projection: 'perspective',
-        alpha: 70,
+        alpha: 70, // ← 倾斜角
         beta: -18,
         distance: 175,
         minDistance: 80,
@@ -219,9 +220,7 @@ const option = computed(() => {
           shadowQuality: 'high',
           color: '#e6f7ff'
         },
-        ambient: {
-          intensity: 0.35
-        }
+        ambient: { intensity: 0.35 }
       },
       regions: mapData.map((r) => {
         const isActive = hasActiveRegion && r.name === activeRegionName
@@ -244,18 +243,9 @@ const option = computed(() => {
     },
     postEffect: {
       enable: true,
-      bloom: {
-        enable: true,
-        bloomIntensity: 0.85
-      },
-      SSAO: {
-        enable: true,
-        radius: 6,
-        intensity: 1
-      },
-      FXAA: {
-        enable: true
-      }
+      bloom: { enable: true, bloomIntensity: 0.85 },
+      SSAO: { enable: true, radius: 6, intensity: 1 },
+      FXAA: { enable: true }
     },
     series: [
       {

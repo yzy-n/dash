@@ -11,14 +11,17 @@ const props = defineProps<{
 }>()
 
 const mapReady = ref(false)
+const techTexture = ref<HTMLCanvasElement | null>(null)
+
+/* -------------------- 地图 JSON 地址 -------------------- */
 const ANSHAN_GEO_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/210300_full.json'
 const isFile = typeof window !== 'undefined' && window.location.protocol === 'file:'
 const baseUrl = import.meta.env.BASE_URL || '/'
 const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
 const localGeoUrl = isFile ? 'geo/anshan.geojson' : `${normalizedBaseUrl}geo/anshan.geojson`
 const ANSHAN_GEO_URLS = [localGeoUrl, ANSHAN_GEO_URL]
-const techTexture = ref<HTMLCanvasElement | null>(null)
 
+/* -------------------- 别名 & 坐标 -------------------- */
 const REGION_ALIAS: Record<string, string> = {
   岫岩县: '岫岩满族自治县',
   高新区: '千山区',
@@ -35,6 +38,7 @@ const REGION_COORDS: Record<string, [number, number]> = {
   千山区: [122.949298, 41.068909]
 }
 
+/* -------------------- 科技纹理 -------------------- */
 const createTechTexture = () => {
   const size = 512
   const canvas = document.createElement('canvas')
@@ -106,7 +110,7 @@ onMounted(async () => {
       }
     }
     if (!geoJson) throw new Error('map geojson not loaded')
-    echarts.registerMap('anshan', geoJson)
+    if (!echarts.getMap('anshan')) echarts.registerMap('anshan', geoJson)
     mapReady.value = true
   } catch (err) {
     mapReady.value = false
@@ -114,8 +118,11 @@ onMounted(async () => {
   }
 })
 
+/* -------------------- option -------------------- */
 const option = computed(() => {
   if (!mapReady.value) return {}
+
+  // === 基准样式统一色值 ===
   const topColor = 'rgba(20, 140, 220, 0.65)'
   const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
   const activeColor = 'rgba(80, 200, 255, 0.92)'
@@ -126,6 +133,7 @@ const option = computed(() => {
     ? (REGION_ALIAS[props.activeName] ?? props.activeName)
     : ''
 
+  /* ---------- 数据聚合 ---------- */
   const aggregated = new Map<string, number>()
   props.rows.forEach((row) => {
     const name = REGION_ALIAS[row.name] ?? row.name
@@ -133,16 +141,14 @@ const option = computed(() => {
   })
   const mapData = Array.from(aggregated.entries()).map(([name, value]) => ({ name, value }))
 
+  /* ---------- 顶部 3 个散点 ---------- */
   const points = [...mapData]
     .sort((a, b) => b.value - a.value)
     .slice(0, 3)
     .map((item) => {
       const coord = REGION_COORDS[item.name]
       if (!coord) return null
-      return {
-        name: item.name,
-        value: [coord[0], coord[1], item.value]
-      }
+      return { name: item.name, value: [coord[0], coord[1], item.value] }
     })
     .filter(Boolean)
 
@@ -158,11 +164,14 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item',
+      backgroundColor: 'rgba(6, 36, 68, 0.85)',
+      borderColor: 'rgba(78, 184, 255, 0.4)',
+      borderWidth: 1,
+      textStyle: { color: '#eaf4ff' },
       formatter: (p: any) => {
         if (Array.isArray(p?.value)) return p?.name ?? ''
         return `${p?.name ?? ''}<br>数据：${p?.value ?? ''}`
-      },
-      textStyle: { color: '#fff' }
+      }
     },
     geo3D: {
       map: 'anshan',
@@ -190,9 +199,7 @@ const option = computed(() => {
         textShadowColor: 'rgba(0, 120, 200, 0.6)'
       },
       emphasis: {
-        label: {
-          color: '#ffffff'
-        },
+        label: { color: '#ffffff' },
         itemStyle: {
           color: topColorEmphasis,
           borderColor: 'rgba(255, 180, 80, 1)',
@@ -201,8 +208,8 @@ const option = computed(() => {
       },
       viewControl: {
         projection: 'perspective',
-        alpha: 70,
-        beta: -18,
+        alpha: 70, // ← 倾斜角度
+        beta: -18, // ← 水平旋转
         distance: 175,
         minDistance: 80,
         maxDistance: 170,
@@ -219,9 +226,7 @@ const option = computed(() => {
           shadowQuality: 'high',
           color: '#e6f7ff'
         },
-        ambient: {
-          intensity: 0.35
-        }
+        ambient: { intensity: 0.35 }
       },
       regions: mapData.map((r) => {
         const isActive = hasActiveRegion && r.name === activeRegionName
@@ -244,18 +249,9 @@ const option = computed(() => {
     },
     postEffect: {
       enable: true,
-      bloom: {
-        enable: true,
-        bloomIntensity: 0.85
-      },
-      SSAO: {
-        enable: true,
-        radius: 6,
-        intensity: 1
-      },
-      FXAA: {
-        enable: true
-      }
+      bloom: { enable: true, bloomIntensity: 0.85 },
+      SSAO: { enable: true, radius: 6, intensity: 1 },
+      FXAA: { enable: true }
     },
     series: [
       {

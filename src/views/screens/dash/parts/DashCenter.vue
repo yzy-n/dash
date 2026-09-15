@@ -119,7 +119,7 @@ watch(
 }
 
 .kpi-label {
-  font-size: 28px;
+  font-size: 36px;
   text-align: center;
   color: rgba(214, 238, 255, 0.75);
 }

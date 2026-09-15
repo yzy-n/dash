@@ -68,57 +68,157 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
+import 'echarts-gl'
 
 const mapRef = ref<HTMLElement | null>(null)
 let chartInstance: echarts.ECharts | null = null
+const techTexture = ref<HTMLCanvasElement | null>(null)
+
+/** 生成科技感纹理（网格 + 星点） */
+const createTechTexture = () => {
+  const size = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return canvas
+
+  ctx.fillStyle = 'rgba(5, 25, 70, 0.2)'
+  ctx.fillRect(0, 0, size, size)
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.10)'
+  ctx.lineWidth = 1
+  const step = 32
+  for (let x = 0; x <= size; x += step) {
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x, size)
+    ctx.stroke()
+  }
+  for (let y = 0; y <= size; y += step) {
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y)
+    ctx.stroke()
+  }
+
+  ctx.strokeStyle = 'rgba(140, 245, 255, 0.08)'
+  for (let i = 0; i < 20; i += 1) {
+    const y = Math.floor((i / 20) * size)
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y + 18)
+    ctx.stroke()
+  }
+
+  ctx.fillStyle = 'rgba(220, 255, 255, 0.12)'
+  for (let i = 0; i < 2600; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    const r = Math.random() * 1.2
+    ctx.beginPath()
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'
+  for (let i = 0; i < 180; i += 1) {
+    const x = Math.random() * size
+    const y = Math.random() * size
+    ctx.fillRect(x, y, 1, 1)
+  }
+
+  return canvas
+}
 
 onMounted(async () => {
   if (!mapRef.value) return
 
+  techTexture.value = createTechTexture()
+
   const url = `${import.meta.env.BASE_URL}geo/anshan.geojson`
   const anshanGeoJson = await fetch(url).then((res) => res.json())
 
-  echarts.registerMap('anshan-city', anshanGeoJson)
+  // 注意：这里注册名改成 anshan，和 geo3D 保持一致
+  echarts.registerMap('anshan', anshanGeoJson)
+
   chartInstance = echarts.init(mapRef.value)
+
+  // 主色
+  const topColor = 'rgba(20, 140, 220, 0.65)'
+  const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
+  const detailTexture = techTexture.value as any
 
   const option: echarts.EChartsOption = {
     backgroundColor: 'transparent',
     tooltip: {
-      show: true,
+      trigger: 'item',
       backgroundColor: 'rgba(6, 36, 68, 0.85)',
+      borderColor: 'rgba(78, 184, 255, 0.4)',
       textStyle: { color: '#eaf4ff' },
-      borderColor: 'rgba(78, 184, 255, 0.4)'
+      formatter: (p: any) => `${p?.name ?? ''}`
     },
-    geo: {
-      map: 'anshan-city',
-      roam: false,
-      layoutCenter: ['50%', '52%'],
-      layoutSize: 1100,
-      aspectScale: 0.92,
+    geo3D: {
+      map: 'anshan',
+      regionHeight: 10,
+      shading: 'realistic',
+      realisticMaterial: {
+        detailTexture,
+        textureTiling: 1,
+        roughness: 0.28,
+        metalness: 0.02
+      },
+      groundPlane: { show: false },
+      itemStyle: {
+        color: topColor,
+        borderColor: 'rgba(255, 160, 40, 0.92)',
+        borderWidth: 2,
+        opacity: 1
+      },
       label: {
         show: true,
-        color: '#94d8ff',
-        fontSize: 22
-      },
-      itemStyle: {
-        areaColor: {
-          type: 'radial',
-          x: 0.5,
-          y: 0.5,
-          r: 0.8,
-          colorStops: [
-            { offset: 0, color: 'rgba(50, 150, 255, 0.36)' },
-            { offset: 1, color: 'rgba(10, 40, 80, 0.06)' }
-          ]
-        },
-        borderColor: 'rgba(78, 184, 255, 0.7)',
-        borderWidth: 2
+        color: 'rgba(240, 252, 255, 0.92)',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textShadowBlur: 10,
+        textShadowColor: 'rgba(0, 120, 200, 0.6)'
       },
       emphasis: {
+        label: { color: '#ffffff' },
         itemStyle: {
-          areaColor: 'rgba(40, 160, 255, 0.45)'
+          color: topColorEmphasis,
+          borderColor: 'rgba(255, 180, 80, 1)',
+          borderWidth: 2.6
         }
+      },
+      viewControl: {
+        projection: 'perspective',
+        alpha: 70, // ← 倾斜角度，改这里
+        beta: -18, // ← 水平旋转
+        distance: 175,
+        minDistance: 80,
+        maxDistance: 170,
+        rotateSensitivity: 0,
+        zoomSensitivity: 0,
+        panSensitivity: 0
+      },
+      light: {
+        main: {
+          intensity: 1.3,
+          alpha: 35,
+          beta: 35,
+          shadow: true,
+          shadowQuality: 'high',
+          color: '#e6f7ff'
+        },
+        ambient: { intensity: 0.35 }
       }
+    },
+    postEffect: {
+      enable: true,
+      bloom: { enable: true, bloomIntensity: 0.85 },
+      SSAO: { enable: true, radius: 6, intensity: 1 },
+      FXAA: { enable: true }
     }
   }
 
@@ -271,8 +371,8 @@ onBeforeUnmount(() => {
 /* 小气泡 */
 .bubble {
   position: absolute;
-  width: 170px;
-  height: 170px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(22, 130, 230, 0.24), rgba(8, 30, 70, 0.04));
@@ -287,12 +387,12 @@ onBeforeUnmount(() => {
 }
 
 .bubble .time {
-  font-size: 21px;
+  font-size: 28px;
   color: #94d8ff;
 }
 
 .bubble .label {
-  font-size: 23px;
+  font-size: 28px;
   text-align: center;
 }
 
@@ -304,11 +404,11 @@ onBeforeUnmount(() => {
 }
 
 .bubble .unit {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .bubble .rate {
-  font-size: 21px;
+  font-size: 24px;
   color: #4cff70;
 }
 

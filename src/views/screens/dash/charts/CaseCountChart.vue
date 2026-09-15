@@ -11,16 +11,16 @@ const option = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
-    grid: { left: 46, right: 18, top: 18, bottom: 34 },
+    grid: { left: 120, right: 18, top: 48, bottom: 80 },
     xAxis: {
       type: 'category',
       data: props.x,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12, rotate: 25 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 32, rotate: 25 }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 32 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: [

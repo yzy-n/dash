@@ -360,7 +360,6 @@ const yearDemandBarOption = computed(() => {
   display: inline-flex;
   align-items: center;
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;

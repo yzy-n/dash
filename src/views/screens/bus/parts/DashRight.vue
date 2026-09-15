@@ -218,7 +218,6 @@ const currentGoodsShipSeries = computed(() =>
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;

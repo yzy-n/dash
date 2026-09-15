@@ -27,7 +27,7 @@ const option = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    grid: { left: 120, right: 80, top: 12, bottom: 10 },
+    grid: { left: 140, right: 80, top: 12, bottom: 10 },
     xAxis: {
       type: 'value',
       max,
@@ -41,7 +41,7 @@ const option = computed(() => {
       data: data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 20 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 32 }
     },
     series: [
       {
@@ -59,7 +59,7 @@ const option = computed(() => {
             return `${percent}%`
           },
           color: '#dff3ff',
-          fontSize: 15
+          fontSize: 32
         },
         itemStyle: {
           borderRadius: 8,

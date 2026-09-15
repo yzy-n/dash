@@ -492,7 +492,6 @@ const aedOption = computed(() => {
 
 .panel-title {
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;

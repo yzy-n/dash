@@ -119,7 +119,7 @@ const option = computed(() => {
   const detailTexture = techTexture.value as any
 
   const activeRegionName = props.activeName
-    ? REGION_ALIAS[props.activeName] ?? props.activeName
+    ? (REGION_ALIAS[props.activeName] ?? props.activeName)
     : ''
 
   const aggregated = new Map<string, number>()
@@ -180,7 +180,7 @@ const option = computed(() => {
       label: {
         show: true,
         color: 'rgba(240, 252, 255, 0.92)',
-        fontSize: 14,
+        fontSize: 34,
         fontWeight: 'bold',
         textShadowBlur: 10,
         textShadowColor: 'rgba(0, 120, 200, 0.6)'
@@ -265,7 +265,7 @@ const option = computed(() => {
           formatter: (p: any) => p?.name ?? '',
           position: 'right',
           color: '#f2fbff',
-          fontSize: 14
+          fontSize: 1
         },
         itemStyle: {
           color: (p: any) => (p?.name === activeRegionName ? '#ffdd22' : '#00ccff'),

@@ -12,18 +12,18 @@ const option = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
-    grid: { left: 40, right: 18, top: 18, bottom: 26 },
+    grid: { left: 106, right: 18, top: 66, bottom: 46 },
     xAxis: {
       type: 'category',
       data: props.metric.years,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 12 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 36 }
     },
     yAxis: {
       type: 'value',
       name: props.metric.unit ? `单位：${props.metric.unit}` : undefined,
-      nameTextStyle: { color: 'rgba(214,238,255,0.55)', fontSize: 12, padding: [0, 0, 0, 10] },
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 12 },
+      nameTextStyle: { color: 'rgba(214,238,255,0.55)', fontSize: 26, padding: 10 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 36 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: [
