@@ -443,7 +443,7 @@ const firstLastTimeText = computed(() => '-')
   align-items: center;
   padding-left: 30px;
   color: rgba(224, 246, 255, 0.92);
-  font-size: 22px;
+  font-size: 32px;
 }
 
 .node-dot {

@@ -413,10 +413,10 @@ const capacityRingOption = computed(() => {
         position: 'outside',
         formatter: `${item.name}\n{v|${item.value}}`,
         rich: {
-          v: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 14, fontWeight: 800 }
+          v: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 24, fontWeight: 800 }
         },
         color: 'rgba(214, 238, 255, 0.7)',
-        fontSize: 12
+        fontSize: 24
       },
       labelLine: { length: 10, length2: 10, lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
       data: [
@@ -664,8 +664,7 @@ const energyOption = computed(() => {
   border: 1px solid rgba(78, 184, 255, 0.22);
   background: rgba(5, 26, 66, 0.45);
   color: rgba(209, 234, 255, 0.86);
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 32px;
   letter-spacing: 1px;
   display: inline-flex;
   align-items: center;
@@ -721,6 +720,7 @@ const energyOption = computed(() => {
 .metric-list {
   display: grid;
   gap: 12px;
+  margin-top: 40px;
 }
 
 .metric-row {
@@ -737,13 +737,13 @@ const energyOption = computed(() => {
 }
 
 .metric-label {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
 
 .metric-num {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
@@ -767,7 +767,8 @@ const energyOption = computed(() => {
 
 .electric-chart,
 .capacity-chart {
-  height: 100%;
+  margin-top: 120px;
+  height: 80%;
   min-height: 0;
 }
 
@@ -990,7 +991,7 @@ const energyOption = computed(() => {
 }
 
 .pile-top-right-sub {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
   letter-spacing: 1px;

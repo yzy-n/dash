@@ -130,18 +130,18 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 15 },
+      axisLabel: { color: '#fff', fontSize: 24 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
     yAxis: {
       name: '单位：辆',
-      nameTextStyle: { color: '#fff', fontSize: 16 },
+      nameTextStyle: { color: '#fff', fontSize: 24 },
       type: 'value',
       max: yAxisMax,
       interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 15 },
+      axisLabel: { color: '#fff', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
       axisTick: { show: false }
     },

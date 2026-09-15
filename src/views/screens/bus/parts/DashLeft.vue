@@ -389,7 +389,7 @@ const currentParkingChart = computed(() => {
   display: flex;
   gap: 60px;
   margin-bottom: 20px;
-  font-size: 34px;
+  font-size: 36px;
   /* 新增居中 */
   justify-content: center;
   width: 100%;
@@ -434,7 +434,7 @@ const currentParkingChart = computed(() => {
   padding: 12px 14px;
   background: rgba(6, 18, 48, 0.58);
   border: 1px solid rgba(89, 194, 255, 0.12);
-  font-size: 18px;
+  font-size: 32px;
 }
 .table-row.head {
   background: rgba(20, 30, 75, 0.55);

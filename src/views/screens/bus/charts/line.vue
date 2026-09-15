@@ -57,7 +57,7 @@ const chartOption = computed(() => {
     legend: {
       top: 10,
       right: '8%',
-      textStyle: { color: '#fff', fontSize: 14 },
+      textStyle: { color: '#fff', fontSize: 32 },
       data: legendData
     },
     grid: {
@@ -71,7 +71,7 @@ const chartOption = computed(() => {
       type: 'category',
       data: props.xData,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 15 },
+      axisLabel: { color: '#fff', fontSize: 24 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
@@ -79,10 +79,10 @@ const chartOption = computed(() => {
       // 左轴 出租车数量（单位：辆）
       {
         name: '单位：辆',
-        nameTextStyle: { color: '#fff', fontSize: 16 },
+        nameTextStyle: { color: '#fff', fontSize: 32 },
         type: 'value',
         axisLine: { lineStyle: { color: '#405888' } },
-        axisLabel: { color: '#fff', fontSize: 15 },
+        axisLabel: { color: '#fff', fontSize: 28 },
         splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
         axisTick: { show: false }
       },

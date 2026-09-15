@@ -144,7 +144,7 @@ const chartOption = computed(() => {
           style: {
             text: '暂无数据',
             fill: 'rgba(214, 238, 255, 0.72)',
-            fontSize: 18,
+            fontSize: 32,
             fontWeight: 600
           }
         },
@@ -152,7 +152,7 @@ const chartOption = computed(() => {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
       backgroundColor: 'rgba(0,0,0,0.75)',
-      textStyle: { color: '#fff', fontSize: 14 },
+      textStyle: { color: '#fff', fontSize: 32 },
       formatter: (params: any[]) => {
         let tipStr = `${params[0].axisValue}<br/>`
         params.forEach((p) => {
@@ -164,9 +164,9 @@ const chartOption = computed(() => {
       }
     },
     legend: {
-      top: 12,
+      top: 42,
       left: 'center',
-      textStyle: { color: '#ffffff', fontSize: 14 },
+      textStyle: { color: '#ffffff', fontSize: 22 },
       selectedMode: false,
       itemWidth: 10,
       itemHeight: 10,
@@ -185,18 +185,18 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisList.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 15 },
+      axisLabel: { color: '#fff', fontSize: 32 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
     yAxis: {
       name: '单位：万人',
-      nameTextStyle: { color: '#fff', fontSize: 16 },
+      nameTextStyle: { color: '#fff', fontSize: 32 },
       type: 'value',
       max: yAxisMax,
       interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 15 },
+      axisLabel: { color: '#fff', fontSize: 32 },
       splitLine: {
         lineStyle: { color: 'rgba(82, 110, 165, 0.3)' }
       },
