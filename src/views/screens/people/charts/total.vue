@@ -49,16 +49,16 @@ const renderChart = () => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: '#335488' } },
-      axisLabel: { color: '#ffffff', fontSize: 14 }
+      axisLabel: { color: '#ffffff', fontSize: 26 }
     },
     yAxis: [
       {
         type: 'value',
         name: '单位：万户',
-        nameTextStyle: { color: '#fff' },
+        nameTextStyle: { color: '#fff', fontSize: 26 },
         splitLine: { lineStyle: { color: '#25406b' } },
         axisLine: { show: false },
-        axisLabel: { color: '#fff' },
+        axisLabel: { color: '#fff', fontSize: 26 },
         max: 35
       },
       {
@@ -89,7 +89,7 @@ const renderChart = () => {
             ]
           }
         },
-        barWidth: 22,
+        barWidth: 50,
         data: data1
       },
       {
@@ -109,7 +109,7 @@ const renderChart = () => {
             ]
           }
         },
-        barWidth: 22,
+        barWidth: 50,
         data: data2
       }
     ]

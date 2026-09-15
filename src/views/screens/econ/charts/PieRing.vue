@@ -40,7 +40,7 @@ const option = computed(() => {
           position: 'outside',
           formatter: '{b}\n增加值:{c}亿元\n占比:{d}%',
           color: '#fff',
-          fontSize: 14
+          fontSize: 30
         },
         labelLine: {
           show: true,

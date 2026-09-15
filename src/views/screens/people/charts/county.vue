@@ -48,7 +48,7 @@ const option = computed(() => {
     return {
       name,
       type: 'bar',
-      barWidth: 16,
+      barWidth: 50,
       itemStyle: {
         borderRadius: [6, 6, 0, 0],
         color: {
@@ -77,15 +77,15 @@ const option = computed(() => {
       data: seriesNames,
       top: 4,
       right: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 },
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
       itemWidth: 10,
       itemHeight: 10
     },
     grid: {
       left: 48,
       right: 20,
-      top: 40,
-      bottom: 60,
+      top: 60,
+      bottom: 20,
       containLabel: true
     },
     xAxis: {
@@ -93,7 +93,7 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.6)',
-        fontSize: 12,
+        fontSize: 26,
         rotate: 30
       },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
@@ -103,8 +103,8 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：万人',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }

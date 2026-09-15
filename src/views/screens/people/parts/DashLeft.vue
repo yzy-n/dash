@@ -138,8 +138,6 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import Five from '../charts/five.vue'
 import County from '../charts/county.vue'
 import Total from '../charts/total.vue'
@@ -292,7 +290,6 @@ const popDecreaseRows = ref([])
   display: inline-flex;
   align-items: center;
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
@@ -416,7 +413,7 @@ const popDecreaseRows = ref([])
   pointer-events: none;
 }
 .pop-side-total-label {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(214, 238, 255, 0.9);
@@ -435,7 +432,7 @@ const popDecreaseRows = ref([])
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.18);
 }
 .pop-side-total-value .unit {
-  font-size: 16px;
+  font-size: 26px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.65);
 }
@@ -485,7 +482,7 @@ const popDecreaseRows = ref([])
   pointer-events: none;
 }
 .pop-side-row-label {
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
   z-index: 1;
@@ -497,12 +494,12 @@ const popDecreaseRows = ref([])
   z-index: 1;
 }
 .pop-side-row-value .num {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
 }
 .pop-side-row-value .unit {
-  font-size: 14px;
+  font-size: 26px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.6);
 }
@@ -654,17 +651,19 @@ const popDecreaseRows = ref([])
   pointer-events: none;
 }
 .pop-metric-label {
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(214, 238, 255, 0.82);
   z-index: 1;
+  margin-top: -10px;
 }
 .pop-metric-value {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
   z-index: 1;
+  margin-top: -10px;
 }
 .pop-metric-value .num {
   font-size: 34px;
@@ -690,6 +689,7 @@ const popDecreaseRows = ref([])
   background: radial-gradient(circle at 40% 35%, rgba(54, 232, 255, 0.24), rgba(6, 18, 48, 0.22));
   position: relative;
   z-index: 1;
+  margin-top: -10px;
 }
 .pop-metric-icon::before {
   content: '';

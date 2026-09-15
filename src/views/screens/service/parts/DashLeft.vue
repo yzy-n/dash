@@ -460,25 +460,25 @@ const pileOption = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 70, right: 26, top: 26, bottom: 34 },
+    tooltip: { show: true },
+    grid: { left: 70, right: 26, top: 26, bottom: 94 },
     legend: {
       bottom: 6,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 24 }
     },
     xAxis: {
       type: 'category',
       data: districts,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -488,7 +488,7 @@ const pileOption = computed(() => {
         name: '商用充电站',
         type: 'bar',
         data: publicVals,
-        barWidth: 10,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
@@ -550,10 +550,10 @@ const energyOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 80, right: 26, top: 16, bottom: 18 },
+    grid: { left: 120, right: 46, top: 16, bottom: 68 },
     xAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -561,7 +561,7 @@ const energyOption = computed(() => {
     yAxis: {
       type: 'category',
       data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 14 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 24 },
       axisLine: { show: false },
       axisTick: { show: false }
     },
@@ -826,20 +826,20 @@ const energyOption = computed(() => {
 }
 
 .resume-name {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.9);
 }
 
 .resume-rate {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
 
 .resume-bar {
-  height: 16px;
+  height: 24px;
   border-radius: 999px;
   background: rgba(89, 194, 255, 0.12);
   overflow: hidden;
@@ -856,7 +856,7 @@ const energyOption = computed(() => {
 }
 
 .resume-desc {
-  font-size: 16px;
+  font-size: 24px;
   line-height: 1.5;
   color: rgba(214, 238, 255, 0.68);
 }
@@ -1081,7 +1081,7 @@ const energyOption = computed(() => {
   justify-content: center;
   gap: 10px;
   color: rgba(214, 238, 255, 0.82);
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 900;
   letter-spacing: 2px;
 }
@@ -1191,7 +1191,7 @@ const energyOption = computed(() => {
 }
 
 .project-name {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.82);
@@ -1205,14 +1205,14 @@ const energyOption = computed(() => {
 }
 
 .project-stat-label {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.62);
 }
 
 .project-stat-value {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);

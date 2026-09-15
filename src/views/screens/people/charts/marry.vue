@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import type { EChartsOption } from 'echarts'
 
 // 柱状数据类型：初婚、再婚、复婚、准许登记结婚；折线：离婚率
 type MarriageRow = {
@@ -80,10 +79,10 @@ const option = computed<EChartsOption>(() => {
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 }
     },
     grid: {
-      left: '6%',
+      left: '10%',
       right: '8%',
       top: '14%',
       bottom: '12%'
@@ -92,7 +91,7 @@ const option = computed<EChartsOption>(() => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
       splitLine: { show: false }
     },
     yAxis: [
@@ -102,7 +101,7 @@ const option = computed<EChartsOption>(() => {
         nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)' },
         max: 21000,
         axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
         splitLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.3)' } }
       },
       {

@@ -506,7 +506,7 @@ const rightInnerMetrics: MetricRow[] = [
 }
 
 .metric-label {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.86);
   letter-spacing: 2px;
@@ -542,13 +542,13 @@ const rightInnerMetrics: MetricRow[] = [
 }
 
 .metric-city {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
 
 .metric-val {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);

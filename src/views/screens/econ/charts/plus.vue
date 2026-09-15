@@ -38,7 +38,7 @@ const option = computed(() => {
     grid: {
       left: '3%',
       right: '4%',
-      bottom: '18%',
+      bottom: '10%',
       top: '14%',
       containLabel: true
     },
@@ -47,7 +47,7 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: '#fff',
-        fontSize: 22,
+        fontSize: 34,
         rotate: 35
       },
       axisLine: {
@@ -58,14 +58,14 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：亿元',
-      nameTextStyle: { color: '#fff', fontSize: 16 },
+      nameTextStyle: { color: '#fff', fontSize: 22 },
       splitLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
       },
       min: 0,
       max: 150,
       interval: 30,
-      axisLabel: { color: '#fff', fontSize: 20 },
+      axisLabel: { color: '#fff', fontSize: 34 },
       axisLine: { show: false }
     },
     series: [

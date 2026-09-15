@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import * as echarts from 'echarts'
 import EChart from '@/components/echarts/EChart.vue'
 
 interface AreaRatioItem {
@@ -54,7 +53,7 @@ const option = computed(() => {
     grid: {
       left: '8%',
       right: '8%',
-      bottom: '18%',
+      bottom: '10%',
       top: '12%',
       containLabel: true
     },
@@ -75,13 +74,13 @@ const option = computed(() => {
       {
         type: 'value',
         name: '单位：万平方米',
-        nameTextStyle: { color: '#82d8e8', fontSize: 16 },
+        nameTextStyle: { color: '#82d8e8', fontSize: 22 },
         splitLine: {
           lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
         },
         min: 0,
         max: 10,
-        axisLabel: { color: '#82d8e8', fontSize: 20 },
+        axisLabel: { color: '#82d8e8', fontSize: 30 },
         axisLine: { show: false }
       },
       {

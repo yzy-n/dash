@@ -49,7 +49,7 @@ const option = computed(() => {
         style: {
           text: '地图加载中...',
           fill: 'rgba(214, 238, 255, 0.75)',
-          fontSize: 16,
+          fontSize: 36,
           fontWeight: 800
         }
       }
@@ -73,7 +73,7 @@ const option = computed(() => {
       show: true,
       left: 10,
       bottom: 10,
-      textStyle: { color: '#fff', fontSize: 12 },
+      textStyle: { color: '#fff', fontSize: 26 },
       pieces: [
         { gte: 2000, label: '2000以上', color: '#ff4455' },
         { gte: 1000, lte: 2000, label: '1000‑2000', color: '#ffdd44' },
@@ -101,7 +101,7 @@ const option = computed(() => {
         label: {
           show: true,
           color: '#ffffff',
-          fontSize: 13,
+          fontSize: 24,
           formatter: (p: any) => {
             const v = Number(p?.value)
             const valueText = Number.isFinite(v) ? v : '-'

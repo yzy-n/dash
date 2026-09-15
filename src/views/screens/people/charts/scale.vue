@@ -37,7 +37,7 @@ const option = computed(() => {
     return {
       name: '每户平均人数',
       type: 'bar',
-      barWidth: 26,
+      barWidth: 50,
       itemStyle: {
         color: {
           type: 'linear',
@@ -85,7 +85,7 @@ const option = computed(() => {
       data: seriesNames,
       top: 8,
       right: 12,
-      textStyle: { color: '#fff', fontSize: 13 },
+      textStyle: { color: '#fff', fontSize: 26 },
       itemWidth: 12,
       itemHeight: 12
     },
@@ -100,19 +100,19 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(120,200,255,0.35)' } },
-      axisLabel: { color: '#fff', fontSize: 14 },
+      axisLabel: { color: '#fff', fontSize: 26 },
       axisTick: { show: false },
       splitLine: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：人',
-      nameTextStyle: { color: '#fff', fontSize: 14 },
+      nameTextStyle: { color: '#fff', fontSize: 26 },
       min: 0,
       max: 6,
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: '#fff', fontSize: 14 },
+      axisLabel: { color: '#fff', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120,200,255,0.15)' } }
     },
     series

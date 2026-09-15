@@ -346,14 +346,14 @@ const genderOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 54, right: 18, top: 18, bottom: 18 },
+    grid: { left: 154, right: 118, top: 18, bottom: 18 },
     xAxis: { type: 'value', show: false },
     yAxis: {
       type: 'category',
       data: ['男性', '女性'],
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 14, fontWeight: 800 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 36, fontWeight: 800 }
     },
     series: [
       {
@@ -382,7 +382,7 @@ const genderOption = computed(() => {
             }
           }
         ],
-        barWidth: 14,
+        barWidth: 50,
         itemStyle: { borderRadius: 10 }
       }
     ]
@@ -405,7 +405,7 @@ const ageOption = computed(() => {
         label: {
           show: true,
           color: 'rgba(240, 251, 255, 0.88)',
-          fontSize: 12,
+          fontSize: 26,
           formatter: '{b}  {c}'
         },
         labelLine: { show: false },
@@ -422,17 +422,17 @@ const birthOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 48, right: 18, top: 22, bottom: 30 },
+    grid: { left: 90, right: 18, top: 22, bottom: 30 },
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.65)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.65)', fontSize: 26 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -441,7 +441,7 @@ const birthOption = computed(() => {
       {
         type: 'bar',
         data: y.map((v, idx) => ({ value: v, itemStyle: { color: colors[idx] } })),
-        barWidth: 18,
+        barWidth: 50,
         itemStyle: { borderRadius: [10, 10, 0, 0] }
       }
     ]
@@ -454,17 +454,17 @@ const moveOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 56, right: 18, top: 22, bottom: 42 },
+    grid: { left: 90, right: 18, top: 22, bottom: 62 },
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.65)', fontSize: 12, rotate: 18 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.65)', fontSize: 26, rotate: 18 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -473,7 +473,7 @@ const moveOption = computed(() => {
       {
         type: 'bar',
         data: y.map((v, idx) => ({ value: v, itemStyle: { color: colors[idx] } })),
-        barWidth: 16,
+        barWidth: 50,
         itemStyle: { borderRadius: [10, 10, 0, 0] }
       }
     ]
@@ -628,7 +628,7 @@ const moveOption = computed(() => {
   pointer-events: none;
 }
 .corner-title {
-  font-size: 20px;
+  font-size: 36px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(240, 251, 255, 0.9);

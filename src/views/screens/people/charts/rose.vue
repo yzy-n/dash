@@ -38,7 +38,7 @@ const option = computed<EChartsOption>(() => {
       orient: 'vertical',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 }
     },
     polar: {
       radius: ['12%', '88%'],
@@ -57,7 +57,7 @@ const option = computed<EChartsOption>(() => {
       type: 'value',
       axisLabel: {
         color: '#fce647',
-        fontSize: 11
+        fontSize: 26
       },
       axisTick: { show: false },
       splitLine: { show: false }
@@ -73,7 +73,7 @@ const option = computed<EChartsOption>(() => {
           show: true,
           position: 'outside',
           color: '#fce647',
-          fontSize: 11
+          fontSize: 26
         },
         labelLine: {
           show: true,

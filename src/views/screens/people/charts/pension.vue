@@ -47,31 +47,31 @@ const option = computed<EChartsOption>(() => {
       right: 16,
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12, fontWeight: 800 },
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26, fontWeight: 800 },
       data: ['参保职工数', '退休数']
     },
-    grid: { left: 52, right: 18, top: 40, bottom: 44 },
+    grid: { left: 62, right: 18, top: 60, bottom: 44 },
     xAxis: {
       type: 'category',
       data: names,
       axisLine: { lineStyle: { color: 'rgba(140, 210, 255, 0.22)' } },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12, fontWeight: 800 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26, fontWeight: 800 }
     },
     yAxis: {
       type: 'value',
       name: '单位：万人',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12, fontWeight: 800, padding: [0, 0, 0, 10] },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26, fontWeight: 800, padding: [0, 0, 0, 10] },
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, fontWeight: 800 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 26, fontWeight: 800 },
       splitLine: { lineStyle: { color: 'rgba(140, 210, 255, 0.12)' } }
     },
     series: [
       {
         name: '参保职工数',
         type: 'bar',
-        barWidth: 14,
+        barWidth: 50,
         barGap: '35%',
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
@@ -92,7 +92,7 @@ const option = computed<EChartsOption>(() => {
       {
         name: '退休数',
         type: 'bar',
-        barWidth: 14,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {

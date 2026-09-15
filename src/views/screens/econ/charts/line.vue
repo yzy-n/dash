@@ -76,7 +76,7 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: '#fff',
-        fontSize: 13,
+        fontSize: 28,
         rotate: 40
       },
       axisLine: {
@@ -87,18 +87,18 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: '#fff', fontSize: 14 },
+      nameTextStyle: { color: '#fff', fontSize: 28 },
       splitLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
       },
-      axisLabel: { color: '#fff' },
+      axisLabel: { color: '#fff', fontSize: 28 },
       axisLine: { show: false }
     },
     series: [
       {
         name: '占比',
         type: 'bar',
-        barWidth: 24,
+        barWidth: 50,
         data: seriesData,
         markLine: {
           silent: true,

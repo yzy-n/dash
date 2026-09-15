@@ -296,18 +296,18 @@ const waterOption = computed(() => {
   const y = activeWaterType.value === '综合生产能力' ? [55, 10, 3, 2] : [36, 12, 4, 3]
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 70, right: 26, top: 26, bottom: 30 },
+    tooltip: { show: true },
+    grid: { left: 70, right: 26, top: 46, bottom: 30 },
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -316,7 +316,7 @@ const waterOption = computed(() => {
       {
         type: 'bar',
         data: y,
-        barWidth: 22,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
@@ -614,18 +614,18 @@ const aedOption = computed(() => {
 
 .gas-metric {
   position: absolute;
-  width: 360px;
+  width: 300px;
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.32);
   padding: 14px 16px 12px;
   box-sizing: border-box;
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .gas-metric-label {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
@@ -637,48 +637,48 @@ const aedOption = computed(() => {
 }
 
 .gas-metric-num {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 14px rgba(255, 226, 74, 0.18);
 }
 
 .gas-metric-unit {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
 
 .gas-metric--lt {
   left: 40px;
-  top: 140px;
+  top: 180px;
 }
 
 .gas-metric--rt {
   right: 40px;
-  top: 140px;
+  top: 180px;
 }
 
 .gas-metric--lm {
   left: 40px;
-  top: 50%;
+  top: 54%;
   transform: translateY(-50%);
 }
 
 .gas-metric--rm {
   right: 40px;
-  top: 50%;
+  top: 54%;
   transform: translateY(-50%);
 }
 
 .gas-metric--lb {
   left: 40px;
-  bottom: 46px;
+  bottom: 80px;
 }
 
 .gas-metric--rb {
   right: 40px;
-  bottom: 46px;
+  bottom: 80px;
 }
 
 .panel--tower {
@@ -692,14 +692,14 @@ const aedOption = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  font-size: 20px;
+  font-size: 36px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.78);
 }
 
 .tower-kpi-value {
-  font-size: 26px;
+  font-size: 36px;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
@@ -740,7 +740,7 @@ const aedOption = computed(() => {
 }
 
 .tower-legend-label {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
@@ -752,14 +752,14 @@ const aedOption = computed(() => {
 }
 
 .tower-legend-num {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
 
 .tower-legend-unit {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
@@ -855,15 +855,17 @@ const aedOption = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 34px;
 }
 
 .heat-value {
-  font-size: 22px;
+  font-size: 34px;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
 
 .heat-unit {
+  font-size: 24px;
   color: rgba(214, 238, 255, 0.62);
 }
 
@@ -915,7 +917,7 @@ const aedOption = computed(() => {
 }
 .red-top-label {
   flex: 1;
-  font-size: 22px;
+  font-size: 34px;
   color: #ffffff;
 }
 .red-top-val {
@@ -923,7 +925,7 @@ const aedOption = computed(() => {
   color: #f9e784;
 }
 .red-top-val span {
-  font-size: 20px;
+  font-size: 24px;
   color: #fff;
   margin-left: 4px;
 }
@@ -956,7 +958,7 @@ const aedOption = computed(() => {
   height: 48px;
 }
 .red-card-name {
-  font-size: 20px;
+  font-size: 34px;
   color: #fff;
   text-align: center;
   margin-bottom: 12px;
@@ -966,7 +968,7 @@ const aedOption = computed(() => {
   color: #f9e784;
 }
 .red-card-num span {
-  font-size: 18px;
+  font-size: 24px;
   color: #fff;
 }
 

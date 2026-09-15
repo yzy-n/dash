@@ -45,7 +45,7 @@ const option = computed(() => {
     grid: {
       left: '3%',
       right: '4%',
-      bottom: '22%',
+      bottom: '12%',
       top: '12%',
       containLabel: true
     },
@@ -54,8 +54,8 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: '#fff',
-        fontSize: 23,
-        rotate: 45
+        fontSize: 26,
+        rotate: 65
       },
       axisLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.4)' }
@@ -69,7 +69,7 @@ const option = computed(() => {
       splitLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
       },
-      axisLabel: { color: '#fff' },
+      axisLabel: { color: '#fff', fontSize: 30 },
       axisLine: { show: false }
     },
     series: [

@@ -304,7 +304,6 @@ const pensionSummary = computed(() => {
 }
 .panel-title {
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;
@@ -366,7 +365,7 @@ const pensionSummary = computed(() => {
   align-items: center;
 }
 .nature-label {
-  font-size: 24px;
+  font-size: 34px;
   color: #cce6ff;
   margin-bottom: 8px;
   background: linear-gradient(90deg, rgba(24, 90, 170, 0.6), rgba(12, 50, 100, 0.4));
@@ -374,7 +373,7 @@ const pensionSummary = computed(() => {
   padding: 4px 22px;
 }
 .nature-value {
-  font-size: 32px;
+  font-size: 36px;
   color: #ffdd66;
   font-weight: bold;
   text-shadow: 0 0 10px rgba(255, 220, 80, 0.25);
@@ -422,43 +421,41 @@ const pensionSummary = computed(() => {
   justify-content: center;
 }
 .tab {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 170px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.38);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
-  opacity: 0.55;
-  filter: grayscale(1) brightness(0.75);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.12),
-    0 0 0 rgba(54, 232, 255, 0);
-  transition:
-    opacity 160ms ease,
-    filter 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease,
-    color 160ms ease;
-}
-.tab--active {
-  color: rgba(240, 251, 255, 0.96);
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
   text-shadow:
-    0 0 12px rgba(54, 232, 255, 0.35),
-    0 0 20px rgba(54, 232, 255, 0.18);
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
+}
+
+.tab--active {
+  color: #eaf4ff;
   opacity: 1;
-  filter: none;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.38),
-    0 0 16px rgba(54, 232, 255, 0.22);
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 .panel--water {
   flex: 1;
@@ -485,7 +482,7 @@ const pensionSummary = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.9);
   background: linear-gradient(135deg, rgba(40, 160, 255, 0.58), rgba(12, 60, 120, 0.18));
@@ -638,7 +635,7 @@ const pensionSummary = computed(() => {
   box-shadow: 0 0 24px rgba(54, 232, 255, 0.15);
 }
 .assist‑label {
-  font-size: 22px;
+  font-size: 36px;
   color: #e6f4ff;
   text-align: center;
   line-height: 1.4;

@@ -104,7 +104,6 @@
             <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
           </select>
         </div>
-        <!-- 【修复】建筑业增值增速 使用 panel-tabs 定位容器，和全局tab统一 -->
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in heatTabs"
@@ -291,7 +290,7 @@ const barOption = ref<EChartsOption>({
     axisLabel: {
       color: '#82d8e8',
       rotate: 40,
-      fontSize: 14
+      fontSize: 36
     }
   },
   yAxis: {
@@ -300,7 +299,7 @@ const barOption = ref<EChartsOption>({
     type: 'value',
     splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
     axisLine: { show: false },
-    axisLabel: { color: '#82d8e8' }
+    axisLabel: { color: '#82d8e8', fontSize: 30 }
   },
   series: [
     {
@@ -560,7 +559,6 @@ const aedOption = computed(() => {
 }
 .panel-title {
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;
@@ -596,6 +594,7 @@ const aedOption = computed(() => {
   grid-template-rows: auto auto;
   gap: 14px;
   margin-bottom: 20px;
+  margin-top: 40px;
 }
 /* 第4、5个卡片，第二行居中摆放 */
 .market-metrics-wrap .metric-item:nth-child(4) {
@@ -638,11 +637,11 @@ const aedOption = computed(() => {
   border-left: 2px solid #ffdd66;
 }
 .metric-label {
-  font-size: 22px;
+  font-size: 26px;
   color: #c6ecf8;
 }
 .metric-value {
-  font-size: 26px;
+  font-size: 30px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -712,7 +711,7 @@ const aedOption = computed(() => {
 }
 .price-cell {
   padding: 12px 10px;
-  font-size: 20px;
+  font-size: 30px;
   color: #e6f4ff;
   text-align: center;
   display: flex;
@@ -768,43 +767,41 @@ const aedOption = computed(() => {
   justify-content: center;
 }
 .tab {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 170px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.38);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
-  opacity: 0.55;
-  filter: grayscale(1) brightness(0.75);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.12),
-    0 0 0 rgba(54, 232, 255, 0);
-  transition:
-    opacity 160ms ease,
-    filter 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease,
-    color 160ms ease;
-}
-.tab--active {
-  color: rgba(240, 251, 255, 0.96);
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
   text-shadow:
-    0 0 12px rgba(54, 232, 255, 0.35),
-    0 0 20px rgba(54, 232, 255, 0.18);
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
+}
+
+.tab--active {
+  color: #eaf4ff;
   opacity: 1;
-  filter: none;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 1px rgba(86, 208, 255, 0.38),
-    0 0 16px rgba(54, 232, 255, 0.22);
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 .panel--gas {
   flex: 1;
@@ -1107,7 +1104,7 @@ const aedOption = computed(() => {
 }
 .red-top-label {
   min-width: 0;
-  font-size: 22px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.92);
   letter-spacing: 1px;
@@ -1119,13 +1116,13 @@ const aedOption = computed(() => {
   display: inline-flex;
   align-items: baseline;
   gap: 22px;
-  font-size: 30px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 14px rgba(255, 226, 74, 0.12);
 }
 .red-top-val span {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 900;
   color: rgba(124, 242, 255, 0.9);
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.14);

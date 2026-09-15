@@ -117,11 +117,6 @@
       </div>
       <div class="pile-body">
         <div class="metric-list">
-          <div v-for="item in electricMetrics" :key="item.label" class="metric-row">
-            <span class="metric-label">{{ item.label }}</span>
-            <span class="metric-num">{{ item.value }}</span>
-            <span class="metric-unit">{{ item.unit }}</span>
-          </div>
         </div>
         <div class="pile-chart">
           <Line />
@@ -200,9 +195,6 @@ const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
 const dateElectric = ref(dateOptions[0])
 const dateCapacity = ref(dateOptions[0])
 const dateInvest = ref(dateOptions[1])
-const datePile = ref(dateOptions[2])
-const dateProject = ref(dateOptions[0])
-const dateEnergy = ref(dateOptions[0])
 const dateSteel = ref('')
 // 模拟截图里表格数据
 const steelTableData = ref([
@@ -237,13 +229,13 @@ const gdpLineOption = computed(() => {
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 24 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -289,13 +281,13 @@ const regionGdpOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 14 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 24 }
     },
-    grid: { left: 52, right: 44, top: 18, bottom: 46 },
+    grid: { left: 82, right: 84, top: 48, bottom: 66 },
     xAxis: {
       type: 'category',
       data: names,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 30 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 24, rotate: 30 },
       axisTick: { show: false },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } }
     },
@@ -303,8 +295,8 @@ const regionGdpOption = computed(() => {
       {
         type: 'value',
         name: '单位：亿元',
-        nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12, padding: [0, 0, 0, 8] },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24, padding: [0, 0, 0, 8] },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
         splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
         axisLine: { show: false },
         axisTick: { show: false }
@@ -312,8 +304,8 @@ const regionGdpOption = computed(() => {
       {
         type: 'value',
         name: '单位：%',
-        nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12, padding: [0, 8, 0, 0] },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24, padding: [0, 8, 0, 0] },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
         splitLine: { show: false },
         axisLine: { show: false },
         axisTick: { show: false }
@@ -431,9 +423,8 @@ const investDistrictX = [
   '千山区',
   '高新区',
   '经开区',
-  '凤城区'
 ]
-const investDistrictY = [25.8, 42.3, 11.6, 20, 25.8, 14.4, 39.8, 71, 148, -57.8]
+const investDistrictY = [25.8, 42.3, 11.6, 20, 25.8, 14.4, 39.8, 71, 148]
 const investOption = computed(() => {
   return {
     backgroundColor: 'transparent',
@@ -444,19 +435,19 @@ const investOption = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 60, right: 24, top: 24, bottom: 80 },
+    grid: { left: 60, right: 24, top: 64, bottom: 80 },
     xAxis: {
       type: 'category',
       data: investDistrictX,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -506,22 +497,22 @@ const investOption2 = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 60, right: 24, top: 24, bottom: 80 },
+    grid: { left: 60, right: 24, top: 64, bottom: 300 },
     xAxis: {
       type: 'category',
       data: investDistrictX2,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 12, rotate: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
+      axisTick: { show: true }
     },
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
-      axisTick: { show: false }
+      axisTick: { show: true }
     },
     series: [
       {
@@ -740,11 +731,10 @@ const energyOption = computed(() => {
   display: inline-flex;
   align-items: center;
   font-size: 34px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
-  margin-left: 35px;
+  margin-left: 20px;
   letter-spacing: 2px;
   color: #f8fbff;
   text-shadow:
@@ -790,24 +780,40 @@ const energyOption = computed(() => {
   justify-content: center;
 }
 .tab {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 220px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.76);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 .tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  text-shadow: 0 0 12px rgba(54, 232, 255, 0.22);
+  color: #eaf4ff;
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 .capacity-body {
   height: 100%;
@@ -837,7 +843,7 @@ const energyOption = computed(() => {
   min-height: 0;
 }
 .gdp-block-title {
-  font-size: 22px;
+  font-size: 34px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(124, 242, 255, 0.95);
@@ -845,7 +851,7 @@ const energyOption = computed(() => {
 }
 .gdp-block-unit,
 .gdp-block-legend {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 800;
   color: rgba(214, 238, 255, 0.6);
   letter-spacing: 1px;
@@ -872,10 +878,11 @@ const energyOption = computed(() => {
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.42);
   padding: 14px 18px;
+  margin-bottom: 90px;
 }
 .four-reform-title {
   text-align: center;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
   color: #40f3b8;
   letter-spacing: 2px;
@@ -896,7 +903,7 @@ const energyOption = computed(() => {
   background: rgba(10, 30, 65, 0.35);
 }
 .four-reform-label {
-  font-size: 17px;
+  font-size: 28px;
   font-weight: 800;
   color: rgba(214, 238, 255, 0.75);
 }
@@ -912,7 +919,7 @@ const energyOption = computed(() => {
   text-shadow: 0 0 10px rgba(54, 232, 255, 0.16);
 }
 .four-reform-value .unit {
-  font-size: 15px;
+  font-size: 28px;
   color: rgba(214, 238, 255, 0.6);
 }
 .pile-body {
@@ -1300,7 +1307,7 @@ const energyOption = computed(() => {
 .steel-header-row .col {
   flex: 1;
   text-align: center;
-  font-size: 24px;
+  font-size: 34px;
   color: #fff;
   padding: 12px 4px;
   text-shadow: 0 0 8px #2178dd;
@@ -1335,7 +1342,7 @@ const energyOption = computed(() => {
 .steel-data-row .col {
   flex: 1;
   text-align: center;
-  font-size: 24px;
+  font-size: 34px;
   color: #ffffff;
   padding: 16px 4px;
   text-shadow: 0 0 6px #247ddd;
