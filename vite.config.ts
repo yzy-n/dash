@@ -42,6 +42,12 @@ export default defineConfig(({ mode }) => {
               changeOrigin: true,
               timeout: 5000,
               proxyTimeout: 5000
+            },
+            '/publicservice': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
             }
           }
         }

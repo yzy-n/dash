@@ -2,10 +2,18 @@
   <div class="left-wrap">
     <section class="panel panel--command">
       <div class="panel-title">指挥体系</div>
-      <div class="command-tabs">
-        <button type="button" class="command-tab command-tab--active">发布预警</button>
-        <button type="button" class="command-tab">应急响应</button>
-        <button type="button" class="command-tab">监测处置</button>
+      <div class="tabs">
+        <button
+          v-for="item in commandTabs"
+          :key="item.key"
+          type="button"
+          class="tab"
+          :class="{ 'tab--active': activeCommandTab === item.key }"
+          :style="{ backgroundImage: `url(${tabBgUrl})` }"
+          @click="activeCommandTab = item.key"
+        >
+          {{ item.label }}
+        </button>
       </div>
       <div class="command-flow">
         <div class="command-layer command-layer--top">
@@ -119,9 +127,18 @@
         <div class="rescue-material">
           <div class="material-head">
             <div class="material-title">应急救援物资</div>
-            <div class="material-tabs">
-              <button type="button" class="material-tab material-tab--active">救灾物资</button>
-              <button type="button" class="material-tab">医疗防疫物资</button>
+            <div class="tabs tabs--mini">
+              <button
+                v-for="item in materialTabs"
+                :key="item.key"
+                type="button"
+                class="tab"
+                :class="{ 'tab--active': activeMaterialTab === item.key }"
+                :style="{ backgroundImage: `url(${tabBgUrl})` }"
+                @click="activeMaterialTab = item.key"
+              >
+                {{ item.label }}
+              </button>
             </div>
           </div>
           <div class="material-table">
@@ -215,8 +232,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import tabBgUrl from '@/assets/img/tabBg.png'
 
 type FundGraphNode = {
   id: string
@@ -230,6 +248,19 @@ type FundGraphLink = {
   source: string
   target: string
 }
+
+const commandTabs = [
+  { key: 'warning', label: '发布预警' },
+  { key: 'response', label: '应急响应' },
+  { key: 'monitor', label: '监测处置' }
+]
+const activeCommandTab = ref('warning')
+
+const materialTabs = [
+  { key: 'relief', label: '救灾物资' },
+  { key: 'medical', label: '医疗防疫物资' }
+]
+const activeMaterialTab = ref('relief')
 
 const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: FundGraphLink[]) => {
   return {
@@ -349,9 +380,6 @@ const fundExpenseOption = computed(() => {
   overflow: hidden;
   border-radius: 18px;
   padding: 92px 28px 26px;
-  /* background:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/leftBg.png'); */
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
@@ -396,33 +424,69 @@ const fundExpenseOption = computed(() => {
   flex-direction: column;
 }
 
-.command-tabs {
+/* ======================================================== */
+/* 通用 tab 样式（跟第二个文件一致） */
+/* ======================================================== */
+.tabs {
+  width: 100%;
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 6px;
+  gap: 22px;
+  margin: 6px 0 18px;
 }
 
-.command-tab {
-  width: 180px;
-  height: 54px;
-  border-radius: 14px;
-  border: 1px solid rgba(84, 188, 255, 0.18);
-  background: rgba(6, 18, 48, 0.45);
-  color: rgba(214, 238, 255, 0.7);
+.tabs--mini {
+  gap: 12px;
+  margin: 0;
+  width: auto;
+  justify-content: flex-end;
+}
+
+.tab {
+  height: 56px;
+  min-width: 200px;
+  padding: 0 32px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
   font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 
-.command-tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  border-color: rgba(54, 232, 255, 0.4);
-  background: radial-gradient(circle at 30% 30%, rgba(54, 232, 255, 0.22), rgba(6, 18, 48, 0.55));
-  box-shadow:
-    inset 0 0 18px rgba(54, 232, 255, 0.12),
-    0 0 14px rgba(54, 232, 255, 0.12);
+.tab--active {
+  color: #eaf4ff;
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
+}
+
+/* 物资区 tab 尺寸更小 */
+.tabs--mini .tab {
+  height: 40px;
+  min-width: 140px;
+  padding: 0 20px;
+  font-size: 16px;
+  line-height: 40px;
+  letter-spacing: 1px;
 }
 
 .command-flow {
@@ -660,30 +724,6 @@ const fundExpenseOption = computed(() => {
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
   letter-spacing: 2px;
-}
-
-.material-tabs {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.material-tab {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(84, 188, 255, 0.18);
-  background: rgba(6, 18, 48, 0.32);
-  color: rgba(214, 238, 255, 0.7);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.material-tab--active {
-  border-color: rgba(54, 232, 255, 0.42);
-  color: rgba(240, 251, 255, 0.96);
-  background: rgba(54, 232, 255, 0.14);
 }
 
 .material-table {

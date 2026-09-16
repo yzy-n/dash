@@ -10,14 +10,14 @@
       <div class="panel-tabs">
         <button
           v-for="tab in electricTabs"
-          :key="tab"
+          :key="tab.type"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeElectricTab }"
+          :class="{ 'tab--active': tab.type === activeElectricTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeElectricTab = tab"
+          @click="handleElectricTabClick(tab.type)"
         >
-          {{ tab }}
+          {{ tab.label }}
         </button>
       </div>
       <div class="pile-body">
@@ -44,14 +44,14 @@
       <div class="panel-tabs">
         <button
           v-for="tab in capacityTabs"
-          :key="tab"
+          :key="tab.type"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeCapacityTab }"
+          :class="{ 'tab--active': tab.type === activeCapacityTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeCapacityTab = tab"
+          @click="handleCapacityTabClick(tab.type)"
         >
-          {{ tab }}
+          {{ tab.label }}
         </button>
       </div>
       <div class="capacity-body">
@@ -291,12 +291,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import ProjectPie3D from '../charts/ProjectPie3D.vue'
+import { getPowervolume, getPowertype } from '@/api/service'
 
-const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
+const dateOptions = [
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+]
 const dateElectric = ref(dateOptions[0])
 const dateCapacity = ref(dateOptions[0])
 const dateResume = ref(dateOptions[1])
@@ -304,42 +317,81 @@ const datePile = ref(dateOptions[2])
 const dateProject = ref(dateOptions[0])
 const dateEnergy = ref(dateOptions[0])
 
-const electricTabs = ['全社会用电量', '全行业实际用电量']
-const activeElectricTab = ref<(typeof electricTabs)[number]>(electricTabs[0])
+// ============================================================
+// 用电情况（接口版）
+// ============================================================
+const electricTabs = [
+  { type: 1, label: '全社会用电量' },
+  { type: 2, label: '全行业实际用电量' }
+] as const
+
+const activeElectricTab = ref<1 | 2>(1)
+
+const electricList = ref<
+  Array<{
+    label: string
+    type: string
+    capacityNum: string
+    yoy: string
+    ringRatio: string
+    year: string | null
+    [key: string]: any
+  }>
+>([])
+
+const electricSummary = ref<Record<string, any>>({})
+
+const handleElectricTabClick = async (type: 1 | 2) => {
+  if (activeElectricTab.value === type) return
+  activeElectricTab.value = type
+  await fetchElectricData(type)
+}
+
+const fetchElectricData = async (type: 1 | 2) => {
+  try {
+    const res = await getPowervolume({
+      type,
+      date: dateElectric.value
+    })
+    electricList.value = res?.dataList ?? []
+    electricSummary.value = res?.summary ?? {}
+  } catch (e) {
+    console.error('用电情况查询失败', e)
+  }
+}
+
+watch(dateElectric, () => {
+  fetchElectricData(activeElectricTab.value)
+})
 
 const electricMetrics = computed(() => {
-  const map = {
-    全社会用电量: [
-      { label: '用电量', value: '19331.06', unit: '万千瓦时' },
-      { label: '占比', value: '9.64', unit: '%' },
-      { label: '同比', value: '33.03', unit: '%' },
-      { label: '环比', value: '7.27', unit: '%' }
-    ],
-    全行业实际用电量: [
-      { label: '用电量', value: '20677.03', unit: '万千瓦时' },
-      { label: '占比', value: '10.31', unit: '%' },
-      { label: '同比', value: '28.15', unit: '%' },
-      { label: '环比', value: '5.92', unit: '%' }
-    ]
-  } as const
-  return map[activeElectricTab.value]
+  const s = electricSummary.value
+  const list = electricList.value
+  const total = Number(s?.totalPower) || 0
+  const avgYoy =
+    list.length > 0
+      ? (list.reduce((acc, item) => acc + (Number(item.yoy) || 0), 0) / list.length).toFixed(2)
+      : '0'
+  const avgRing =
+    list.length > 0
+      ? (list.reduce((acc, item) => acc + (Number(item.ringRatio) || 0), 0) / list.length).toFixed(
+          2
+        )
+      : '0'
+
+  return [
+    { label: '用电量', value: total ? total.toFixed(2) : '-', unit: '万千瓦时' },
+    { label: '占比', value: '100.00', unit: '%' },
+    { label: '同比', value: avgYoy, unit: '%' },
+    { label: '环比', value: avgRing, unit: '%' }
+  ]
 })
 
 const electricPieOption = computed(() => {
-  const data =
-    activeElectricTab.value === '全行业实际用电量'
-      ? [
-          { name: '城市居民用电量', value: 38 },
-          { name: '第一产业', value: 10 },
-          { name: '第二产业', value: 32 },
-          { name: '第三产业', value: 20 }
-        ]
-      : [
-          { name: '城市居民用电量', value: 40 },
-          { name: '第一产业', value: 9 },
-          { name: '第二产业', value: 31 },
-          { name: '第三产业', value: 20 }
-        ]
+  const data = electricList.value.map((item) => ({
+    name: item.label,
+    value: Number(item.capacityNum) || 0
+  }))
 
   return {
     backgroundColor: 'transparent',
@@ -365,84 +417,140 @@ const electricPieOption = computed(() => {
   }
 })
 
-const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
-const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
+// ============================================================
+// 用电容量情况（接口版）
+// ============================================================
+const capacityTabs = [
+  { type: 1, label: '全社会用电容量' },
+  { type: 2, label: '全行业实际用电容量' }
+] as const
 
-const capacityMetrics = computed(() => {
-  const map = {
-    全社会用电容量: [
-      { label: '第三产业', value: '408.46', unit: '万千瓦' },
-      { label: '同比', value: '3.95', unit: '%' },
-      { label: '环比', value: '1.24', unit: '%' }
-    ],
-    全行业实际用电容量: [
-      { label: '第二产业', value: '962.25', unit: '万千瓦' },
-      { label: '同比', value: '4.89', unit: '%' },
-      { label: '环比', value: '1.31', unit: '%' }
-    ]
-  } as const
-  return map[activeCapacityTab.value]
+const activeCapacityTab = ref<1 | 2>(1)
+
+const capacityList = ref<
+  Array<{
+    label: string
+    volume: string
+    num: string
+    [key: string]: any
+  }>
+>([])
+
+const capacitySummary = ref<Record<string, any>>({})
+
+const handleCapacityTabClick = async (type: 1 | 2) => {
+  if (activeCapacityTab.value === type) return
+  activeCapacityTab.value = type
+  await fetchCapacityData(type)
+}
+
+const fetchCapacityData = async (type: 1 | 2) => {
+  try {
+    const res = await getPowertype({
+      type,
+      date: dateCapacity.value
+    })
+    capacityList.value = res?.dataList ?? []
+    capacitySummary.value = res?.summary ?? {}
+  } catch (e) {
+    console.error('用电容量查询失败', e)
+  }
+}
+
+watch(dateCapacity, () => {
+  fetchCapacityData(activeCapacityTab.value)
 })
 
-const capacityRingOption = computed(() => {
-  const rings =
-    activeCapacityTab.value === '全行业实际用电容量'
-      ? [
-          { name: '城市居民用电量', value: 48.9, color: '#33d5ff' },
-          { name: '第一产业', value: 12.1, color: '#ffe24a' },
-          { name: '第二产业', value: 66.5, color: '#40f3b8' },
-          { name: '第三产业', value: 35.8, color: '#ffb84a' }
-        ]
-      : [
-          { name: '城市居民用电量', value: 42.6, color: '#33d5ff' },
-          { name: '第一产业', value: 10.8, color: '#ffe24a' },
-          { name: '第二产业', value: 58.4, color: '#40f3b8' },
-          { name: '第三产业', value: 32.3, color: '#ffb84a' }
-        ]
+const capacityMetrics = computed(() => {
+  const s = capacitySummary.value
+  const list = capacityList.value
+  const totalVolume = Number(s?.totalVolume) || 0
+  const totalNum = Number(s?.totalNum) || 0
 
-  const makeRing = (item: (typeof rings)[number], idx: number) => {
-    const outer = 78 - idx * 14
-    const inner = outer - 8
-    return {
-      type: 'pie',
-      radius: [`${inner}%`, `${outer}%`],
-      center: ['58%', '56%'],
-      silent: true,
-      label: {
-        show: true,
-        position: 'outside',
-        formatter: `${item.name}\n{v|${item.value}}`,
-        rich: {
-          v: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 24, fontWeight: 800 }
-        },
-        color: 'rgba(214, 238, 255, 0.7)',
-        fontSize: 24
-      },
-      labelLine: { length: 10, length2: 10, lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
-      data: [
-        {
-          value: item.value,
-          name: item.name,
-          itemStyle: { color: item.color }
-        },
-        {
-          value: 100 - item.value,
-          name: '',
-          itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
-          label: { show: false },
-          labelLine: { show: false }
-        }
-      ]
-    }
-  }
+  return [
+    { label: '用电容量', value: totalVolume ? totalVolume.toFixed(2) : '-', unit: '万千瓦' },
+    { label: '总数量', value: totalNum ? String(totalNum) : '-', unit: '个' },
+    { label: '类型数', value: String(list.length || 0), unit: '类' }
+  ]
+})
+
+// ============================================================
+// 环形图（无 label，用 legend 展示类别 + 数值）
+// ============================================================
+const capacityRingOption = computed(() => {
+  const list = capacityList.value
+  const colors = ['#33d5ff', '#ffe24a', '#40f3b8', '#ffb84a', '#8b5cff']
+  const total = list.reduce((acc, item) => acc + (Number(item.volume) || 0), 0)
 
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    series: rings.map(makeRing)
+    legend: {
+      orient: 'vertical',
+      right: 6,
+      top: 'middle',
+      itemWidth: 10,
+      itemHeight: 10,
+      itemGap: 14,
+      icon: 'circle',
+      data: list.map((item, idx) => ({
+        name: item.label,
+        itemStyle: { color: colors[idx % colors.length] }
+      })),
+      formatter: (name: string) => {
+        const item = list.find((i) => i.label === name)
+        return `{n|${name}}  {v|${item?.volume ?? ''}}`
+      },
+      textStyle: {
+        rich: {
+          n: {
+            color: 'rgba(214, 238, 255, 0.82)',
+            fontSize: 13,
+            verticalAlign: 'middle'
+          },
+          v: {
+            color: '#fff',
+            fontSize: 13,
+            fontWeight: 800,
+            verticalAlign: 'middle'
+          }
+        }
+      }
+    },
+    series: list.map((item, idx) => {
+      const outer = 82 - idx * 15
+      const inner = outer - 12
+      const val = Number(item.volume) || 0
+      const rest = Math.max(total - val, 0)
+      return {
+        type: 'pie',
+        radius: [`${inner}%`, `${outer}%`],
+        center: ['36%', '50%'],
+        startAngle: 90,
+        silent: true,
+        label: { show: false },
+        labelLine: { show: false },
+        data: [
+          {
+            value: val,
+            name: item.label,
+            itemStyle: { color: colors[idx % colors.length] }
+          },
+          {
+            value: rest,
+            name: '',
+            itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
+            label: { show: false }
+          }
+        ]
+      }
+    })
   }
 })
 
+// ============================================================
+// 企业复工复产情况（原逻辑，未改动）
+// ============================================================
 const resumeIndustryOptions = ['工业', '服务业', '商贸业']
 const resumeIndustry = ref<(typeof resumeIndustryOptions)[number]>('工业')
 
@@ -453,6 +561,9 @@ const resumeProdRate = computed(() =>
   resumeIndustry.value === '工业' ? 54.9 : resumeIndustry.value === '服务业' ? 48.3 : 52.1
 )
 
+// ============================================================
+// 充电桩建设情况（原逻辑，未改动）
+// ============================================================
 const pileOption = computed(() => {
   const districts = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
   const privateVals = [14, 65, 6, 18, 9, 10, 4, 7]
@@ -528,6 +639,9 @@ const pileOption = computed(() => {
   }
 })
 
+// ============================================================
+// 重点项目报装情况（原逻辑，未改动）
+// ============================================================
 const projectTabs = ['项目报装情况', '已报装项目详情']
 const activeProjectTab = ref<(typeof projectTabs)[number]>(projectTabs[0])
 
@@ -537,6 +651,9 @@ const projectTodo = computed(() => (activeProjectTab.value === '项目报装情�
 const projectDoneRate = computed(() => Math.round((projectDone.value / projectTotal.value) * 100))
 const projectTodoRate = computed(() => 100 - projectDoneRate.value)
 
+// ============================================================
+// 能源装机情况（原逻辑，未改动）
+// ============================================================
 const energyTabs = ['能源发电量', '能源分布情况']
 const activeEnergyTab = ref<(typeof energyTabs)[number]>(energyTabs[0])
 
@@ -587,6 +704,14 @@ const energyOption = computed(() => {
       }
     ]
   }
+})
+
+// ============================================================
+// 生命周期
+// ============================================================
+onMounted(() => {
+  fetchElectricData(activeElectricTab.value)
+  fetchCapacityData(activeCapacityTab.value)
 })
 </script>
 
@@ -696,25 +821,41 @@ const energyOption = computed(() => {
 }
 
 .tab {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 220px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.76);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 
 .tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  text-shadow: 0 0 12px rgba(54, 232, 255, 0.22);
+  color: #eaf4ff;
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 
 .metric-list {
@@ -1150,7 +1291,6 @@ const energyOption = computed(() => {
 }
 
 .project-table {
-  border-radius: 12px;
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.42);
