@@ -333,10 +333,10 @@ const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: Fun
 
 const fundIncomeOption = computed(() => {
   const nodes: FundGraphNode[] = [
-    { id: 't', label: '收入合计', valueText: '1057.62 万元', size: 140, color: '#36e8ff' },
-    { id: 'b', label: '财政专项收入', valueText: '1057.62 万元', size: 96, color: '#ffbc40' },
-    { id: 'b2', label: '公共预算收入', valueText: '0 万元', size: 90, color: '#7cf2ff' },
-    { id: 'b3', label: '政府性基金收入', valueText: '0 万元', size: 90, color: '#79ffa8' }
+    { id: 't', label: '收入合计', valueText: '1057.62 万元', size: 180, color: '#36e8ff' },
+    { id: 'b', label: '财政专项收入', valueText: '1057.62 万元', size: 124, color: '#ffbc40' },
+    { id: 'b2', label: '公共预算收入', valueText: '0 万元', size: 124, color: '#7cf2ff' },
+    { id: 'b3', label: '政府性基金收入', valueText: '0 万元', size: 124, color: '#79ffa8' }
   ]
   const links: FundGraphLink[] = [
     { source: 't', target: 'b' },
@@ -348,11 +348,11 @@ const fundIncomeOption = computed(() => {
 
 const fundExpenseOption = computed(() => {
   const nodes: FundGraphNode[] = [
-    { id: 't', label: '支出合计', valueText: '1093.30 万元', size: 140, color: '#36e8ff' },
-    { id: 'a', label: '应急专项支出', valueText: '293.67 万元', size: 96, color: '#7cf2ff' },
-    { id: 'd', label: '个人救助补贴', valueText: '25.84 万元', size: 90, color: '#79ffa8' },
-    { id: 'e', label: '救灾物资采购', valueText: '106.28 万元', size: 90, color: '#8b5cff' },
-    { id: 'f', label: '工程抢险支出', valueText: '961.18 万元', size: 96, color: '#39d5ff' }
+    { id: 't', label: '支出合计', valueText: '1093.30 万元', size: 180, color: '#36e8ff' },
+    { id: 'a', label: '应急专项支出', valueText: '293.67 万元', size: 124, color: '#7cf2ff' },
+    { id: 'd', label: '个人救助补贴', valueText: '25.84 万元', size: 124, color: '#79ffa8' },
+    { id: 'e', label: '救灾物资采购', valueText: '106.28 万元', size: 124, color: '#8b5cff' },
+    { id: 'f', label: '工程抢险支出', valueText: '961.18 万元', size: 124, color: '#39d5ff' }
   ]
   const links: FundGraphLink[] = [
     { source: 't', target: 'a' },
@@ -547,14 +547,14 @@ const fundExpenseOption = computed(() => {
 }
 
 .flow-name {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
   letter-spacing: 2px;
 }
 
 .flow-sub {
-  font-size: 18px;
+  font-size: 28px;
   color: rgba(214, 238, 255, 0.72);
 }
 
@@ -566,7 +566,7 @@ const fundExpenseOption = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 800;
   color: rgba(214, 238, 255, 0.82);
   letter-spacing: 1px;
@@ -636,7 +636,7 @@ const fundExpenseOption = computed(() => {
   grid-template-columns: 26px 1fr auto auto;
   gap: 10px;
   align-items: center;
-  font-size: 18px;
+  font-size: 26px;
   color: rgba(214, 238, 255, 0.78);
 }
 
@@ -688,7 +688,7 @@ const fundExpenseOption = computed(() => {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  font-size: 18px;
+  font-size: 26px;
   color: rgba(214, 238, 255, 0.82);
   border-bottom: 1px solid rgba(89, 194, 255, 0.1);
   box-sizing: border-box;
@@ -740,7 +740,7 @@ const fundExpenseOption = computed(() => {
   padding: 0 16px;
   border-bottom: 1px solid rgba(89, 194, 255, 0.1);
   color: rgba(214, 238, 255, 0.82);
-  font-size: 18px;
+  font-size: 26px;
   box-sizing: border-box;
 }
 

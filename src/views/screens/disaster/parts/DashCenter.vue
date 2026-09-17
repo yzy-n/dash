@@ -443,13 +443,13 @@ const gridInfoRows: GridInfoRow[] = [
 }
 
 .quake-time {
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.96);
 }
 
 .quake-desc {
-  font-size: 14px;
+  font-size: 30px;
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
@@ -540,7 +540,7 @@ const gridInfoRows: GridInfoRow[] = [
   display: flex;
   align-items: center;
   padding: 0 18px;
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(30, 20, 0, 0.9);
@@ -559,7 +559,7 @@ const gridInfoRows: GridInfoRow[] = [
 }
 
 .forecast-text {
-  font-size: 14px;
+  font-size: 30px;
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
@@ -575,7 +575,7 @@ const gridInfoRows: GridInfoRow[] = [
 }
 
 .forecast-step {
-  font-size: 14px;
+  font-size: 30px;
   line-height: 1.4;
   color: rgba(214, 238, 255, 0.82);
   padding-left: 14px;

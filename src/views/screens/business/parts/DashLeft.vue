@@ -225,13 +225,13 @@ const tongBanOption = computed(() => {
     xAxis: {
       type: 'category',
       data: areaData,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 34 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 34 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -280,7 +280,7 @@ const overDateOption = computed(() => {
     xAxis: {
       type: 'category',
       data: areaData,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', rotate: 35, fontSize: 34 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
@@ -288,7 +288,7 @@ const overDateOption = computed(() => {
       {
         type: 'value',
         name: '超期办件数量',
-        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 34 },
         splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
         axisLine: { show: false },
         axisTick: { show: false }
@@ -297,7 +297,7 @@ const overDateOption = computed(() => {
         type: 'value',
         name: '超期办件占比(%)',
         position: 'right',
-        axisLabel: { color: '#ffd454' },
+        axisLabel: { color: '#ffd454', fontSize: 34 },
         splitLine: { show: false },
         axisLine: { show: false },
         axisTick: { show: false }
@@ -329,8 +329,8 @@ const overDateOption = computed(() => {
         yAxisIndex: 1,
         smooth: true,
         symbol: 'circle',
-        itemStyle: { color: '#ffd454' },
-        lineStyle: { color: '#ffd454' },
+        itemStyle: { color: '#ffd454', fontSize: 34 },
+        lineStyle: { color: '#ffd454', fontSize: 34 },
         data: overRate
       }
     ]
@@ -480,7 +480,7 @@ const overDateOption = computed(() => {
   gap: 6px;
 }
 .rate-label {
-  font-size: 24px;
+  font-size: 30px;
   color: rgba(214, 238, 255, 0.72);
 }
 .rate-val-row {
@@ -502,7 +502,7 @@ const overDateOption = computed(() => {
   font-size: 30px;
 }
 .rate-std {
-  font-size: 22px;
+  font-size: 30px;
   color: rgba(214, 238, 255, 0.58);
 }
 .std-num {
@@ -532,7 +532,7 @@ const overDateOption = computed(() => {
   margin-top: 20px;
 }
 .tc-col {
-  font-size: 24px;
+  font-size: 34px;
   color: rgba(214, 238, 255, 0.78);
 }
 .table-header .tc-col {

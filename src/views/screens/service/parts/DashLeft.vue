@@ -217,45 +217,37 @@
           <span class="project-kpi-value">{{ projectTotal }}</span>
           <span class="project-kpi-unit">个</span>
         </div>
+
         <div class="project-stage">
           <div class="project-base"></div>
           <div class="project-ring project-ring--a"></div>
           <div class="project-ring project-ring--b"></div>
-          <ProjectPie3D :done="projectDone" :todo="projectTodo" />
-        </div>
-        <div class="project-table">
-          <div class="project-table-row">
-            <span class="project-dot project-dot--done"></span>
-            <span class="project-name">已报装</span>
-            <div class="project-stat">
-              <div class="project-stat-label">数量</div>
-              <div class="project-stat-value">
-                {{ projectDone }}
-                <span class="project-stat-unit">个</span>
-              </div>
-            </div>
-            <div class="project-stat">
-              <div class="project-stat-label">占比</div>
-              <div class="project-stat-value">
-                {{ projectDoneRate }}
-                <span class="project-stat-unit">%</span>
-              </div>
-            </div>
+          <div class="project-chart-wrap">
+            <ProjectPie3D
+              :key="`project-${activeProjectTab}-${dateProject}-${projectRenderKey}`"
+              :items="projectPieItems"
+            />
           </div>
-          <div class="project-table-row">
-            <span class="project-dot project-dot--todo"></span>
-            <span class="project-name">待报装</span>
+        </div>
+
+        <div class="project-table">
+          <div v-for="(item, idx) in projectPieItems" :key="item.name" class="project-table-row">
+            <span
+              class="project-dot"
+              :class="idx === 0 ? 'project-dot--done' : 'project-dot--todo'"
+            ></span>
+            <span class="project-name">{{ item.name }}</span>
             <div class="project-stat">
               <div class="project-stat-label">数量</div>
               <div class="project-stat-value">
-                {{ projectTodo }}
+                {{ item.value }}
                 <span class="project-stat-unit">个</span>
               </div>
             </div>
             <div class="project-stat">
               <div class="project-stat-label">占比</div>
               <div class="project-stat-value">
-                {{ projectTodoRate }}
+                {{ projectPieTotal ? Math.round((item.value / projectPieTotal) * 100) : 0 }}
                 <span class="project-stat-unit">%</span>
               </div>
             </div>
@@ -299,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import ProjectPie3D from '../charts/ProjectPie3D.vue'
@@ -367,9 +359,16 @@ const dateResume = ref(resumeDateOptions[1])
 const pileDateOptions = ref<string[]>(['2022年统计数据'])
 const datePile = ref<string>('2022年统计数据')
 
-// 重点项目报装情况
-const projectDateOptions = ['2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12']
-const dateProject = ref(projectDateOptions[0])
+// 重点项目报装情况（接口返回 timeOptions 会覆盖）
+const projectDateOptions = ref<string[]>([
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12'
+])
+const dateProject = ref<string>(projectDateOptions.value[0])
 
 // 能源装机情况
 const energyDateOptions = [
@@ -396,19 +395,7 @@ const electricTabs = [
 ] as const
 
 const activeElectricTab = ref<1 | 2>(1)
-
-const electricList = ref<
-  Array<{
-    label: string
-    type: string
-    capacityNum: string
-    yoy: string
-    ringRatio: string
-    year: string | null
-    [key: string]: any
-  }>
->([])
-
+const electricList = ref<any[]>([])
 const electricSummary = ref<Record<string, any>>({})
 
 const handleElectricTabClick = async (type: 1 | 2) => {
@@ -419,10 +406,7 @@ const handleElectricTabClick = async (type: 1 | 2) => {
 
 const fetchElectricData = async (type: 1 | 2) => {
   try {
-    const res = await getPowervolume({
-      type,
-      date: dateElectric.value
-    })
+    const res = await getPowervolume({ type, date: dateElectric.value })
     electricList.value = res?.dataList ?? []
     electricSummary.value = res?.summary ?? {}
   } catch (e) {
@@ -458,7 +442,7 @@ const electricMetrics = computed(() => {
 })
 
 const electricPieOption = computed(() => {
-  const data = electricList.value.map((item) => ({
+  const data = electricList.value.map((item: any) => ({
     name: item.label,
     value: Number(item.capacityNum) || 0
   }))
@@ -471,7 +455,7 @@ const electricPieOption = computed(() => {
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 }
     },
     series: [
       {
@@ -496,16 +480,7 @@ const capacityTabs = [
 ] as const
 
 const activeCapacityTab = ref<1 | 2>(1)
-
-const capacityList = ref<
-  Array<{
-    label: string
-    volume: string
-    num: string
-    [key: string]: any
-  }>
->([])
-
+const capacityList = ref<any[]>([])
 const capacitySummary = ref<Record<string, any>>({})
 
 const handleCapacityTabClick = async (type: 1 | 2) => {
@@ -516,10 +491,7 @@ const handleCapacityTabClick = async (type: 1 | 2) => {
 
 const fetchCapacityData = async (type: 1 | 2) => {
   try {
-    const res = await getPowertype({
-      type,
-      date: dateCapacity.value
-    })
+    const res = await getPowertype({ type, date: dateCapacity.value })
     capacityList.value = res?.dataList ?? []
     capacitySummary.value = res?.summary ?? {}
   } catch (e) {
@@ -547,7 +519,7 @@ const capacityMetrics = computed(() => {
 const capacityRingOption = computed(() => {
   const list = capacityList.value
   const colors = ['#33d5ff', '#ffe24a', '#40f3b8', '#ffb84a', '#8b5cff']
-  const total = list.reduce((acc, item) => acc + (Number(item.volume) || 0), 0)
+  const total = list.reduce((acc: number, item: any) => acc + (Number(item.volume) || 0), 0)
 
   return {
     backgroundColor: 'transparent',
@@ -560,31 +532,22 @@ const capacityRingOption = computed(() => {
       itemHeight: 10,
       itemGap: 14,
       icon: 'circle',
-      data: list.map((item, idx) => ({
+      data: list.map((item: any, idx: number) => ({
         name: item.label,
         itemStyle: { color: colors[idx % colors.length] }
       })),
       formatter: (name: string) => {
-        const item = list.find((i) => i.label === name)
+        const item = list.find((i: any) => i.label === name)
         return `{n|${name}}  {v|${item?.volume ?? ''}}`
       },
       textStyle: {
         rich: {
-          n: {
-            color: 'rgba(214, 238, 255, 0.82)',
-            fontSize: 13,
-            verticalAlign: 'middle'
-          },
-          v: {
-            color: '#fff',
-            fontSize: 13,
-            fontWeight: 800,
-            verticalAlign: 'middle'
-          }
+          n: { color: 'rgba(214, 238, 255, 0.82)', fontSize: 13, verticalAlign: 'middle' },
+          v: { color: '#fff', fontSize: 13, fontWeight: 800, verticalAlign: 'middle' }
         }
       }
     },
-    series: list.map((item, idx) => {
+    series: list.map((item: any, idx: number) => {
       const outer = 82 - idx * 15
       const inner = outer - 12
       const val = Number(item.volume) || 0
@@ -598,11 +561,7 @@ const capacityRingOption = computed(() => {
         label: { show: false },
         labelLine: { show: false },
         data: [
-          {
-            value: val,
-            name: item.label,
-            itemStyle: { color: colors[idx % colors.length] }
-          },
+          { value: val, name: item.label, itemStyle: { color: colors[idx % colors.length] } },
           {
             value: rest,
             name: '',
@@ -616,7 +575,7 @@ const capacityRingOption = computed(() => {
 })
 
 // ============================================================
-// 企业复工复产情况（原逻辑，未改动）
+// 企业复工复产情况
 // ============================================================
 const resumeIndustryOptions = ['工业', '服务业', '商贸业']
 const resumeIndustry = ref<(typeof resumeIndustryOptions)[number]>('工业')
@@ -629,22 +588,19 @@ const resumeProdRate = computed(() =>
 )
 
 // ============================================================
-// 充电桩建设情况（接口版）
+// 充电桩建设情况
 // ============================================================
 const pileSummary = ref<Record<string, any>>({})
 const pileList = ref<any[]>([])
 
 const fetchPileData = async () => {
   try {
-    const res: any = await getChargeboard({
-      souseDate: datePile.value
-    })
+    const res: any = await getChargeboard({ souseDate: datePile.value })
     const data = res?.data ?? res ?? {}
 
     pileSummary.value = data.summary ?? {}
     pileList.value = data.dataList ?? []
 
-    // 用接口返回的时间选项覆盖下拉列表
     const options: string[] = data.summary?.timeOptions ?? []
     if (options.length) {
       pileDateOptions.value = options
@@ -677,18 +633,18 @@ const pileOption = computed(() => {
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 24 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 }
     },
     xAxis: {
       type: 'category',
       data: districts,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -739,7 +695,7 @@ const pileOption = computed(() => {
 })
 
 // ============================================================
-// 重点项目报装情况（接口版）
+// 重点项目报装情况
 // ============================================================
 const projectTabs = [
   { type: 1, label: '项目报装情况' },
@@ -747,9 +703,9 @@ const projectTabs = [
 ] as const
 
 const activeProjectTab = ref<1 | 2>(1)
-
 const projectSummary = ref<Record<string, any>>({})
 const projectList = ref<any[]>([])
+const projectRenderKey = ref(0)
 
 const handleProjectTabClick = async (type: 1 | 2) => {
   if (activeProjectTab.value === type) return
@@ -766,6 +722,17 @@ const fetchProjectData = async () => {
     const data = res?.data ?? res ?? {}
     projectSummary.value = data.summary ?? {}
     projectList.value = data.dataList ?? []
+
+    const options: string[] = data.summary?.timeOptions ?? []
+    if (options.length) {
+      projectDateOptions.value = options
+      if (!options.includes(dateProject.value)) {
+        dateProject.value = data.summary?.souseDate ?? options[0]
+      }
+    }
+
+    await nextTick()
+    projectRenderKey.value++
   } catch (e) {
     console.error('重点项目报装情况查询失败', e)
     projectSummary.value = {}
@@ -777,17 +744,36 @@ watch(dateProject, () => {
   fetchProjectData()
 })
 
-const projectTotal = computed(() => Number(projectSummary.value.projectTotal) || 0)
-const projectDone = computed(() => Number(projectSummary.value.projectDone) || 0)
-const projectTodo = computed(() => Number(projectSummary.value.projectTodo) || 0)
-const projectDoneRate = computed(() => {
-  if (!projectTotal.value) return 0
-  return Math.round((projectDone.value / projectTotal.value) * 100)
+// summary 数据（tab1 顶部 KPI 用）
+const projectDone = computed(() => Number(projectSummary.value['已报装']) || 0)
+const projectTodo = computed(() => Number(projectSummary.value['待报装']) || 0)
+const projectTotal = computed(() => projectDone.value + projectTodo.value)
+
+// 饼图数据源：根据 tab 切换不同维度
+const projectPieItems = computed<Array<{ name: string; value: number }>>(() => {
+  if (activeProjectTab.value === 1) {
+    // tab1：已报装 / 待报装（来自 summary）
+    return [
+      { name: '已报装', value: projectDone.value },
+      { name: '待报装', value: projectTodo.value }
+    ]
+  }
+  // tab2：按 speed 分组统计 dataList
+  const map: Record<string, number> = {}
+  projectList.value.forEach((item: any) => {
+    const key = item.speed || '其他'
+    map[key] = (map[key] || 0) + 1
+  })
+  return Object.entries(map).map(([name, value]) => ({ name, value }))
 })
-const projectTodoRate = computed(() => 100 - projectDoneRate.value)
+
+// 饼图总量（用于统计表算占比）
+const projectPieTotal = computed(() =>
+  projectPieItems.value.reduce((acc, item) => acc + item.value, 0)
+)
 
 // ============================================================
-// 能源装机情况（原逻辑，未改动）
+// 能源装机情况
 // ============================================================
 const energyTabs = ['能源发电量', '能源分布情况']
 const activeEnergyTab = ref<(typeof energyTabs)[number]>(energyTabs[0])
@@ -802,10 +788,10 @@ const energyOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 120, right: 46, top: 16, bottom: 68 },
+    grid: { left: 120, right: 66, top: 16, bottom: 68 },
     xAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -813,7 +799,7 @@ const energyOption = computed(() => {
     yAxis: {
       type: 'category',
       data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 28 },
       axisLine: { show: false },
       axisTick: { show: false }
     },
@@ -898,6 +884,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 20;
 }
 
 .panel-title {
@@ -947,17 +934,20 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   gap: 14px;
+  z-index: 30;
+  pointer-events: auto;
 }
 
 .panel-tabs--center {
   justify-content: center;
 }
-
 .panel-tabs--right {
   justify-content: center;
 }
 
 .tab {
+  position: relative;
+  z-index: 31;
   height: 56px;
   min-width: 280px;
   padding: 0 38px;
@@ -1015,20 +1005,18 @@ onMounted(() => {
 }
 
 .metric-label {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
-
 .metric-num {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
-
 .metric-unit {
-  font-size: 16px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
@@ -1038,7 +1026,7 @@ onMounted(() => {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   align-items: center;
 }
@@ -1063,6 +1051,7 @@ onMounted(() => {
   align-items: center;
   padding: 0 12px;
   box-sizing: border-box;
+  z-index: 20;
 }
 
 .resume-select {
@@ -1102,13 +1091,11 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
 }
-
 .resume-name {
   font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.9);
 }
-
 .resume-rate {
   font-size: 28px;
   font-weight: 900;
@@ -1122,19 +1109,16 @@ onMounted(() => {
   background: rgba(89, 194, 255, 0.12);
   overflow: hidden;
 }
-
 .resume-bar-fill {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(64, 243, 184, 0.18), rgba(64, 243, 184, 0.95));
 }
-
 .resume-bar--yellow .resume-bar-fill {
   background: linear-gradient(90deg, rgba(255, 226, 74, 0.2), rgba(255, 226, 74, 0.95));
 }
-
 .resume-desc {
-  font-size: 24px;
+  font-size: 34px;
   line-height: 1.5;
   color: rgba(214, 238, 255, 0.68);
 }
@@ -1146,7 +1130,6 @@ onMounted(() => {
   grid-template-rows: 140px 1fr;
   gap: 14px;
 }
-
 .pile-top {
   display: grid;
   grid-template-columns: 520px 1fr;
@@ -1222,7 +1205,6 @@ onMounted(() => {
   color: rgba(214, 238, 255, 0.86);
   letter-spacing: 2px;
 }
-
 .pile-top-left-value {
   display: inline-flex;
   align-items: baseline;
@@ -1267,35 +1249,30 @@ onMounted(() => {
   display: grid;
   gap: 4px;
 }
-
 .pile-top-right-sub {
   font-size: 18px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
   letter-spacing: 1px;
 }
-
 .pile-top-right-main {
   font-size: 18px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.82);
   letter-spacing: 2px;
 }
-
 .pile-top-right-metrics {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
 }
-
 .pile-top-right-val,
 .pile-top-right-yoy {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
 }
-
 .pile-top-right-yoy-label {
   font-size: 16px;
   font-weight: 900;
@@ -1305,7 +1282,6 @@ onMounted(() => {
 .pile-top-left .pile-num {
   font-size: 28px;
 }
-
 .pile-top-right .pile-num {
   font-size: 22px;
 }
@@ -1316,33 +1292,29 @@ onMounted(() => {
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .pile-num--cyan {
   color: rgba(51, 213, 255, 0.95);
   text-shadow: 0 0 12px rgba(51, 213, 255, 0.18);
 }
-
 .pile-num--yellow {
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .pile-unit {
   font-size: 16px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .pile-split {
   font-size: 16px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.42);
 }
-
 .pile-chart {
   min-height: 0;
 }
 
+/* ========== 重点项目面板 ========== */
 .project-body {
   height: 100%;
   min-height: 0;
@@ -1393,6 +1365,11 @@ onMounted(() => {
   margin-top: -180px;
 }
 
+.project-chart-wrap {
+  position: relative;
+  z-index: 1;
+}
+
 .project-base {
   position: absolute;
   width: 620px;
@@ -1402,6 +1379,7 @@ onMounted(() => {
   background: radial-gradient(circle at 50% 40%, rgba(54, 232, 255, 0.16), rgba(6, 18, 48, 0));
   transform: perspective(900px) rotateX(72deg) translateY(28px);
   box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
+  pointer-events: none;
 }
 
 .project-ring {
@@ -1433,8 +1411,8 @@ onMounted(() => {
   background: rgba(6, 18, 48, 0.42);
   overflow: hidden;
   min-height: 0;
-  margin-top: -180px;
-  margin-bottom: 20px;
+  margin-top: -280px;
+  margin-bottom: 80px;
 }
 
 .project-table-row {
@@ -1457,44 +1435,37 @@ onMounted(() => {
   border-radius: 999px;
   box-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .project-dot--done {
   background: rgba(51, 213, 255, 0.95);
 }
-
 .project-dot--todo {
   background: rgba(255, 226, 74, 0.95);
   box-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .project-name {
   font-size: 28px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.82);
 }
-
 .project-stat {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 10px;
 }
-
 .project-stat-label {
   font-size: 28px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .project-stat-value {
   font-size: 28px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
-
 .project-stat-unit {
   margin-left: 6px;
   font-size: 16px;
@@ -1520,21 +1491,17 @@ onMounted(() => {
   font-weight: 900;
   letter-spacing: 2px;
 }
-
 .energy-kpi-label {
   color: rgba(214, 238, 255, 0.78);
 }
-
 .energy-kpi-value {
   font-size: 28px;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .energy-kpi-unit {
   color: rgba(214, 238, 255, 0.62);
 }
-
 .energy-chart {
   min-height: 0;
   margin-top: -50px;

@@ -264,16 +264,16 @@ const regionTableData = ref([
   background: radial-gradient(circle, rgba(54, 232, 255, 0.2), transparent);
 }
 .left-stat-name {
-  font-size: 18px;
+  font-size: 34px;
   color: #e2f2ff;
 }
 .left-stat-val {
-  font-size: 24px;
+  font-size: 34px;
   font-weight: bold;
   color: #ffdd66;
 }
 .unit {
-  font-size: 16px;
+  font-size: 34px;
   margin-left: 4px;
   color: #82c8ff;
 }
@@ -305,18 +305,18 @@ const regionTableData = ref([
 }
 .region-table-head {
   display: grid;
-  grid-template-columns: 1fr 90px 90px 90px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   padding: 10px 12px;
   background: rgba(14, 40, 85, 0.5);
-  font-size: 17px;
+  font-size: 26px;
   color: #82c8ff;
   font-weight: 500;
 }
 .region-table-row {
   display: grid;
-  grid-template-columns: 1fr 90px 90px 90px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   padding: 9px 12px;
-  font-size: 17px;
+  font-size: 26px;
   color: rgba(214, 238, 255, 0.82);
   border-bottom: 1px solid rgba(84, 188, 255, 0.1);
 }

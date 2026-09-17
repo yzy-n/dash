@@ -149,20 +149,20 @@ const rebuildBarOption = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 40, right: 20, top: 30, bottom: 60 },
+    grid: { left: 120, right: 20, top: 60, bottom: 80 },
     xAxis: {
       type: 'category',
       data: ['市本级', '海城市', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区'],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 14, rotate: 35 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 26, rotate: 35 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '时限压缩比例',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 14 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       max: 100,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 14 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },  
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -202,18 +202,18 @@ const certBarOption = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 30, right: 20, top: 40, bottom: 60 },
+    grid: { left: 90, right: 20, top: 40, bottom: 60 },
     xAxis: {
       type: 'category',
       data: ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区'],
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 13 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 26 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       max: 60,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 13 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -463,7 +463,7 @@ const certBarOption = computed(() => {
   margin-bottom: 8px;
 }
 .cert-text {
-  font-size: 16px;
+  font-size: 26px;
   color: #82c8ff;
   text-align: center;
 }
@@ -474,11 +474,11 @@ const certBarOption = computed(() => {
   margin: 6px 0;
 }
 .cert-unit {
-  font-size: 16px;
+  font-size: 26px;
   color: #82c8ff;
 }
 .cert-small-text {
-  font-size: 14px;
+  font-size: 26px;
   color: #82c8ff;
   margin-top: 4px;
   text-align: center;

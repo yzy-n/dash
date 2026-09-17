@@ -406,7 +406,7 @@ const rightInnerMetrics: MetricRow[] = [
 .metrics {
   position: relative;
   display: block;
-  --metric-card-h: 170px;
+  --metric-card-h: 200px;
   --metric-gap: 18px;
   min-height: 0;
   z-index: 2;
@@ -536,19 +536,19 @@ const rightInnerMetrics: MetricRow[] = [
 
 .metric-row {
   display: grid;
-  grid-template-columns: 72px 1fr 26px;
+  grid-template-columns: 72px 1fr 124px;
   align-items: center;
   gap: 10px;
 }
 
 .metric-city {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
 
 .metric-val {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);

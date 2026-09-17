@@ -717,7 +717,7 @@ const forestOption = computed(() => {
   padding: 0 16px;
   border-top: 1px solid rgba(89, 194, 255, 0.12);
   color: rgba(214, 238, 255, 0.82);
-  font-size: 18px;
+  font-size: 30px;
   box-sizing: border-box;
 }
 
