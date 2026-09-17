@@ -4,7 +4,7 @@
       <div class="panel-head">
         <div class="panel-title">用电情况</div>
         <select v-model="dateElectric" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in electricDateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
       <div class="panel-tabs">
@@ -38,7 +38,7 @@
       <div class="panel-head">
         <div class="panel-title">用电容量情况</div>
         <select v-model="dateCapacity" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in capacityDateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
       <div class="panel-tabs">
@@ -72,7 +72,7 @@
       <div class="panel-head">
         <div class="panel-title">企业复工复产情况</div>
         <select v-model="dateResume" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in resumeDateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
       <div class="resume-filter">
@@ -114,7 +114,9 @@
       <div class="panel-head">
         <div class="panel-title">充电桩建设情况</div>
         <select v-model="datePile" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in pileDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="pile-body">
@@ -123,17 +125,19 @@
             <div class="pile-top-left-row">
               <div class="pile-top-left-label">现有商用充电站/桩</div>
               <div class="pile-top-left-value">
-                <span class="pile-num pile-num--cyan">60</span>
+                <span class="pile-num pile-num--cyan">{{
+                  pileSummary.commercialStation ?? '-'
+                }}</span>
                 <span class="pile-unit">站</span>
                 <span class="pile-split">/</span>
-                <span class="pile-num">217</span>
+                <span class="pile-num">{{ pileSummary.commercialPile ?? '-' }}</span>
                 <span class="pile-unit">个</span>
               </div>
             </div>
             <div class="pile-top-left-row">
               <div class="pile-top-left-label">现有民用充电桩</div>
               <div class="pile-top-left-value">
-                <span class="pile-num pile-num--yellow">2611</span>
+                <span class="pile-num pile-num--yellow">{{ pileSummary.civilPile ?? '-' }}</span>
                 <span class="pile-unit">个</span>
               </div>
             </div>
@@ -147,12 +151,14 @@
               </div>
               <div class="pile-top-right-metrics">
                 <div class="pile-top-right-val">
-                  <span class="pile-num">340.94</span>
+                  <span class="pile-num">{{ pileSummary.commercialPower ?? '-' }}</span>
                   <span class="pile-unit">万千瓦时</span>
                 </div>
                 <div class="pile-top-right-yoy">
                   <span class="pile-top-right-yoy-label">同比:</span>
-                  <span class="pile-num pile-num--cyan">32.06</span>
+                  <span class="pile-num pile-num--cyan">{{
+                    pileSummary.commercialYoy ?? '-'
+                  }}</span>
                   <span class="pile-unit">%</span>
                 </div>
               </div>
@@ -164,12 +170,12 @@
               </div>
               <div class="pile-top-right-metrics">
                 <div class="pile-top-right-val">
-                  <span class="pile-num">287.77</span>
+                  <span class="pile-num">{{ pileSummary.civilPower ?? '-' }}</span>
                   <span class="pile-unit">万千瓦时</span>
                 </div>
                 <div class="pile-top-right-yoy">
                   <span class="pile-top-right-yoy-label">同比:</span>
-                  <span class="pile-num pile-num--yellow">142.89</span>
+                  <span class="pile-num pile-num--yellow">{{ pileSummary.civilYoy ?? '-' }}</span>
                   <span class="pile-unit">%</span>
                 </div>
               </div>
@@ -186,20 +192,22 @@
       <div class="panel-head">
         <div class="panel-title">重点项目报装情况</div>
         <select v-model="dateProject" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in projectDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="panel-tabs panel-tabs--center">
         <button
           v-for="tab in projectTabs"
-          :key="tab"
+          :key="tab.type"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeProjectTab }"
+          :class="{ 'tab--active': tab.type === activeProjectTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeProjectTab = tab"
+          @click="handleProjectTabClick(tab.type)"
         >
-          {{ tab }}
+          {{ tab.label }}
         </button>
       </div>
       <div class="project-body">
@@ -260,7 +268,7 @@
       <div class="panel-head">
         <div class="panel-title">能源装机情况</div>
         <select v-model="dateEnergy" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <option v-for="item in energyDateOptions" :key="item" :value="item">{{ item }}</option>
         </select>
       </div>
       <div class="panel-tabs panel-tabs--right">
@@ -295,9 +303,20 @@ import { computed, ref, watch, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import ProjectPie3D from '../charts/ProjectPie3D.vue'
-import { getPowervolume, getPowertype } from '@/api/service'
+import {
+  getPowervolume,
+  getPowertype,
+  getReturnwork,
+  getChargeboard,
+  getReportboard
+} from '@/api/service'
 
-const dateOptions = [
+// ============================================================
+// 各面板独立时间下拉配置
+// ============================================================
+
+// 用电情况
+const electricDateOptions = [
   '2023-03',
   '2023-04',
   '2023-05',
@@ -310,12 +329,63 @@ const dateOptions = [
   '2023-12',
   '2024'
 ]
-const dateElectric = ref(dateOptions[0])
-const dateCapacity = ref(dateOptions[0])
-const dateResume = ref(dateOptions[1])
-const datePile = ref(dateOptions[2])
-const dateProject = ref(dateOptions[0])
-const dateEnergy = ref(dateOptions[0])
+const dateElectric = ref(electricDateOptions[0])
+
+// 用电容量情况
+const capacityDateOptions = [
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+]
+const dateCapacity = ref(capacityDateOptions[0])
+
+// 企业复工复产情况
+const resumeDateOptions = [
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+]
+const dateResume = ref(resumeDateOptions[1])
+
+// 充电桩建设情况（接口返回 timeOptions 会覆盖）
+const pileDateOptions = ref<string[]>(['2022年统计数据'])
+const datePile = ref<string>('2022年统计数据')
+
+// 重点项目报装情况
+const projectDateOptions = ['2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12']
+const dateProject = ref(projectDateOptions[0])
+
+// 能源装机情况
+const energyDateOptions = [
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+]
+const dateEnergy = ref(energyDateOptions[0])
 
 // ============================================================
 // 用电情况（接口版）
@@ -474,9 +544,6 @@ const capacityMetrics = computed(() => {
   ]
 })
 
-// ============================================================
-// 环形图（无 label，用 legend 展示类别 + 数值）
-// ============================================================
 const capacityRingOption = computed(() => {
   const list = capacityList.value
   const colors = ['#33d5ff', '#ffe24a', '#40f3b8', '#ffb84a', '#8b5cff']
@@ -562,12 +629,44 @@ const resumeProdRate = computed(() =>
 )
 
 // ============================================================
-// 充电桩建设情况（原逻辑，未改动）
+// 充电桩建设情况（接口版）
 // ============================================================
+const pileSummary = ref<Record<string, any>>({})
+const pileList = ref<any[]>([])
+
+const fetchPileData = async () => {
+  try {
+    const res: any = await getChargeboard({
+      souseDate: datePile.value
+    })
+    const data = res?.data ?? res ?? {}
+
+    pileSummary.value = data.summary ?? {}
+    pileList.value = data.dataList ?? []
+
+    // 用接口返回的时间选项覆盖下拉列表
+    const options: string[] = data.summary?.timeOptions ?? []
+    if (options.length) {
+      pileDateOptions.value = options
+      if (!options.includes(datePile.value)) {
+        datePile.value = data.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('充电桩建设情况查询失败', e)
+    pileSummary.value = {}
+    pileList.value = []
+  }
+}
+
+watch(datePile, () => {
+  fetchPileData()
+})
+
 const pileOption = computed(() => {
-  const districts = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
-  const privateVals = [14, 65, 6, 18, 9, 10, 4, 7]
-  const publicVals = [8, 12, 3, 10, 6, 7, 3, 5]
+  const districts = pileList.value.map((i: any) => i.areaName ?? '')
+  const commercialVals = pileList.value.map((i: any) => Number(i.commercialStation) || 0)
+  const civilVals = pileList.value.map((i: any) => Number(i.civilPile) || 0)
 
   return {
     backgroundColor: 'transparent',
@@ -598,7 +697,7 @@ const pileOption = computed(() => {
       {
         name: '商用充电站',
         type: 'bar',
-        data: publicVals,
+        data: commercialVals,
         barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
@@ -616,9 +715,9 @@ const pileOption = computed(() => {
         }
       },
       {
-        name: '民用充电站',
+        name: '民用充电桩',
         type: 'bar',
-        data: privateVals,
+        data: civilVals,
         barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
@@ -640,15 +739,51 @@ const pileOption = computed(() => {
 })
 
 // ============================================================
-// 重点项目报装情况（原逻辑，未改动）
+// 重点项目报装情况（接口版）
 // ============================================================
-const projectTabs = ['项目报装情况', '已报装项目详情']
-const activeProjectTab = ref<(typeof projectTabs)[number]>(projectTabs[0])
+const projectTabs = [
+  { type: 1, label: '项目报装情况' },
+  { type: 2, label: '已报装项目详情' }
+] as const
 
-const projectTotal = computed(() => (activeProjectTab.value === '项目报装情况' ? 35 : 35))
-const projectDone = computed(() => (activeProjectTab.value === '项目报装情况' ? 25 : 25))
-const projectTodo = computed(() => (activeProjectTab.value === '项目报装情况' ? 10 : 10))
-const projectDoneRate = computed(() => Math.round((projectDone.value / projectTotal.value) * 100))
+const activeProjectTab = ref<1 | 2>(1)
+
+const projectSummary = ref<Record<string, any>>({})
+const projectList = ref<any[]>([])
+
+const handleProjectTabClick = async (type: 1 | 2) => {
+  if (activeProjectTab.value === type) return
+  activeProjectTab.value = type
+  await fetchProjectData()
+}
+
+const fetchProjectData = async () => {
+  try {
+    const res: any = await getReportboard({
+      type: activeProjectTab.value,
+      souseDate: dateProject.value
+    })
+    const data = res?.data ?? res ?? {}
+    projectSummary.value = data.summary ?? {}
+    projectList.value = data.dataList ?? []
+  } catch (e) {
+    console.error('重点项目报装情况查询失败', e)
+    projectSummary.value = {}
+    projectList.value = []
+  }
+}
+
+watch(dateProject, () => {
+  fetchProjectData()
+})
+
+const projectTotal = computed(() => Number(projectSummary.value.projectTotal) || 0)
+const projectDone = computed(() => Number(projectSummary.value.projectDone) || 0)
+const projectTodo = computed(() => Number(projectSummary.value.projectTodo) || 0)
+const projectDoneRate = computed(() => {
+  if (!projectTotal.value) return 0
+  return Math.round((projectDone.value / projectTotal.value) * 100)
+})
 const projectTodoRate = computed(() => 100 - projectDoneRate.value)
 
 // ============================================================
@@ -712,6 +847,8 @@ const energyOption = computed(() => {
 onMounted(() => {
   fetchElectricData(activeElectricTab.value)
   fetchCapacityData(activeCapacityTab.value)
+  fetchPileData()
+  fetchProjectData()
 })
 </script>
 
@@ -1401,5 +1538,21 @@ onMounted(() => {
 .energy-chart {
   min-height: 0;
   margin-top: -50px;
+}
+
+/* 统一 select 展开后的选项背景 */
+.panel-date option,
+.resume-select option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.panel-date option:checked,
+.resume-select option:checked {
+  background: linear-gradient(0deg, #1a4d8c 0%, #1a4d8c 100%);
+  color: #fff;
 }
 </style>
