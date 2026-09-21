@@ -29,7 +29,10 @@
           </div>
         </div>
         <div class="electric-chart">
-          <EChart :option="electricPieOption" />
+          <EChart
+            :key="`electric-${activeElectricTab}-${dateElectric}`"
+            :option="electricPieOption"
+          />
         </div>
       </div>
     </section>
@@ -63,7 +66,10 @@
           </div>
         </div>
         <div class="capacity-chart">
-          <EChart :option="capacityRingOption" />
+          <EChart
+            :key="`capacity-${activeCapacityTab}-${dateCapacity}`"
+            :option="capacityRingOption"
+          />
         </div>
       </div>
     </section>
@@ -183,7 +189,7 @@
           </div>
         </div>
         <div class="pile-chart">
-          <EChart :option="pileOption" />
+          <EChart :key="`pile-${datePile}`" :option="pileOption" />
         </div>
       </div>
     </section>
@@ -266,24 +272,24 @@
       <div class="panel-tabs panel-tabs--right">
         <button
           v-for="tab in energyTabs"
-          :key="tab"
+          :key="tab.type"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeEnergyTab }"
+          :class="{ 'tab--active': tab.type === activeEnergyTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeEnergyTab = tab"
+          @click="handleEnergyTabClick(tab.type)"
         >
-          {{ tab }}
+          {{ tab.label }}
         </button>
       </div>
       <div class="energy-body">
         <div class="energy-kpi">
-          <span class="energy-kpi-label">能源总发电量</span>
+          <span class="energy-kpi-label">{{ energyKpiLabel }}</span>
           <span class="energy-kpi-value">{{ energyTotal }}</span>
-          <span class="energy-kpi-unit">万千瓦时</span>
+          <span class="energy-kpi-unit">{{ energyKpiUnit }}</span>
         </div>
         <div class="energy-chart">
-          <EChart :option="energyOption" />
+          <EChart :key="`energy-${activeEnergyTab}-${dateEnergy}`" :option="energyOption" />
         </div>
       </div>
     </section>
@@ -300,12 +306,9 @@ import {
   getPowertype,
   getReturnwork,
   getChargeboard,
-  getReportboard
+  getReportboard,
+  getInstalledcapacity
 } from '@/api/service'
-
-// ============================================================
-// 各面板独立时间下拉配置
-// ============================================================
 
 // 用电情况
 const electricDateOptions = [
@@ -370,12 +373,8 @@ const projectDateOptions = ref<string[]>([
 ])
 const dateProject = ref<string>(projectDateOptions.value[0])
 
-// 能源装机情况
-const energyDateOptions = [
-  '2023-03',
-  '2023-04',
-  '2023-05',
-  '2023-06',
+// 能源装机情况（接口返回 timeOptions 会覆盖）
+const energyDateOptions = ref<string[]>([
   '2023-07',
   '2023-08',
   '2023-09',
@@ -383,8 +382,8 @@ const energyDateOptions = [
   '2023-11',
   '2023-12',
   '2024'
-]
-const dateEnergy = ref(energyDateOptions[0])
+])
+const dateEnergy = ref<string>(energyDateOptions.value[0])
 
 // ============================================================
 // 用电情况（接口版）
@@ -744,21 +743,17 @@ watch(dateProject, () => {
   fetchProjectData()
 })
 
-// summary 数据（tab1 顶部 KPI 用）
 const projectDone = computed(() => Number(projectSummary.value['已报装']) || 0)
 const projectTodo = computed(() => Number(projectSummary.value['待报装']) || 0)
 const projectTotal = computed(() => projectDone.value + projectTodo.value)
 
-// 饼图数据源：根据 tab 切换不同维度
 const projectPieItems = computed<Array<{ name: string; value: number }>>(() => {
   if (activeProjectTab.value === 1) {
-    // tab1：已报装 / 待报装（来自 summary）
     return [
       { name: '已报装', value: projectDone.value },
       { name: '待报装', value: projectTodo.value }
     ]
   }
-  // tab2：按 speed 分组统计 dataList
   const map: Record<string, number> = {}
   projectList.value.forEach((item: any) => {
     const key = item.speed || '其他'
@@ -767,23 +762,103 @@ const projectPieItems = computed<Array<{ name: string; value: number }>>(() => {
   return Object.entries(map).map(([name, value]) => ({ name, value }))
 })
 
-// 饼图总量（用于统计表算占比）
 const projectPieTotal = computed(() =>
   projectPieItems.value.reduce((acc, item) => acc + item.value, 0)
 )
 
 // ============================================================
-// 能源装机情况
+// 能源装机情况（接口版）
 // ============================================================
-const energyTabs = ['能源发电量', '能源分布情况']
-const activeEnergyTab = ref<(typeof energyTabs)[number]>(energyTabs[0])
+const energyTabs = [
+  { type: 1, label: '能源发电量' },
+  { type: 2, label: '能源分布情况' }
+] as const
 
-const energyTotal = computed(() => (activeEnergyTab.value === '能源发电量' ? '618032' : '618032'))
+const activeEnergyTab = ref<1 | 2>(1)
+const energyList = ref<any[]>([])
+const energySummary = ref<Record<string, any>>({})
+
+const handleEnergyTabClick = async (type: 1 | 2) => {
+  if (activeEnergyTab.value === type) return
+  activeEnergyTab.value = type
+  await fetchEnergyData(type)
+}
+
+const fetchEnergyData = async (type: 1 | 2) => {
+  try {
+    const res: any = await getInstalledcapacity({
+      type,
+      souseDate: dateEnergy.value
+    })
+    console.log('[energy] type=', type, 'res=', res)
+    const data = res?.data ?? res ?? {}
+
+    energyList.value = data.dataList ?? []
+    energySummary.value = data.summary ?? {}
+    console.log('[energy] dataList=', energyList.value, 'summary=', energySummary.value)
+
+    const options: string[] = data.summary?.timeOptions ?? []
+    if (options.length) {
+      energyDateOptions.value = options
+      if (!options.includes(dateEnergy.value)) {
+        dateEnergy.value = data.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('能源装机情况查询失败', e)
+    energyList.value = []
+    energySummary.value = {}
+  }
+}
+
+watch(dateEnergy, () => {
+  fetchEnergyData(activeEnergyTab.value)
+})
+
+// KPI 显示：type=1 总装机量，type=2 项目总数
+const energyKpiLabel = computed(() =>
+  activeEnergyTab.value === 1 ? '能源总发电量' : '能源项目总数'
+)
+const energyKpiUnit = computed(() => (activeEnergyTab.value === 1 ? '万千瓦时' : '个'))
+
+const energyTotal = computed(() => {
+  if (activeEnergyTab.value === 2) {
+    // type=2 显示项目总数
+    const s = energySummary.value
+    const total = Number(s?.totalNum) || 0
+    return total ? String(total) : String(energyList.value.length || 0)
+  }
+  // type=1 显示总装机量
+  const s = energySummary.value
+  const total = Number(s?.totalNum) || Number(s?.totalPower) || 0
+  return total ? String(total) : '-'
+})
 
 const energyOption = computed(() => {
-  const categories = ['火电', '水电', '风电', '太阳能', '生物质']
-  const values =
-    activeEnergyTab.value === '能源分布情况' ? [55, 12, 20, 6, 7] : [558130, 714, 20114, 2697, 1269]
+  let categories: string[] = []
+  let values: number[] = []
+
+  if (activeEnergyTab.value === 1) {
+    // type=1：{ label, num }
+    categories = energyList.value.map((i: any) => i.label ?? '')
+    values = energyList.value.map((i: any) => Number(i.num) || 0)
+  } else {
+    // type=2：{ sendPowerType, place, deviceVolume, ... }
+    // 按发电类型统计数量
+    const map: Record<string, number> = {}
+    energyList.value.forEach((item: any) => {
+      const raw = item.sendPowerType || '其他'
+      // "风电、陆上风电" → 取"风电"
+      const key = raw.split('、')[0].trim() || '其他'
+      map[key] = (map[key] || 0) + 1
+    })
+    categories = Object.keys(map)
+    values = Object.values(map)
+  }
+
+  // 若 type=1 的最大值 ≤ 100，视为百分比
+  const maxVal = values.length ? Math.max(...values) : 0
+  const isPercent = activeEnergyTab.value === 1 && maxVal > 0 && maxVal <= 100
 
   return {
     backgroundColor: 'transparent',
@@ -791,7 +866,11 @@ const energyOption = computed(() => {
     grid: { left: 120, right: 66, top: 16, bottom: 68 },
     xAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: {
+        color: 'rgba(214, 238, 255, 0.55)',
+        fontSize: 28,
+        formatter: isPercent ? '{value}%' : '{value}'
+      },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -835,6 +914,7 @@ onMounted(() => {
   fetchCapacityData(activeCapacityTab.value)
   fetchPileData()
   fetchProjectData()
+  fetchEnergyData(activeEnergyTab.value)
 })
 </script>
 

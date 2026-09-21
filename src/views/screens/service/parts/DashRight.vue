@@ -4,24 +4,28 @@
       <section class="panel panel--gas">
         <div class="panel-head">
           <div class="panel-title">燃气</div>
-          <div class="panel-date">2022年统计数据</div>
+          <select v-model="dateGas" class="panel-date-select">
+            <option v-for="item in gasDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="panel-tabs">
           <button
             v-for="tab in gasTabs"
-            :key="tab"
+            :key="tab.type"
             type="button"
             class="tab"
-            :class="{ 'tab--active': tab === activeGasTab }"
+            :class="{ 'tab--active': tab.type === activeGasTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeGasTab = tab"
+            @click="handleGasTabClick(tab.type)"
           >
-            {{ tab }}
+            {{ tab.label }}
           </button>
         </div>
         <div class="gas-stage">
           <div class="gas-gauge">
-            <EChart :option="gasOption" />
+            <EChart :key="`gas-${activeGasTab}-${dateGas}`" :option="gasOption" />
           </div>
           <div class="gas-icon"></div>
           <div
@@ -42,7 +46,11 @@
       <section class="panel panel--tower">
         <div class="panel-head">
           <div class="panel-title">通信铁塔建设情况</div>
-          <div class="panel-date">2022年统计数据</div>
+          <select v-model="dateTower" class="panel-date-select" @change="fetchTowerData">
+            <option v-for="item in towerDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="tower-kpi">
           <span class="tower-kpi-label">全市通信铁塔数量</span>
@@ -51,14 +59,14 @@
         </div>
         <div class="tower-body">
           <div class="tower-chart">
-            <EChart :option="towerOption" />
+            <EChart :key="`tower-${dateTower}`" :option="towerOption" />
           </div>
           <div class="tower-legend">
             <div v-for="item in towerLegend" :key="item.label" class="tower-legend-row">
               <div class="tower-legend-label">{{ item.label }}</div>
               <div class="tower-legend-value">
-                <span class="tower-legend-num">{{ item.value }}</span>
-                <span class="tower-legend-unit">{{ item.unit }}</span>
+                <span class="tower-legend-num">{{ item.num }}</span>
+                <span class="tower-legend-unit">个</span>
               </div>
               <div class="tower-legend-rate">{{ item.rate }}</div>
             </div>
@@ -71,38 +79,52 @@
       <section class="panel panel--water">
         <div class="panel-head">
           <div class="panel-title">用水</div>
-          <div class="panel-date">2022年统计数据</div>
+          <select v-model="dateWater" class="panel-date-select">
+            <option v-for="item in waterDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="water-filter">
-          <select v-model="activeWaterType" class="water-select">
-            <option v-for="item in waterTypes" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="activeWaterType"
+            class="panel-date-select water-type-select"
+            @change="fetchWaterData"
+          >
+            <option v-for="item in waterTypes" :key="item.type" :value="item.type">
+              {{ item.label }}
+            </option>
           </select>
         </div>
         <div class="water-chart">
-          <EChart :option="waterOption" />
+          <EChart :key="`water-${activeWaterType}-${dateWater}`" :option="waterOption" />
         </div>
       </section>
 
       <section class="panel panel--heat">
         <div class="panel-head">
           <div class="panel-title">供暖情况</div>
-          <div class="panel-date">2022年统计数据</div>
+          <select v-model="dateHeat" class="panel-date-select" @change="fetchHeatData">
+            <option v-for="item in heatDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in heatTabs"
-            :key="tab"
+            :key="tab.type"
             type="button"
             class="tab"
-            :class="{ 'tab--active': tab === activeHeatTab }"
+            :class="{ 'tab--active': tab.type === activeHeatTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeHeatTab = tab"
+            @click="handleHeatTabClick(tab.type)"
           >
-            {{ tab }}
+            {{ tab.label }}
           </button>
         </div>
         <div class="heat-list">
-          <div v-for="row in heatRows" :key="row.label" class="heat-row">
+          <div v-for="row in heatList" :key="row.label" class="heat-row">
             <span class="heat-icon"></span>
             <span class="heat-label">{{ row.label }}</span>
             <span class="heat-value">{{ row.value }}</span>
@@ -113,63 +135,52 @@
     </div>
 
     <div class="col">
-      <!-- 红十字会：高度由内容撑开，不抢占剩余高度 -->
       <section class="panel panel--red">
         <div class="panel-head red-panel-head">
           <div class="panel-title">红十字会</div>
-          <div class="panel-date">2022年统计数据</div>
+          <select v-model="dateRed" class="panel-date-select" @change="fetchRedData">
+            <option v-for="item in redDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="red-inner">
-          <!-- 顶部两行 -->
           <div class="red-top-item">
             <div class="red-top-icon"></div>
-            <div class="red-top-label">造血干细胞捐献</div>
-            <div class="red-top-val">8485 <span>人</span></div>
+            <div class="red-top-label">{{ redTopItems[0].label }}</div>
+            <div class="red-top-val">
+              {{ redTopItems[0].value }}
+              <span>{{ redTopItems[0].unit }}</span>
+            </div>
           </div>
           <div class="red-top-item">
             <div class="red-top-icon"></div>
-            <div class="red-top-label">捐献造血干细胞实际捐献</div>
-            <div class="red-top-val">28 <span>例</span></div>
+            <div class="red-top-label">{{ redTopItems[1].label }}</div>
+            <div class="red-top-val">
+              {{ redTopItems[1].value }}
+              <span>{{ redTopItems[1].unit }}</span>
+            </div>
           </div>
 
-          <!-- 5个模块卡片 -->
           <div class="red-card-wrap">
-            <div class="red-card">
+            <div v-for="card in redCards" :key="card.key" class="red-card">
               <div class="red-card-icon"></div>
-              <div class="red-card-name">遗体捐献</div>
-              <div class="red-card-num">61 <span>例</span></div>
-            </div>
-            <div class="red-card">
-              <div class="red-card-icon"></div>
-              <div class="red-card-name">眼组织捐献</div>
-              <div class="red-card-num">24 <span>例</span></div>
-            </div>
-            <div class="red-card">
-              <div class="red-card-icon"></div>
-              <div class="red-card-name">器官捐献</div>
-              <div class="red-card-num">15 <span>例</span></div>
-            </div>
-            <div class="red-card">
-              <div class="red-card-icon"></div>
-              <div class="red-card-name">肝脏捐献</div>
-              <div class="red-card-num">15 <span>个</span></div>
-            </div>
-            <div class="red-card">
-              <div class="red-card-icon"></div>
-              <div class="red-card-name">肾脏捐献</div>
-              <div class="red-card-num">30 <span>个</span></div>
+              <div class="red-card-name">{{ card.label }}</div>
+              <div class="red-card-num">
+                {{ card.value }}
+                <span>{{ card.unit }}</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- AED占剩下全部高度 -->
       <section class="panel--aed">
         <div class="panel-head panel-head--center">
           <div class="panel-title">AED分布图</div>
         </div>
         <div class="aed-chart">
-          <EChart :option="aedOption" />
+          <EChart :key="`aed-${aedList.length}`" :option="aedOption" />
         </div>
       </section>
     </div>
@@ -177,45 +188,79 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
+import {
+  getNaturalgas,
+  getWaterboard,
+  getCruciformsociety,
+  getStationbuild,
+  getHeatboard,
+  getAedcondition
+} from '@/api/service'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 
-const gasTabs = ['煤气', '天然气', '液化石油气']
-const activeGasTab = ref<(typeof gasTabs)[number]>(gasTabs[0])
+// ============================================================
+// 燃气（接口版）
+// ============================================================
+const gasTabs = [
+  { type: 1, label: '煤气' },
+  { type: 2, label: '天然气' }
+] as const
+
+const activeGasTab = ref<1 | 2>(1)
+
+const gasDateOptions = ref<string[]>(['2022年统计数据', '2024至2025', '2025年'])
+const dateGas = ref<string>('2025年')
+
+const gasSummary = ref<Record<string, any>>({})
+
+const handleGasTabClick = async (type: 1 | 2) => {
+  if (activeGasTab.value === type) return
+  activeGasTab.value = type
+  await fetchGasData()
+}
+
+const fetchGasData = async () => {
+  try {
+    const res: any = await getNaturalgas({
+      type: activeGasTab.value,
+      souseDate: dateGas.value
+    })
+    const data = res?.dataList ?? []
+    gasSummary.value = data[0] ?? {}
+
+    const options: string[] = res?.summary?.timeOptions ?? []
+    if (options.length) {
+      gasDateOptions.value = options
+      if (!options.includes(dateGas.value)) {
+        dateGas.value = res?.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('燃气数据查询失败', e)
+    gasSummary.value = {}
+  }
+}
+
+watch(dateGas, () => {
+  fetchGasData()
+})
 
 const gasMetrics = computed(() => {
-  const map = {
-    煤气: [
-      { pos: 'lt', label: '家庭用户', value: '738000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '13743', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '136.3', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '9124', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '2033', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '745763', unit: '户' }
-    ],
-    天然气: [
-      { pos: 'lt', label: '家庭用户', value: '812000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '15240', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '152.1', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '10230', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '2360', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '801340', unit: '户' }
-    ],
-    液化石油气: [
-      { pos: 'lt', label: '家庭用户', value: '398000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '6240', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '86.6', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '4312', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '980', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '402115', unit: '户' }
-    ]
-  } as const
-  return map[activeGasTab.value]
+  const s = gasSummary.value
+  return [
+    { pos: 'lt', label: '家庭用户', value: s.familyNum ?? '-', unit: '户' },
+    { pos: 'rt', label: '供气总量', value: s.gasTotal ?? '-', unit: '万立方米' },
+    { pos: 'lm', label: '用气人口', value: s.gasPopu ?? '-', unit: '万人' },
+    { pos: 'rm', label: '家庭用量', value: s.familyNum ?? '-', unit: '万立方米' },
+    { pos: 'lb', label: '管道长度', value: s.pipelineLength ?? '-', unit: '公里' },
+    { pos: 'rb', label: '用户户数', value: s.houseNum ?? '-', unit: '户' }
+  ]
 })
 
 const gasOption = computed(() => {
-  const value = activeGasTab.value === '煤气' ? 68 : activeGasTab.value === '天然气' ? 72 : 55
+  const value = Number(gasSummary.value.gaugeValue) || 0
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
@@ -288,16 +333,56 @@ const gasOption = computed(() => {
   }
 })
 
-const waterTypes = ['综合生产能力', '城区合计']
-const activeWaterType = ref<(typeof waterTypes)[number]>(waterTypes[0])
+// ============================================================
+// 用水（接口版）
+// ============================================================
+const waterDateOptions = ref<string[]>(['2022年统计数据'])
+const dateWater = ref<string>('2022年统计数据')
+
+const waterTypes = [
+  { type: 1, label: '综合生产能力' },
+  { type: 2, label: '供水能力' },
+  { type: 3, label: '城区合计' }
+]
+const activeWaterType = ref<number>(waterTypes[0].type)
+
+const waterList = ref<Array<{ areaName: string; num: string; typeName: string }>>([])
+
+const fetchWaterData = async () => {
+  try {
+    const res: any = await getWaterboard({
+      type: activeWaterType.value,
+      souseDate: dateWater.value
+    })
+
+    waterList.value = res?.dataList ?? []
+
+    const options: string[] = res?.summary?.timeOptions ?? []
+    if (options.length) {
+      waterDateOptions.value = options
+      if (!options.includes(dateWater.value)) {
+        dateWater.value = res?.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('用水数据查询失败', e)
+    waterList.value = []
+  }
+}
+
+watch(dateWater, () => {
+  fetchWaterData()
+})
 
 const waterOption = computed(() => {
-  const x = ['城区合计', '海城市', '台安县', '岫岩县']
-  const y = activeWaterType.value === '综合生产能力' ? [55, 10, 3, 2] : [36, 12, 4, 3]
+  const list = waterList.value
+  const x = list.map((i) => i.areaName)
+  const y = list.map((i) => Number(i.num) || 0)
+
   return {
     backgroundColor: 'transparent',
     tooltip: { show: true },
-    grid: { left: 70, right: 26, top: 46, bottom: 30 },
+    grid: { left: 90, right: 26, top: 46, bottom: 30 },
     xAxis: {
       type: 'category',
       data: x,
@@ -330,28 +415,60 @@ const waterOption = computed(() => {
               { offset: 1, color: 'rgba(51, 213, 255, 0.12)' }
             ]
           }
+        },
+        label: {
+          show: true,
+          position: 'top',
+          color: 'rgba(240, 251, 255, 0.92)',
+          fontSize: 22,
+          fontWeight: 900
         }
       }
     ]
   }
 })
 
-const towerTotal = '4710'
-const towerLegend = [
-  { label: '地面站', value: '2564', unit: '个', rate: '54.44%' },
-  { label: '楼面站', value: '1674', unit: '个', rate: '35.54%' },
-  { label: 'H杆', value: '472', unit: '个', rate: '10.02%' }
-]
+// ============================================================
+// 通信铁塔（接口版）
+// ============================================================
+const towerDateOptions = ref<string[]>(['2022年统计数据'])
+const dateTower = ref<string>('2022年统计数据')
+
+const towerTotal = ref<string>('-')
+const towerLegend = ref<Array<{ label: string; num: string; rate: string }>>([])
+
+const fetchTowerData = async () => {
+  try {
+    const res: any = await getStationbuild({
+      souseDate: dateTower.value
+    })
+
+    const list: Array<{ label: string; num: string; rate: string }> = res?.dataList ?? []
+    towerLegend.value = list
+    towerTotal.value = res?.summary?.totalNum ?? '-'
+
+    const options: string[] = res?.summary?.timeOptions ?? []
+    if (options.length) {
+      towerDateOptions.value = options
+      if (!options.includes(dateTower.value)) {
+        dateTower.value = res?.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('通信铁塔数据查询失败', e)
+    towerLegend.value = []
+    towerTotal.value = '-'
+  }
+}
 
 const towerOption = computed(() => {
-  const data = [
-    { name: '地面站', value: 2564 },
-    { name: '楼面站', value: 1674 },
-    { name: 'H杆', value: 472 }
-  ]
+  const data = towerLegend.value.map((item) => ({
+    name: item.label,
+    value: Number(item.num) || 0
+  }))
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: { show: true },
     series: [
       {
         type: 'pie',
@@ -366,84 +483,233 @@ const towerOption = computed(() => {
   }
 })
 
-const heatTabs = ['供暖能力', '供暖组织']
-const activeHeatTab = ref<(typeof heatTabs)[number]>(heatTabs[0])
+// ============================================================
+// 供暖（接口版）
+// ============================================================
+const heatDateOptions = ref<string[]>(['2022年统计数据'])
+const dateHeat = ref<string>('2022年统计数据')
 
-const heatRows = computed(() => {
-  const map = {
-    供暖能力: [
-      { label: '供热能力', value: '4466', unit: '兆瓦' },
-      { label: '集中供热面积', value: '8160', unit: '万平方米' },
-      { label: '供热总量', value: '4125', unit: '万吉焦' },
-      { label: '一级管网', value: '815', unit: '公里' },
-      { label: '二级管网', value: '3586', unit: '公里' }
-    ],
-    供暖组织: [
-      { label: '供热单位', value: '68', unit: '家' },
-      { label: '热源点', value: '12', unit: '处' },
-      { label: '换热站', value: '156', unit: '座' },
-      { label: '一级管网', value: '815', unit: '公里' },
-      { label: '二级管网', value: '3586', unit: '公里' }
-    ]
-  } as const
-  return map[activeHeatTab.value]
+const heatTabs = [
+  { type: 1, label: '供暖能力' },
+  { type: 2, label: '供暖组织' }
+] as const
+
+const activeHeatTab = ref<1 | 2>(1)
+
+const heatList = ref<Array<{ label: string; value: string; unit: string }>>([])
+
+const handleHeatTabClick = async (type: 1 | 2) => {
+  if (activeHeatTab.value === type) return
+  activeHeatTab.value = type
+  await fetchHeatData()
+}
+
+const fetchHeatData = async () => {
+  try {
+    const res: any = await getHeatboard({
+      type: activeHeatTab.value,
+      souseDate: dateHeat.value
+    })
+
+    heatList.value = res?.dataList ?? []
+
+    const options: string[] = res?.summary?.timeOptions ?? []
+    if (options.length) {
+      heatDateOptions.value = options
+      if (!options.includes(dateHeat.value)) {
+        dateHeat.value = res?.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('供暖数据查询失败', e)
+    heatList.value = []
+  }
+}
+
+watch(dateHeat, () => {
+  fetchHeatData()
 })
 
-const redTopRows = [
-  { label: '造血干细胞捐献', value: '8485', unit: '人' },
-  { label: '捐献造血干细胞实际捐献', value: '28', unit: '例' }
-]
+// ============================================================
+// 红十字会（接口版）
+// ============================================================
+const redDateOptions = ref<string[]>(['2022年统计数据', '2023年度'])
+const dateRed = ref<string>('2022年统计数据')
 
-const redCards = [
-  { label: '遗体捐献', value: '61', unit: '例' },
-  { label: '眼组织捐献', value: '24', unit: '例' },
-  { label: '器官捐献', value: '15', unit: '例' },
-  { label: '肝脏捐献', value: '15', unit: '个' },
-  { label: '肾脏捐献', value: '30', unit: '个' }
-]
+const redMap = ref<Record<string, string>>({})
+
+const fetchRedData = async () => {
+  try {
+    const res: any = await getCruciformsociety({
+      souseDate: dateRed.value
+    })
+
+    const list: Array<{ key: string; label: string; value: string }> = res?.dataList ?? []
+
+    const map: Record<string, string> = {}
+    list.forEach((item) => {
+      if (item?.key) map[item.key] = item.value
+    })
+    redMap.value = map
+
+    const options: string[] = res?.summary?.timeOptions ?? []
+    if (options.length) {
+      redDateOptions.value = options
+      if (!options.includes(dateRed.value)) {
+        dateRed.value = res?.summary?.souseDate ?? options[0]
+      }
+    }
+  } catch (e) {
+    console.error('红十字会数据查询失败', e)
+    redMap.value = {}
+  }
+}
+
+const redTopItems = computed(() => {
+  const m = redMap.value
+  return [
+    { key: 'stemCellsNum', label: '造血干细胞捐献', value: m.stemCellsNum ?? '-', unit: '人' },
+    {
+      key: 'stemCellsCases',
+      label: '捐献造血干细胞实际捐献',
+      value: m.stemCellsCases ?? '-',
+      unit: '例'
+    }
+  ]
+})
+
+const redCards = computed(() => {
+  const m = redMap.value
+  return [
+    { key: 'remainsCases', label: '遗体捐献', value: m.remainsCases ?? '-', unit: '例' },
+    {
+      key: 'ocularTissueCases',
+      label: '眼组织捐献',
+      value: m.ocularTissueCases ?? '-',
+      unit: '例'
+    },
+    { key: 'organCases', label: '器官捐献', value: m.organCases ?? '-', unit: '例' },
+    { key: 'heparNum', label: '肝脏捐献', value: m.heparNum ?? '-', unit: '个' },
+    { key: 'kidneyNum', label: '肾脏捐献', value: m.kidneyNum ?? '-', unit: '个' }
+  ]
+})
+
+// ============================================================
+// AED（接口版）
+// ============================================================
+type AedItem = {
+  putPlace: string
+  putTime: string
+  contacts: string
+  phone: string
+  status: string
+  lng: number
+  lat: number
+}
+
+const aedList = ref<AedItem[]>([])
+
+// 归一化经纬度：确保第一个是经度（~122-124），第二个是纬度（~40-42）
+function normalizeLngLat(lng: number, lat: number): [number, number] {
+  // 鞍山经度大约 122-124，纬度大约 40-42
+  // 如果 lng 落在 40-42 且 lat 落在 122-124，说明写反了，交换
+  if (lng > 40 && lng < 42 && lat > 122 && lat < 124) {
+    return [lat, lng]
+  }
+  return [lng, lat]
+}
+
+const fetchAedData = async () => {
+  try {
+    const res: any = await getAedcondition()
+    console.log('[aed] res=', res)
+
+    const list: AedItem[] = res?.dataList ?? []
+
+    // 归一化经纬度
+    aedList.value = list.map((item) => {
+      const [lng, lat] = normalizeLngLat(Number(item.lng), Number(item.lat))
+      return { ...item, lng, lat }
+    })
+    console.log('[aed] normalized list=', aedList.value)
+  } catch (e) {
+    console.error('AED数据查询失败', e)
+    aedList.value = []
+  }
+}
 
 const aedOption = computed(() => {
-  const points = [
-    [26, 70],
-    [34, 62],
-    [42, 58],
-    [56, 64],
-    [62, 52],
-    [48, 46],
-    [38, 44],
-    [30, 40],
-    [70, 38],
-    [78, 44],
-    [68, 58],
-    [58, 72],
-    [40, 76],
-    [22, 56],
-    [82, 62]
-  ]
+  const points = aedList.value.map((item) => ({
+    value: [item.lng, item.lat],
+    name: item.putPlace,
+    putTime: item.putTime,
+    contacts: item.contacts,
+    phone: item.phone,
+    status: item.status
+  }))
+
   return {
     backgroundColor: 'transparent',
-    grid: { left: 0, right: 0, top: 0, bottom: 0 },
-    xAxis: { show: false, min: 0, max: 100 },
-    yAxis: { show: false, min: 0, max: 100 },
+    grid: { left: 30, right: 30, top: 20, bottom: 20 },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 27, 72, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.4)',
+      borderWidth: 1,
+      textStyle: { color: '#eaf4ff', fontSize: 14 },
+      formatter: (params: any) => {
+        const d = params.data
+        if (!d) return ''
+        return `
+          <div style="font-weight:900;margin-bottom:6px;">${d.name}</div>
+          <div>联系人：${d.contacts}</div>
+          <div>电话：${d.phone}</div>
+          <div>投放时间：${d.putTime}</div>
+          <div>状态：${d.status}</div>
+        `
+      }
+    },
+    xAxis: {
+      type: 'value',
+      min: 122.5,
+      max: 123.3,
+      show: false
+    },
+    yAxis: {
+      type: 'value',
+      min: 40.8,
+      max: 41.3,
+      show: false
+    },
     series: [
       {
         type: 'scatter',
         coordinateSystem: 'cartesian2d',
-        data: points.map((p) => ({ value: [p[0], p[1]] })),
-        symbol: 'pin',
-        symbolSize: 34,
-        itemStyle: { color: '#ff3b3b' },
-        label: {
-          show: true,
-          formatter: 'AED',
-          color: '#fff',
-          fontSize: 12,
-          fontWeight: 900,
-          offset: [0, -6]
+        data: points,
+        symbolSize: 12,
+        itemStyle: {
+          color: '#ff3b3b',
+          shadowBlur: 14,
+          shadowColor: 'rgba(255, 59, 59, 0.6)'
+        },
+        emphasis: {
+          scale: 1.8
         }
       }
     ]
   }
+})
+
+// ============================================================
+// 生命周期
+// ============================================================
+onMounted(() => {
+  fetchGasData()
+  fetchWaterData()
+  fetchTowerData()
+  fetchHeatData()
+  fetchRedData()
+  fetchAedData()
 })
 </script>
 
@@ -517,7 +783,7 @@ const aedOption = computed(() => {
   justify-content: space-between;
   z-index: 2;
 }
-/* 红十字头部：标题左，日期右 */
+
 .red-panel-head {
   justify-content: space-between;
 }
@@ -541,6 +807,39 @@ const aedOption = computed(() => {
   justify-content: center;
 }
 
+.panel-date-select {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(78, 184, 255, 0.22);
+  background: rgba(5, 26, 66, 0.45);
+  color: rgba(209, 234, 255, 0.86);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.panel-date-select option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.panel-date-select option:checked {
+  background: linear-gradient(0deg, #1a4d8c 0%, #1a4d8c 100%);
+  color: #fff;
+}
+
 .panel-tabs {
   position: absolute;
   left: 26px;
@@ -557,25 +856,43 @@ const aedOption = computed(() => {
 }
 
 .tab {
+  position: relative;
+  z-index: 31;
+  height: 56px;
+  min-width: 280px;
+  padding: 0 38px;
   border: none;
   outline: none;
-  height: 42px;
-  min-width: 170px;
-  padding: 0 20px;
-  border-radius: 999px;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  color: rgba(214, 238, 255, 0.76);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: rgba(214, 238, 255, 0.52);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  opacity: 0.72;
+  filter: saturate(0.85);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 12px #7cf,
+    0 0 24px #0cf,
+    0 0 40px #00a8ff;
+  letter-spacing: 2px;
 }
 
 .tab--active {
-  color: rgba(240, 251, 255, 0.96);
-  text-shadow: 0 0 12px rgba(54, 232, 255, 0.22);
+  color: #eaf4ff;
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
+  text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 
 .panel--gas {
@@ -653,29 +970,24 @@ const aedOption = computed(() => {
   left: 40px;
   top: 180px;
 }
-
 .gas-metric--rt {
   right: 40px;
   top: 180px;
 }
-
 .gas-metric--lm {
   left: 40px;
   top: 54%;
   transform: translateY(-50%);
 }
-
 .gas-metric--rm {
   right: 40px;
   top: 54%;
   transform: translateY(-50%);
 }
-
 .gas-metric--lb {
   left: 40px;
   bottom: 80px;
 }
-
 .gas-metric--rb {
   right: 40px;
   bottom: 80px;
@@ -780,30 +1092,7 @@ const aedOption = computed(() => {
   position: absolute;
   top: 78px;
   right: 26px;
-  width: 360px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid rgba(84, 188, 255, 0.22);
-  background: rgba(6, 18, 48, 0.34);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  box-sizing: border-box;
   z-index: 2;
-}
-
-.water-select {
-  width: 100%;
-  height: 100%;
-  appearance: none;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: rgba(240, 251, 255, 0.92);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
 }
 
 .water-chart {
@@ -822,9 +1111,8 @@ const aedOption = computed(() => {
   display: grid;
   gap: 6px;
   margin-top: 90px;
-  /* 删除 margin-bottom:160px; 这个在这里无效 */
-  padding-bottom: 160px; /* ✅ 使用padding代替margin，实现底部留白 */
-  box-sizing: border-box; /* 必须加上，padding不会撑大高度 */
+  padding-bottom: 160px;
+  box-sizing: border-box;
 }
 
 .heat-row {
@@ -887,9 +1175,8 @@ const aedOption = computed(() => {
   box-sizing: border-box;
 }
 
-/* 顶部两行条目 */
 .red-top-item {
-  flex-shrink: 0; /* 禁止压缩 */
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   height: 80px;
@@ -899,6 +1186,7 @@ const aedOption = computed(() => {
   padding: 0 20px;
   position: relative;
 }
+
 .red-top-item::before {
   content: '';
   position: absolute;
@@ -909,21 +1197,25 @@ const aedOption = computed(() => {
   background: linear-gradient(90deg, rgba(40, 120, 220, 0.45), transparent);
   clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
 }
+
 .red-top-icon {
   width: 40px;
   height: 40px;
   z-index: 1;
   margin-right: 16px;
 }
+
 .red-top-label {
   flex: 1;
   font-size: 34px;
   color: #ffffff;
 }
+
 .red-top-val {
   font-size: 32px;
   color: #f9e784;
 }
+
 .red-top-val span {
   font-size: 24px;
   color: #fff;
@@ -931,16 +1223,16 @@ const aedOption = computed(() => {
 }
 
 .red-card-wrap {
-  flex: 1; /* ✅ 关键，把剩下全部高度给这个容器 */
+  flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 14px;
   align-content: stretch;
 }
+
 .red-card {
   position: relative;
-  /* 不要写固定height，用min-height，卡片自身高度由内容决定 */
   min-height: 140px;
   border: 1px solid rgba(80, 160, 255, 0.3);
   border-radius: 10px;
@@ -951,28 +1243,31 @@ const aedOption = computed(() => {
   justify-content: center;
   padding-top: 24px;
 }
+
 .red-card-icon {
   position: absolute;
   top: -14px;
   width: 48px;
   height: 48px;
 }
+
 .red-card-name {
   font-size: 34px;
   color: #fff;
   text-align: center;
   margin-bottom: 12px;
 }
+
 .red-card-num {
   font-size: 34px;
   color: #f9e784;
 }
+
 .red-card-num span {
   font-size: 24px;
   color: #fff;
 }
 
-/* AED面板占剩下全部高度 */
 .panel--aed {
   flex: 1;
   min-height: 0;

@@ -149,6 +149,9 @@
 </template>
 
 <script setup lang="ts">
+import { getUrbanfacilities } from '@/api/service'
+import { ref, onMounted } from 'vue'
+
 type MetricRow = {
   label: string
   anshan: string
@@ -157,143 +160,88 @@ type MetricRow = {
   liaoningTrend?: 'up' | 'down'
 }
 
-const leftOuterMetrics: MetricRow[] = [
-  {
-    label: '人均日生活用水量（升）',
-    anshan: '123.46',
-    liaoning: '153.41',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '供水普及率（%）',
-    anshan: '99.85',
-    liaoning: '97.59',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '公共排水普及率（%）',
-    anshan: '99.85',
-    liaoning: '96.28',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '燃气普及率（%）',
-    anshan: '99.11',
-    liaoning: '95.88',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '排水管道密度（公里/平方公里）',
-    anshan: '5.66',
-    liaoning: '7.11',
-    anshanTrend: 'down',
-    liaoningTrend: 'up'
-  },
-  {
-    label: '污水处理率（%）',
-    anshan: '96.54',
-    liaoning: '98.46',
-    anshanTrend: 'down',
-    liaoningTrend: 'up'
-  }
-]
+type ApiItem = {
+  type: string
+  name: string
+  provinceNum: string
+  cityNum: string
+  municipalNum: string
+  tCounty: string
+  xCounty: string
+  hCounty: string
+}
 
-const leftInnerMetrics: MetricRow[] = [
-  {
-    label: '人口密度（人/平方公里）',
-    anshan: '2115.24',
-    liaoning: '1781.44',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '供水管道密度（公里/平方公里）',
-    anshan: '17.14',
-    liaoning: '12.19',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '建成区路网密度（公里/平方公里）',
-    anshan: '7.63',
-    liaoning: '7.43',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  }
-]
+const leftOuterMetrics = ref<MetricRow[]>([])
+const leftInnerMetrics = ref<MetricRow[]>([])
+const rightOuterMetrics = ref<MetricRow[]>([])
+const rightInnerMetrics = ref<MetricRow[]>([])
 
-const rightOuterMetrics: MetricRow[] = [
-  {
-    label: '人均城市道路面积（平方米）',
-    anshan: '21.01',
-    liaoning: '22.03',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '人均公园绿地面积（平方米）',
-    anshan: '12.93',
-    liaoning: '13.28',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '建成区绿地率（%）',
-    anshan: '35.66',
-    liaoning: '35.55',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '建成区绿化覆盖率（%）',
-    anshan: '36.92',
-    liaoning: '38.04',
-    anshanTrend: 'down',
-    liaoningTrend: 'up'
-  },
-  {
-    label: '生活垃圾处理率（%）',
-    anshan: '100',
-    liaoning: '99.35',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '生活垃圾无害化处理率（%）',
-    anshan: '100',
-    liaoning: '98.69',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  }
-]
+// 名称 -> 单位
+const UNIT_MAP: Record<string, string> = {
+  人均住房建筑面积: '平方米',
+  人均日生活用水量: '升',
+  人均日生活用电量: '千瓦时',
+  人均公园绿地面积: '平方米',
+  人均城市道路面积: '平方米',
+  建成区绿化覆盖率: '%',
+  污水处理率: '%',
+  燃气普及率: '%',
+  供水普及率: '%',
+  集中供热普及率: '%',
+  生活垃圾无害化处理率: '%'
+}
 
-const rightInnerMetrics: MetricRow[] = [
-  {
-    label: '建成区道路面积率（%）',
-    anshan: '14.78',
-    liaoning: '13.9',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
-  },
-  {
-    label: '污水处理厂集中处理率（%）',
-    anshan: '95.81',
-    liaoning: '97.95',
-    anshanTrend: 'down',
-    liaoningTrend: 'up'
-  },
-  {
-    label: '公园绿地服务半径覆盖率（%）',
-    anshan: '76.28',
-    liaoning: '77.91',
-    anshanTrend: 'up',
-    liaoningTrend: 'down'
+function calcTrend(anshan: string, liaoning: string): 'up' | 'down' | undefined {
+  const a = Number(anshan)
+  const l = Number(liaoning)
+  if (Number.isNaN(a) || Number.isNaN(l)) return undefined
+  if (a > l) return 'up'
+  if (a < l) return 'down'
+  return undefined
+}
+
+function toMetricRow(item: ApiItem): MetricRow {
+  const unit = UNIT_MAP[item.name]
+  const label = unit ? `${item.name}（${unit}）` : item.name
+  const anshan = item.cityNum ?? '-'
+  const liaoning = item.provinceNum ?? '-'
+  return {
+    label,
+    anshan,
+    liaoning,
+    anshanTrend: calcTrend(anshan, liaoning),
+    liaoningTrend: calcTrend(liaoning, anshan)
   }
-]
+}
+
+const getList = async () => {
+  try {
+    const res: any = await getUrbanfacilities()
+    console.log('[urbanFacilities] raw res =', res)
+
+    // 兼容多种返回结构
+    const list: ApiItem[] = res?.data?.dataList ?? res?.dataList ?? res?.data ?? []
+
+    console.log('[urbanFacilities] list =', list)
+
+    if (!list.length) {
+      console.warn('[urbanFacilities] 接口返回数据为空')
+      return
+    }
+
+    const rows = list.map(toMetricRow)
+    leftOuterMetrics.value = rows.slice(0, 6)
+    leftInnerMetrics.value = rows.slice(6, 9)
+    rightOuterMetrics.value = rows.slice(9, 15)
+    rightInnerMetrics.value = rows.slice(15, 18)
+  } catch (e) {
+    console.error('城市设施水平查询失败', e)
+  }
+}
+
+onMounted(() => {
+  getList()
+})
 </script>
 
 <style scoped>
