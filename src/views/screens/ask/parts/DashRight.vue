@@ -73,34 +73,30 @@
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in socialAssistTabs"
-            :key="tab"
+            :key="tab.type"
             type="button"
             class="tab"
-            :class="{ 'tab--active': tab === activeAssistTab }"
+            :class="{ 'tab--active': tab.type === activeAssistTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeAssistTab = tab"
+            @click="handleAssistTabClick(tab.type)"
           >
-            {{ tab }}
+            {{ tab.label }}
           </button>
         </div>
       </div>
       <div class="capacity-body">
         <div class="supervise-list">
+          <!-- ⭐ 表头按 tab 动态渲染 -->
           <div class="supervise-header">
-            <div class="sv-col">序号</div>
-            <div class="sv-col">地区</div>
-            <div class="sv-col">交办量</div>
-            <div class="sv-col">办结量</div>
-            <div class="sv-col">办结率</div>
-            <div class="sv-col">满意率</div>
+            <div v-for="col in assistTableColumns" :key="col.key" class="sv-col">
+              {{ col.label }}
+            </div>
           </div>
+          <!-- ⭐ 行数据也按 tab 动态渲染 -->
           <div v-for="(item, idx) in superviseList" :key="idx" class="supervise-row">
-            <div class="sv-col">{{ item.no }}</div>
-            <div class="sv-col">{{ item.area }}</div>
-            <div class="sv-col">{{ item.assignNum }}</div>
-            <div class="sv-col">{{ item.finishNum }}</div>
-            <div class="sv-col">{{ item.finishRate }}</div>
-            <div class="sv-col">{{ item.satisfactionRate }}</div>
+            <div v-for="col in assistTableColumns" :key="col.key" class="sv-col">
+              {{ item[col.key] }}
+            </div>
           </div>
         </div>
       </div>
@@ -117,8 +113,11 @@ import {
   getAcceptanceDeptParticipation,
   getDepthVTop,
   getEarlyWarningProblems,
-  getHandlingQuality
+  getHandlingQuality,
+  getReturnVisitSupervision,
+  getOverdueSupervision
 } from '@/api/ask'
+
 const repaymentPeople = ref([])
 const getRepaymentPeopleList = async () => {
   const res = await getRepaymentPeople()
@@ -171,67 +170,92 @@ const getHandlingQualityList = async () => {
     }))
     .slice(0, 10)
 }
+
+// ⭐ 监管情况 tab：对象数组，type 是 1 / 2
+const socialAssistTabs = [
+  { type: 1, label: '质量监管' },
+  { type: 2, label: '超期监管' }
+] as const
+
+// ⭐ 默认 1（质量监管）
+const activeAssistTab = ref<1 | 2>(1)
+
+// ⭐ 监管情况列表（从接口获取）
+const superviseList = ref<any[]>([])
+
+// ⭐ 表格列配置：根据 tab 切换不同的列
+const assistTableColumns = computed(() => {
+  if (activeAssistTab.value === 1) {
+    // 质量监管（getReturnVisitSupervision）
+    return [
+      { key: 'index', label: '序号' },
+      { key: 'areaName', label: '地区' },
+      { key: 'assignedNum', label: '交办量' },
+      { key: 'concludeNum', label: '办结量' },
+      { key: 'conclude', label: '办结率' },
+      { key: 'satisfied', label: '满意率' }
+    ]
+  }
+  // 超期监管（getOverdueSupervision）
+  return [
+    { key: 'index', label: '序号' },
+    { key: 'areaName', label: '地区' },
+    { key: 'assignmentNum', label: '交办量' },
+    { key: 'timeOutNum', label: '超期量' },
+    { key: 'notReported', label: '未上报' },
+    { key: 'processingtime', label: '处理时效' }
+  ]
+})
+
+// ⭐ tab=1：质量监管
+const fetchReturnVisitSupervision = async () => {
+  try {
+    const res: any = await getReturnVisitSupervision()
+    console.log('[getReturnVisitSupervision] res=', res)
+    superviseList.value = res?.data?.dataList ?? res?.dataList ?? []
+  } catch (e) {
+    console.error('质量监管数据查询失败', e)
+    superviseList.value = []
+  }
+}
+
+// ⭐ tab=2：超期监管
+const fetchOverdueSupervision = async () => {
+  try {
+    const res: any = await getOverdueSupervision()
+    console.log('[getOverdueSupervision] res=', res)
+    superviseList.value = res?.data?.dataList ?? res?.dataList ?? []
+  } catch (e) {
+    console.error('超期监管数据查询失败', e)
+    superviseList.value = []
+  }
+}
+
+// ⭐ 根据 type 统一调度
+const fetchSuperviseData = async (type: 1 | 2) => {
+  if (type === 1) {
+    await fetchReturnVisitSupervision()
+  } else {
+    await fetchOverdueSupervision()
+  }
+}
+
+// ⭐ 点击 tab
+const handleAssistTabClick = async (type: 1 | 2) => {
+  if (activeAssistTab.value === type) return
+  activeAssistTab.value = type
+  await fetchSuperviseData(type)
+}
+
 onMounted(() => {
   getRepaymentPeopleList()
   getAcceptanceDeptParticipationList()
   getDepthVTopList()
   getWarnWarningProblemsList()
   getHandlingQualityList()
+  // 默认加载 tab=1 的监管数据
+  fetchSuperviseData(activeAssistTab.value)
 })
-const socialAssistTabs = ['质量监管', '超期监管']
-const activeAssistTab = ref<(typeof socialAssistTabs)[number]>('质量监管')
-
-//监管情况
-const superviseList = [
-  {
-    no: 2,
-    area: '台安县',
-    assignNum: 9279,
-    finishNum: 8818,
-    finishRate: '95.03%',
-    satisfactionRate: '93.49%'
-  },
-  {
-    no: 3,
-    area: '岫岩县',
-    assignNum: 8190,
-    finishNum: 7840,
-    finishRate: '95.73%',
-    satisfactionRate: '96.21%'
-  },
-  {
-    no: 4,
-    area: '铁东区',
-    assignNum: 73719,
-    finishNum: 71614,
-    finishRate: '97.14%',
-    satisfactionRate: '92.12%'
-  },
-  {
-    no: 5,
-    area: '铁西区',
-    assignNum: 35204,
-    finishNum: 34177,
-    finishRate: '97.08%',
-    satisfactionRate: '95.39%'
-  },
-  {
-    no: 6,
-    area: '立山区',
-    assignNum: 30101,
-    finishNum: 28957,
-    finishRate: '96.20%',
-    satisfactionRate: '93.83%'
-  },
-  {
-    no: 7,
-    area: '千山区',
-    assignNum: 5196,
-    finishNum: 4966,
-    finishRate: '95.57%',
-    satisfactionRate: '91.95%'
-  }
-]
 
 //还利于民柱状图
 const benefitBarOption = computed(() => {
@@ -246,9 +270,7 @@ const benefitBarOption = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     grid: { left: 50, right: 20, top: 40, bottom: 120 },
-    dataset: {
-      source
-    },
+    dataset: { source },
     xAxis: {
       type: 'category',
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 38 },
@@ -302,9 +324,7 @@ const acceptUnitTrendOption = computed(() => {
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
     grid: { left: 50, right: 20, top: 60, bottom: 60 },
-    dataset: {
-      source
-    },
+    dataset: { source },
     xAxis: {
       type: 'category',
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 20, rotate: 35 },
@@ -519,10 +539,6 @@ const warnRingOption = computed(() => {
   display: flex;
   gap: 16px;
   margin-right: 20px;
-}
-.tab {
-  font-size: 17px;
-  color: rgba(214, 238, 255, 0.45);
 }
 .tab.active {
   color: #36e8ff;

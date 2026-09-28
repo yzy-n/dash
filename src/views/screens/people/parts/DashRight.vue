@@ -4,39 +4,47 @@
       <section class="panel market-panel">
         <div class="panel-head">
           <div class="panel-title">教育水平</div>
-          <select v-model="dateCapacity" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateCapacity" class="panel-date" @change="fetchEduLevel">
+            <option v-for="item in eduLevelDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
-        <!-- 柱状图区域 -->
         <div class="water-chart">
           <pie3dChart :data="pieData" :innerRadius="0.6" :minThickness="0.15" :maxThickness="3" />
         </div>
       </section>
-      <!-- ========== 价格监测：替换为【自然变动情况】截图布局，保留外层panel/tab，删除原表格 ========== -->
+
       <section class="panel panel--tower">
         <div class="panel-head">
           <div class="panel-title">自然变动情况</div>
-          <select v-model="dateElectric" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateElectric" class="panel-date" @change="fetchNaturalChange">
+            <option v-for="item in naturalDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="nature-wrap">
           <div class="nature-col nature-col-left">
             <div class="nature-item">
               <div class="nature-label">年平均人口</div>
-              <div class="nature-value">334.92<span class="nature-unit">万人</span></div>
+              <div class="nature-value">
+                {{ naturalData.avgPopuNum }}<span class="nature-unit">万人</span>
+              </div>
             </div>
             <div class="nature-item">
               <div class="nature-label">出生人口</div>
-              <div class="nature-value">14515<span class="nature-unit">人</span></div>
+              <div class="nature-value">
+                {{ naturalData.birthPopuNum }}<span class="nature-unit">人</span>
+              </div>
             </div>
             <div class="nature-item">
               <div class="nature-label">出生率</div>
-              <div class="nature-value">4.33<span class="nature-unit">‰</span></div>
+              <div class="nature-value">
+                {{ naturalData.birthPopuRate }}<span class="nature-unit">‰</span>
+              </div>
             </div>
           </div>
-          <!-- 中间六边形图标占位列 -->
           <div class="nature-col nature-col-center">
             <div class="nature-hex-icon"></div>
             <div class="nature-hex-icon"></div>
@@ -45,26 +53,35 @@
           <div class="nature-col nature-col-right">
             <div class="nature-item">
               <div class="nature-label">自然增长率</div>
-              <div class="nature-value">-5.46<span class="nature-unit">‰</span></div>
+              <div class="nature-value">
+                {{ naturalData.naturalIncreaseRate }}<span class="nature-unit">‰</span>
+              </div>
             </div>
             <div class="nature-item">
               <div class="nature-label">死亡人口</div>
-              <div class="nature-value">32779<span class="nature-unit">人</span></div>
+              <div class="nature-value">
+                {{ naturalData.deathPopuNum }}<span class="nature-unit">人</span>
+              </div>
             </div>
             <div class="nature-item">
               <div class="nature-label">死亡率</div>
-              <div class="nature-value">9.79<span class="nature-unit">‰</span></div>
+              <div class="nature-value">
+                {{ naturalData.deathPopuRate }}<span class="nature-unit">‰</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
     </div>
+
     <div class="col">
       <section class="panel panel--water">
         <div class="panel-head">
           <div class="panel-title">基本养老保险情况</div>
-          <select v-model="dateWater" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateWater" class="panel-date" @change="fetchBaseEndIns">
+            <option v-for="item in pensionDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="water-chart">
@@ -96,11 +113,14 @@
           </div>
         </div>
       </section>
+
       <section class="panel panel--heat">
         <div class="panel-head">
           <div class="panel-title">婚姻情况</div>
-          <select v-model="dateHeat" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateHeat" class="panel-date" @change="fetchMaritalStatus">
+            <option v-for="item in marryDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="heat-chart">
@@ -108,12 +128,15 @@
         </div>
       </section>
     </div>
+
     <div class="col">
       <section class="panel panel--red">
         <div class="panel-head red-panel-head">
           <div class="panel-title">残疾人信息</div>
-          <select v-model="dateRed" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateRed" class="panel-date" @change="fetchHandicapData">
+            <option v-for="item in disabledDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="panel-tabs panel-tabs--center">
@@ -124,7 +147,7 @@
             class="tab"
             :class="{ 'tab--active': tab === activeDisabledTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeDisabledTab = tab"
+            @click="handleDisabledTabClick(tab)"
           >
             {{ tab }}
           </button>
@@ -133,15 +156,16 @@
           <roseChart :data="houseData" :tabKey="activeDisabledTab" />
         </div>
       </section>
-      <!-- 社会救助情况 -->
+
       <section class="panel panel--aed">
         <div class="panel-head red-panel-head">
           <div class="panel-title">社会救助情况</div>
-          <select v-model="dateRed" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select v-model="dateAssist" class="panel-date" @change="fetchSingleData">
+            <option v-for="item in assistDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
-        <!-- tab标签保留：城区合计、海城市、台安县、岫岩县 -->
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in socialAssistTabs"
@@ -150,12 +174,11 @@
             class="tab"
             :class="{ 'tab--active': tab === activeAssistTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeAssistTab = tab"
+            @click="handleAssistTabClick(tab)"
           >
             {{ tab }}
           </button>
         </div>
-        <!-- 替换原来的houseChart，改为双卡片布局 -->
         <div class="aed-chart social-assist-wrap">
           <div class="assist-card">
             <div class="assist-icon assist-icon‑city"></div>
@@ -176,84 +199,103 @@
     </div>
   </aside>
 </template>
+
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import pie3dChart from '@/views/screens/people/charts/3d.vue'
 import pensionChart from '@/views/screens/people/charts/pension.vue'
 import roseChart from '@/views/screens/people/charts/rose.vue'
 import marryChart from '@/views/screens/people/charts/marry.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
+// ⭐ 引入接口
+import {
+  getEduLevel,
+  getBaseEndIns,
+  getHandicapType,
+  getHandicapAge,
+  getHandicapSex,
+  getHandicapInhabitant,
+  getNaturalChange,
+  getMaritalStatus,
+  getSingleData
+} from '@/api/people'
 
-const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
-const dateCapacity = ref(dateOptions[0])
-const dateElectric = ref(dateOptions[0])
-const dateWater = ref(dateOptions[0])
-const dateRed = ref(dateOptions[0])
-const dateHeat = ref(dateOptions[0])
+// ============================================================
+// ⭐ 教育水平
+// ============================================================
+const eduLevelDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴', '2025测试']
+const dateCapacity = ref<string>('2025测试')
+const pieData = ref<Array<{ name: string; value: number }>>([])
 
-// 社会救助tab
-const socialAssistTabs = ['城区合计', '海城市', '台安县', '岫岩县']
-const activeAssistTab = ref<(typeof socialAssistTabs)[number]>('城区合计')
-// 模拟各地区救助数据，可对接后端替换
-const assistSourceData = {
-  城区合计: { cityNum: 17996, ruralNum: 2753 },
-  海城市: { cityNum: 12400, ruralNum: 8600 },
-  台安县: { cityNum: 3200, ruralNum: 4100 },
-  岫岩县: { cityNum: 2100, ruralNum: 6800 }
+const fetchEduLevel = async () => {
+  try {
+    const res: any = await getEduLevel(dateCapacity.value)
+    console.log('[edulevel] res=', res)
+    const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
+    pieData.value = list.map((item) => ({
+      name: item.label ?? '',
+      value: Number(item.studentNum ?? 0)
+    }))
+  } catch (e) {
+    console.error('教育水平查询失败', e)
+    pieData.value = []
+  }
 }
-const assistData = computed(() => assistSourceData[activeAssistTab.value])
 
-const houseTabs = ['类型统计', '年龄段统计', '性别统计', '户口统计']
-const activeDisabledTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
-const houseSourceData = {
-  类型统计: [
-    { name: '视力残疾', value: 35 },
-    { name: '听力残疾', value: 20 },
-    { name: '言语残疾', value: 10 },
-    { name: '肢体残疾', value: 40 },
-    { name: '智力残疾', value: 25 },
-    { name: '精神残疾', value: 15 }
-  ],
-  年龄段统计: [
-    { name: '0‑18岁', value: 8 },
-    { name: '19‑35岁', value: 14 },
-    { name: '36‑55岁', value: 28 },
-    { name: '56‑70岁', value: 33 },
-    { name: '70岁以上', value: 42 }
-  ],
-  性别统计: [
-    { name: '男性', value: 72 },
-    { name: '女性', value: 58 }
-  ],
-  户口统计: [
-    { name: '农业户口', value: 66 },
-    { name: '非农业户口', value: 64 }
-  ]
-}
-const houseData = computed(() => {
-  return houseSourceData[activeDisabledTab.value] || []
+// ============================================================
+// ⭐ 自然变动情况
+// ============================================================
+const naturalDateOptions = ['2022年统计数据']
+const dateElectric = ref<string>('2022年统计数据')
+
+const naturalData = ref({
+  avgPopuNum: 0,
+  birthPopuNum: 0,
+  birthPopuRate: 0,
+  deathPopuNum: 0,
+  deathPopuRate: 0,
+  naturalIncreaseRate: 0
 })
 
-const pieData = [
-  { name: '小学', value: 160675, percent: '37.28%' },
-  { name: '幼儿园', value: 83449, percent: '19.36%' },
-  { name: '特殊教育', value: 862, percent: '0.20%' },
-  { name: '普通高等', value: 42332, percent: '9.82%' },
-  { name: '调整后中等职业', value: 4857, percent: '1.13%' },
-  { name: '普通中学', value: 135908, percent: '31.53%' },
-  { name: '职业中学', value: 2943, percent: '0.68%' }
-]
+const fetchNaturalChange = async () => {
+  try {
+    const res: any = await getNaturalChange(dateElectric.value)
+    const row = res?.data?.dataList?.[0] ?? res?.dataList?.[0] ?? {}
+    naturalData.value = {
+      avgPopuNum: Number(row.avgPopuNum ?? 0),
+      birthPopuNum: Number(row.birthPopuNum ?? 0),
+      birthPopuRate: Number(row.birthPopuRate ?? 0),
+      deathPopuNum: Number(row.deathPopuNum ?? 0),
+      deathPopuRate: Number(row.deathPopuRate ?? 0),
+      naturalIncreaseRate: Number(row.naturalIncreaseRate ?? 0)
+    }
+  } catch (e) {
+    console.error('自然变动情况查询失败', e)
+  }
+}
 
-const pensionRows = ref([
-  { name: '市本级', worker: 12.95, retire: 17.65 },
-  { name: '海城市', worker: 23.6, retire: 12.3 },
-  { name: '台安县', worker: 4.5, retire: 2.2 },
-  { name: '岫岩县', worker: 7.1, retire: 6.0 },
-  { name: '铁东区', worker: 9.8, retire: 4.6 },
-  { name: '铁西区', worker: 7.4, retire: 4.2 },
-  { name: '立山区', worker: 7.6, retire: 4.1 },
-  { name: '千山区', worker: 4.9, retire: 2.6 }
-])
+// ============================================================
+// ⭐ 基本养老保险
+// ============================================================
+const pensionDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴']
+const dateWater = ref<string>('2024年统计年鉴')
+const pensionRows = ref<Array<{ name: string; worker: number; retire: number }>>([])
+
+const fetchBaseEndIns = async () => {
+  try {
+    const res: any = await getBaseEndIns(dateWater.value)
+    const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
+    pensionRows.value = list.map((item) => ({
+      name: item.areaName ?? '',
+      worker: Number(item.labourNum ?? 0),
+      retire: Number(item.retireNum ?? 0)
+    }))
+  } catch (e) {
+    console.error('基本养老保险查询失败', e)
+    pensionRows.value = []
+  }
+}
+
 const pensionSummary = computed(() => {
   const worker = pensionRows.value.reduce((s, r) => s + (Number(r.worker) || 0), 0)
   const retire = pensionRows.value.reduce((s, r) => s + (Number(r.retire) || 0), 0)
@@ -262,8 +304,171 @@ const pensionSummary = computed(() => {
     retire: retire.toFixed(2)
   }
 })
+
+// ============================================================
+// ⭐ 婚姻情况
+// ============================================================
+const marryDateOptions = ['2021', '2020', '2019', '2018', '2017']
+const dateHeat = ref<string>('2021')
+
+const marryData = ref({
+  firstNum: 0,
+  againNum: 0,
+  remarryNum: 0,
+  divorceNum: 0,
+  divorceRate: 0
+})
+
+const fetchMaritalStatus = async () => {
+  try {
+    const res: any = await getMaritalStatus(dateHeat.value)
+    const row = res?.data?.dataList?.[0] ?? res?.dataList?.[0] ?? {}
+    marryData.value = {
+      firstNum: Number(row.firstNum ?? 0),
+      againNum: Number(row.againNum ?? 0),
+      remarryNum: Number(row.remarryNum ?? 0),
+      divorceNum: Number(row.divorceNum ?? 0),
+      divorceRate: Number(row.divorceRate ?? 0)
+    }
+  } catch (e) {
+    console.error('婚姻情况查询失败', e)
+  }
+}
+
+// ============================================================
+// ⭐ 残疾人信息
+// ============================================================
+const disabledDateOptions = ['2023-05']
+const dateRed = ref<string>('2023-05')
+
+const houseTabs = ['类型统计', '年龄段统计', '性别统计', '户口统计'] as const
+const activeDisabledTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
+const houseData = ref<Array<{ name: string; value: number }>>([])
+
+const fetchHandicapData = async () => {
+  const date = dateRed.value
+  const tab = activeDisabledTab.value
+  try {
+    let list: any[] = []
+    if (tab === '类型统计') {
+      const res: any = await getHandicapType(date)
+      list = res?.data?.dataList ?? res?.dataList ?? []
+      houseData.value = list.map((item) => ({
+        name: item.type ?? '',
+        value: Number(item.num ?? 0)
+      }))
+    } else if (tab === '年龄段统计') {
+      const res: any = await getHandicapAge(date)
+      list = res?.data?.dataList ?? res?.dataList ?? []
+      houseData.value = list.map((item) => ({
+        name: item.agePart ?? '',
+        value: Number(item.num ?? 0)
+      }))
+    } else if (tab === '性别统计') {
+      const res: any = await getHandicapSex(date)
+      list = res?.data?.dataList ?? res?.dataList ?? []
+      let menTotal = 0
+      let womenTotal = 0
+      list.forEach((item) => {
+        menTotal += Number(item.men ?? 0)
+        womenTotal += Number(item.women ?? 0)
+      })
+      houseData.value = [
+        { name: '男性', value: menTotal },
+        { name: '女性', value: womenTotal }
+      ]
+    } else if (tab === '户口统计') {
+      const res: any = await getHandicapInhabitant(date)
+      list = res?.data?.dataList ?? res?.dataList ?? []
+      let farmTotal = 0
+      let nonFarmTotal = 0
+      list.forEach((item) => {
+        farmTotal += Number(item.farm ?? 0)
+        nonFarmTotal += Number(item.nonFarm ?? 0)
+      })
+      houseData.value = [
+        { name: '农业户口', value: farmTotal },
+        { name: '非农业户口', value: nonFarmTotal }
+      ]
+    }
+  } catch (e) {
+    console.error('残疾人信息查询失败', e)
+    houseData.value = []
+  }
+}
+
+const handleDisabledTabClick = (tab: (typeof houseTabs)[number]) => {
+  if (activeDisabledTab.value === tab) return
+  activeDisabledTab.value = tab
+  fetchHandicapData()
+}
+
+// ============================================================
+// ⭐ 社会救助情况（接口版）
+// ============================================================
+const socialAssistTabs = ['城区合计', '海城市', '台安县', '岫岩县'] as const
+const activeAssistTab = ref<(typeof socialAssistTabs)[number]>(socialAssistTabs[0])
+
+// 时间选项（默认给一个，接口返回 timeOptions 会覆盖）
+const assistDateOptions = ref<string[]>(['2024年统计年鉴'])
+const dateAssist = ref<string>('2024年统计年鉴')
+
+// 接口返回的原始列表（按 areaName 索引）
+const assistList = ref<Array<{ areaName: string; cityNum: number; countyNum: number }>>([])
+
+// 当前 tab 显示的数据
+const assistData = computed(() => {
+  const target = assistList.value.find((i) => i.areaName === activeAssistTab.value)
+  return {
+    cityNum: target?.cityNum ?? 0,
+    ruralNum: target?.countyNum ?? 0
+  }
+})
+
+const fetchSingleData = async () => {
+  try {
+    const res: any = await getSingleData(dateAssist.value)
+    console.log('[singledata] res=', res)
+
+    const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
+    assistList.value = list.map((item) => ({
+      areaName: item.areaName ?? '',
+      cityNum: Number(item.cityNum ?? 0),
+      countyNum: Number(item.countyNum ?? 0)
+    }))
+
+    // 覆盖时间选项
+    const options: string[] = res?.data?.summary?.timeOptions ?? res?.summary?.timeOptions ?? []
+    if (options.length) {
+      assistDateOptions.value = options
+      if (!options.includes(dateAssist.value)) {
+        dateAssist.value = res?.data?.summary?.souseDate ?? res?.summary?.souseDate ?? options[0]
+      }
+    }
+    console.log('[singledata] assistList=', assistList.value)
+  } catch (e) {
+    console.error('社会救助情况查询失败', e)
+    assistList.value = []
+  }
+}
+
+// tab 点击（不需要重新请求，因为接口一次性返回全部区域）
+const handleAssistTabClick = (tab: (typeof socialAssistTabs)[number]) => {
+  activeAssistTab.value = tab
+}
+
+onMounted(() => {
+  fetchEduLevel()
+  fetchNaturalChange()
+  fetchBaseEndIns()
+  fetchMaritalStatus()
+  fetchHandicapData()
+  fetchSingleData()
+})
 </script>
+
 <style scoped>
+/* 完全保持原样 */
 .right {
   min-height: 0;
   height: 100%;
@@ -332,7 +537,6 @@ const pensionSummary = computed(() => {
   flex: 1;
   min-height: 0;
 }
-/* ========== 自然变动新增样式 ========== */
 .nature-wrap {
   margin-top: 90px;
   height: calc(100% - 90px);
@@ -404,6 +608,15 @@ const pensionSummary = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+.panel-date option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
 }
 .panel-tabs {
   position: absolute;
@@ -450,7 +663,6 @@ const pensionSummary = computed(() => {
     0 0 40px #00a8ff;
   letter-spacing: 2px;
 }
-
 .tab--active {
   color: #eaf4ff;
   opacity: 1;
@@ -606,7 +818,6 @@ const pensionSummary = computed(() => {
   border-radius: 12px;
   overflow: hidden;
 }
-/* ==========社会救助双卡片新增样式========== */
 .social-assist-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;

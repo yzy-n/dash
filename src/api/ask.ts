@@ -46,5 +46,8 @@ export function getHandlingQuality() {
   return requestData(`/appeal/bigscreen/handlingquality`, { method: 'GET' })
 }
 export function getReturnVisitSupervision() {
-  return requestData(`/appeal/mobile/returnvisitsupervision`, { method: 'GET' })
+  return requestData(`/appeal/bigscreen/returnvisitsupervision`, { method: 'GET' })
+}
+export function getOverdueSupervision() {
+  return requestData(`/appeal/bigscreen/overduesupervision`, { method: 'GET' })
 }

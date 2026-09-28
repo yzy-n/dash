@@ -3,8 +3,10 @@
     <section class="panel panel--electric">
       <div class="panel-head">
         <div class="panel-title">进5年人口总数</div>
-        <select v-model="dateElectric" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="datePopu" class="panel-date" @change="getPopuList">
+          <option v-for="item in popuDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="capacity-body">
@@ -17,8 +19,10 @@
     <section class="panel panel--capacity">
       <div class="panel-head">
         <div class="panel-title">城乡人口比例</div>
-        <select v-model="dateCapacity" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateCapacity" class="panel-date" @change="getUrbanRuralList">
+          <option v-for="item in urbanRuralDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="capacity-body">
@@ -46,8 +50,10 @@
     <section class="panel panel--pop-state">
       <div class="panel-head">
         <div class="panel-title">城乡人口情况</div>
-        <select v-model="dateInvest" class="panel-date" @change="getTownPopuList">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateTownPopu" class="panel-date" @change="getTownPopuList">
+          <option v-for="item in townPopuDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="pop-state-body">
@@ -101,8 +107,10 @@
     <section class="panel panel--pile">
       <div class="panel-head">
         <div class="panel-title">全市人口总数</div>
-        <select v-model="dateElectric" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateAreaPopu" class="panel-date" @change="getAreaPopuList">
+          <option v-for="item in areaPopuDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="capacity-chart">
@@ -113,8 +121,10 @@
     <section class="panel panel--resume">
       <div class="panel-head">
         <div class="panel-title">人口密度</div>
-        <select v-model="dateInvest" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateScaleDensity" class="panel-date" @change="getScaleDensityList">
+          <option v-for="item in scaleDensityDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="capacity-chart">
@@ -125,8 +135,10 @@
     <section class="panel panel--steel">
       <div class="panel-head">
         <div class="panel-title">户规模</div>
-        <select v-model="dateSteel" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateHouseScale" class="panel-date" @change="getHouseScaleList">
+          <option v-for="item in houseScaleDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="capacity-chart">
@@ -151,28 +163,64 @@ import {
   getScaleDensity,
   getHouseScale
 } from '@/api/people'
+
+// ⭐ 进5年人口总数卡片独立的时间选项
+const popuDateOptions = ['2022年统计数据']
+// ⭐ 默认选中 2022年统计数据
+const datePopu = ref<string>('2022年统计数据')
+
+// ⭐ 城乡人口比例卡片独立的时间选项
+const urbanRuralDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴']
+// ⭐ 默认选中 2024年统计年鉴
+const dateCapacity = ref<string>('2024年统计年鉴')
+
+// ⭐ 城乡人口情况卡片独立的时间选项
+const townPopuDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴']
+// ⭐ 默认选中 2024年统计年鉴
+const dateTownPopu = ref<string>('2024年统计年鉴')
+
+// ⭐ 全市人口总数卡片独立的时间选项
+const areaPopuDateOptions = ['2022年统计数据']
+// ⭐ 默认选中 2022年统计数据
+const dateAreaPopu = ref<string>('2022年统计数据')
+
+// ⭐ 人口密度卡片独立的时间选项
+const scaleDensityDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴']
+// ⭐ 默认选中 2024年统计年鉴
+const dateScaleDensity = ref<string>('2024年统计年鉴')
+
+// ⭐ 户规模卡片独立的时间选项
+const houseScaleDateOptions = ['2022年统计数据', '2023年统计年鉴', '2024年统计年鉴']
+// ⭐ 默认选中 2024年统计年鉴
+const dateHouseScale = ref<string>('2024年统计年鉴')
+
+// ============ 进5年人口总数 ============
 const popuList = ref<ChartListItem[]>([])
 const getPopuList = async () => {
-  const res = await getPopu()
+  const res = await getPopu(datePopu.value)
   popuList.value = res.dataList.map((item) => ({
     name: item.year,
     总户数: item.houseNum,
     总人数: item.popuNum
   }))
 }
+
+// ============ 城乡人口比例 ============
 const urbanRuralList = ref<ChartListItem[]>([])
 const getUrbanRuralList = async () => {
-  const res = await getUrbanRural()
-  popMetrics.value = res.summary
+  const res = await getUrbanRural(dateCapacity.value)
+  popMetrics.value = res.summary.totals
   urbanRuralList.value = res.dataList.map((item) => ({
     name: item.areaName,
     农村人口数: item.countyNum,
     城镇人口数: item.cityNum
   }))
 }
+
+// ============ 城乡人口情况 ============
 const townPopuList = ref([])
 const getTownPopuList = async () => {
-  const res = await getTownPopu(dateInvest.value)
+  const res = await getTownPopu(dateTownPopu.value)
   townPopuList.value = res.dataList[0]
   popIncreaseTotal.value = townPopuList.value.addTotal
   popDecreaseTotal.value = townPopuList.value.lowerTotal
@@ -188,23 +236,39 @@ const getTownPopuList = async () => {
     { name: '其他减少', value: townPopuList.value.otherTotal }
   ]
 }
+
+// ============ 全市人口总数 ============
 const areaPopuList = ref([])
 const getAreaPopuList = async () => {
-  const res = await getAreaPopu()
+  const res = await getAreaPopu(dateAreaPopu.value)
   areaPopuList.value = res.dataList.map((item) => ({
     name: item.areaName,
     总户数: item.houseNum,
     总人数: item.popuNum
   }))
 }
+
+// ============ 人口密度 ============
 const scaleDensityList = ref([])
 const getScaleDensityList = async () => {
-  const res = await getScaleDensity()
+  const res = await getScaleDensity(dateScaleDensity.value)
   scaleDensityList.value = res.dataList.map((item) => ({
     name: item.areaName,
     value: item.scaleDensity
   }))
 }
+
+// ============ 户规模 ============
+const houseScaleList = ref([])
+const getHouseScaleList = async () => {
+  // ⭐ 传 souseDate 参数
+  const res = await getHouseScale(dateHouseScale.value)
+  houseScaleList.value = res.dataList.map((item) => ({
+    name: item.areaName,
+    value: item.scaleDensity
+  }))
+}
+
 onMounted(() => {
   getPopuList()
   getUrbanRuralList()
@@ -213,25 +277,17 @@ onMounted(() => {
   getScaleDensityList()
   getHouseScaleList()
 })
+
 const electricTabs = ['地区', '行业', '园区']
 const dateOptions = ['2024年统计年鉴', '2023年统计年鉴', '2022年统计数据']
 const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
 
 const dateElectric = ref('')
-const dateCapacity = ref(dateOptions[0])
 const dateInvest = ref(dateOptions[0])
 const datePile = ref(dateOptions[2])
 const dateProject = ref(dateOptions[0])
 const dateEnergy = ref(dateOptions[0])
 const dateSteel = ref('')
-const houseScaleList = ref([])
-const getHouseScaleList = async () => {
-  const res = await getHouseScale()
-  houseScaleList.value = res.dataList.map((item) => ({
-    name: item.areaName,
-    value: item.scaleDensity
-  }))
-}
 
 const popMetrics = ref([])
 
@@ -321,6 +377,13 @@ const popDecreaseRows = ref([])
   cursor: pointer;
   font: inherit;
   text-align: center;
+}
+.panel-date option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 .panel-tabs {
   position: absolute;
@@ -1053,19 +1116,16 @@ const popDecreaseRows = ref([])
 }
 .project-kpi-icon {
   width: 30px;
-
   height: 30px;
   border-radius: 10px;
   border: 1px solid rgba(54, 232, 255, 0.18);
   background: radial-gradient(circle, rgba(54, 232, 255, 0.2), rgba(6, 18, 48, 0.15));
 }
-
 .project-kpi-value {
   font-size: 26px;
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .project-stage {
   position: relative;
   display: grid;
@@ -1073,7 +1133,6 @@ const popDecreaseRows = ref([])
   min-height: 0;
   margin-top: -180px;
 }
-
 .project-base {
   position: absolute;
   width: 620px;
@@ -1084,7 +1143,6 @@ const popDecreaseRows = ref([])
   transform: perspective(900px) rotateX(72deg) translateY(28px);
   box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
 }
-
 .project-ring {
   position: absolute;
   left: 50%;
@@ -1093,23 +1151,19 @@ const popDecreaseRows = ref([])
   transform: translate(-50%, -50%) perspective(900px) rotateX(72deg);
   pointer-events: none;
 }
-
 .project-ring--a {
   width: 700px;
   height: 250px;
   border: 2px solid rgba(54, 232, 255, 0.14);
   box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
 }
-
 .project-ring--b {
   width: 560px;
   height: 210px;
   border: 2px solid rgba(54, 232, 255, 0.1);
   opacity: 0.75;
 }
-
 .project-table {
-  border-radius: 12px;
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.42);
@@ -1118,7 +1172,6 @@ const popDecreaseRows = ref([])
   margin-top: -180px;
   margin-bottom: 20px;
 }
-
 .project-table-row {
   height: 64px;
   display: grid;
@@ -1128,62 +1181,52 @@ const popDecreaseRows = ref([])
   box-sizing: border-box;
   border-top: 1px solid rgba(89, 194, 255, 0.12);
 }
-
 .project-table-row:first-child {
   border-top: none;
 }
-
 .project-dot {
   width: 10px;
   height: 10px;
   border-radius: 999px;
   box-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
 }
-
 .project-dot--done {
   background: rgba(51, 213, 255, 0.95);
 }
-
 .project-dot--todo {
   background: rgba(255, 226, 74, 0.95);
   box-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .project-name {
   font-size: 18px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.82);
 }
-
 .project-stat {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 10px;
 }
-
 .project-stat-label {
   font-size: 18px;
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .project-stat-value {
   font-size: 22px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
-
 .project-stat-unit {
   margin-left: 6px;
   font-size: 16px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
-
 .energy-body {
   height: 100%;
   min-height: 0;
@@ -1192,7 +1235,6 @@ const popDecreaseRows = ref([])
   grid-template-rows: 72px 1fr;
   gap: 10px;
 }
-
 .energy-kpi {
   display: flex;
   align-items: center;
@@ -1202,31 +1244,24 @@ const popDecreaseRows = ref([])
   font-weight: 900;
   letter-spacing: 2px;
 }
-
 .energy-kpi-label {
   color: rgba(214, 238, 255, 0.78);
 }
-
 .energy-kpi-value {
   font-size: 28px;
   color: rgba(255, 226, 74, 0.95);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
-
 .energy-kpi-unit {
   color: rgba(214, 238, 255, 0.62);
 }
-
 .energy-chart {
   min-height: 0;
   margin-top: -50px;
 }
-
 .steel-body {
   width: 100%;
 }
-
-/* 表头行 */
 .steel-header-row {
   display: flex;
   width: 100%;
@@ -1240,8 +1275,6 @@ const popDecreaseRows = ref([])
   padding: 12px 4px;
   text-shadow: 0 0 8px #2178dd;
 }
-
-/* 数据行容器，放左右箭头 */
 .steel-row-wrap {
   display: flex;
   align-items: center;
@@ -1261,7 +1294,6 @@ const popDecreaseRows = ref([])
 .arrow-right::before {
   content: '◆';
 }
-
 .steel-data-row {
   flex: 1;
   display: flex;
