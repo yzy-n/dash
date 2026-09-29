@@ -5,28 +5,67 @@
       合计：<strong>{{ data.orgTotal }}</strong> 个
     </div>
 
-    <button class="chip chip--active" :style="getRectStyle(layout.cityTab)">全市</button>
-    <button class="chip" :style="getRectStyle(layout.districtTab)">地区</button>
-
-    <div
-      v-for="(item, index) in data.orgList"
-      :key="item.label"
-      class="org-item"
-      :style="getOrgItemStyle(index)"
+    <button
+      type="button"
+      class="chip"
+      :class="{ 'chip--active': orgTab === 'city' }"
+      :style="getRectStyle(layout.cityTab)"
+      @click="switchOrgTab('city')"
     >
-      {{ item.label }}
+      全市
+    </button>
+    <button
+      type="button"
+      class="chip"
+      :class="{ 'chip--active': orgTab === 'district' }"
+      :style="getRectStyle(layout.districtTab)"
+      @click="switchOrgTab('district')"
+    >
+      地区
+    </button>
+
+    <!-- 列表滚动容器：一屏 5 条，超出滚动 -->
+    <div ref="orgListEl" class="org-list" :style="getRectStyle(layout.orgList)">
+      <div
+        v-for="(item, index) in orgList"
+        :key="`${orgTab}-${item.label}-${index}`"
+        class="org-item"
+      >
+        {{ item.label }}
+        <span v-if="item.value" class="org-item__value">{{ item.value }}</span>
+      </div>
+
+      <div v-if="!orgList.length" class="org-empty">
+        {{ loading ? '加载中…' : '暂无数据' }}
+      </div>
     </div>
 
     <h3 class="stars-title" :style="getPointStyle(layout.starsTitle)">{{ data.starsTitle }}</h3>
-    <button class="chip2 chip--active" :style="getRectStyle(layout.starsCityTab)">全市</button>
-    <button class="chip2" :style="getRectStyle(layout.starsDistrictTab)">地区</button>
+    <button
+      type="button"
+      class="chip2"
+      :class="{ 'chip--active': starsTab === 'city' }"
+      :style="getRectStyle(layout.starsCityTab)"
+      @click="switchStarsTab('city')"
+    >
+      全市
+    </button>
+    <button
+      type="button"
+      class="chip2"
+      :class="{ 'chip--active': starsTab === 'district' }"
+      :style="getRectStyle(layout.starsDistrictTab)"
+      @click="switchStarsTab('district')"
+    >
+      地区
+    </button>
     <div class="stars-total" :style="getPointStyle(layout.starsTotal)">
-      合计：<strong>{{ data.starsTotal }}</strong> 个
+      合计：<strong>{{ starsTotal }}</strong> 个
     </div>
 
     <div
-      v-for="(item, index) in data.starRows"
-      :key="item.label"
+      v-for="(item, index) in starRows"
+      :key="`${starsTab}-${item.label}`"
       class="star-row"
       :style="getStarRowStyle(index)"
     >
@@ -52,10 +91,15 @@
 <script setup lang="ts">
 import PartyStructure from './PartyStructure.vue'
 import type { PartyLeftData } from '../data'
-import { getPartyList } from '@/api/party'
-import { ref, onMounted } from 'vue'
+import {
+  getExcellentBranch,
+  getExcellentBranchInfo,
+  getStarBranch,
+  getStarBranchInfo
+} from '@/api/party'
+import { ref, onMounted, nextTick } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   data: PartyLeftData
 }>()
 
@@ -69,12 +113,40 @@ type Rect = Point & {
   height: number
 }
 
+type OrgTab = 'city' | 'district'
+type StarsTab = 'city' | 'district'
+
+type OrgRow = {
+  label: string
+  value?: string
+}
+
+type StarRow = {
+  label: string
+  value: string
+  rate: string
+  stars: number
+}
+
+// 列表尺寸常量：单条高度 + 行间距 → 决定容器高度
+const ORG_ITEM_HEIGHT = 84
+const ORG_ITEM_GAP = 40
+const ORG_ITEM_PADDING_TOP = 30
+const ORG_VISIBLE_COUNT = 5
+
+// 容器高度 = 顶部内边距 + 5 条高度 + 4 个间距
+// = 30 + 5 * 84 + 4 * 40 = 610
+const ORG_LIST_HEIGHT =
+  ORG_ITEM_PADDING_TOP +
+  ORG_VISIBLE_COUNT * ORG_ITEM_HEIGHT +
+  (ORG_VISIBLE_COUNT - 1) * ORG_ITEM_GAP
+
 const layout = {
   orgTitle: { left: 172, top: 190 },
   orgTotal: { left: 1018, top: 200 },
   cityTab: { left: 308, top: 286, width: 296, height: 46 },
   districtTab: { left: 692, top: 286, width: 296, height: 46 },
-  orgItems: { left: 126, top: 386, width: 1028, height: 84, stepY: 124 },
+  orgList: { left: 126, top: 386, width: 1028, height: ORG_LIST_HEIGHT },
   starsTitle: { left: 34, top: 1156 },
   starsCityTab: { left: 96, top: 1266, width: 190, height: 44 },
   starsDistrictTab: { left: 382, top: 1266, width: 190, height: 44 },
@@ -95,15 +167,6 @@ const getRectStyle = (rect: Rect) => ({
   height: `${rect.height}px`
 })
 
-const getOrgItemStyle = (index: number) =>
-  getRectStyle({
-    left: layout.orgItems.left,
-    top: layout.orgItems.top + index * layout.orgItems.stepY,
-    width: layout.orgItems.width,
-    height: layout.orgItems.height,
-    marginTop: '30px'
-  })
-
 const getStarRowStyle = (index: number) =>
   getRectStyle({
     left: layout.starRows.left,
@@ -111,10 +174,195 @@ const getStarRowStyle = (index: number) =>
     width: layout.starRows.width,
     height: layout.starRows.height
   })
-const partyList = ref([])
-onMounted(async () => {
-  partyList.value = await getPartyList()
-  console.log(partyList.value)
+
+/**
+ * 兼容两种返回结构：
+ * 1) { code, msg, data: { moduleName, dataList } }
+ * 2) { moduleName, dataList }
+ */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+/* ============ 先进基层党组织 Tab ============ */
+
+const orgTab = ref<OrgTab>('city')
+const orgList = ref<OrgRow[]>([])
+const orgListEl = ref<HTMLElement | null>(null)
+const loading = ref(false)
+
+const orgCache: Record<OrgTab, OrgRow[] | null> = {
+  city: null,
+  district: null
+}
+
+const loadCity = async () => {
+  loading.value = true
+  try {
+    const list = pickList(await getExcellentBranch())
+    const rows: OrgRow[] = list.map((it: any) => ({
+      label: it.branchName || it.companyName || ''
+    }))
+    orgCache.city = rows
+    orgList.value = rows
+  } catch (err) {
+    console.error('[getExcellentBranch] 请求失败', err)
+    orgList.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadDistrict = async () => {
+  loading.value = true
+  try {
+    const list = pickList(await getExcellentBranchInfo())
+    const rows: OrgRow[] = list.map((it: any) => ({
+      label: it.areaName || '',
+      value: it.num ? `${it.num}个` : ''
+    }))
+    orgCache.district = rows
+    orgList.value = rows
+  } catch (err) {
+    console.error('[getExcellentBranchInfo] 请求失败', err)
+    orgList.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+const switchOrgTab = async (tab: OrgTab) => {
+  if (orgTab.value === tab) return
+  orgTab.value = tab
+
+  if (orgCache[tab]) {
+    orgList.value = orgCache[tab]!
+  } else {
+    await (tab === 'city' ? loadCity() : loadDistrict())
+  }
+
+  // 切换后滚动回顶部
+  await nextTick()
+  orgListEl.value?.scrollTo({ top: 0 })
+}
+
+/* ============ 星级党支部 Tab ============ */
+
+const starsTab = ref<StarsTab>('city')
+const starRows = ref<StarRow[]>([])
+const starsTotal = ref<string>(props.data?.starsTotal ?? '0')
+const starsLoading = ref(false)
+
+const starsCache: Record<StarsTab, { rows: StarRow[]; total: string } | null> = {
+  city: null,
+  district: null
+}
+
+/**
+ * 全市：单条记录，含 oneTotal / twoTotal / threeTotal / total / xRate
+ * → 直接映射成 3 行
+ */
+const loadStarsCity = async () => {
+  starsLoading.value = true
+  try {
+    const list = pickList(await getStarBranchInfo())
+    const row = list[0] || {}
+    const total = Number(row.total ?? 0)
+
+    const rows: StarRow[] = [
+      {
+        label: '三星党支部总数',
+        value: `${row.threeTotal ?? 0}个`,
+        rate: row.threeRate || '0%',
+        stars: 3
+      },
+      {
+        label: '二星党支部总数',
+        value: `${row.twoTotal ?? 0}个`,
+        rate: row.twoRate || '0%',
+        stars: 2
+      },
+      {
+        label: '一星党支部总数',
+        value: `${row.oneTotal ?? 0}个`,
+        rate: row.oneRate || '0%',
+        stars: 1
+      }
+    ]
+
+    starsCache.city = { rows, total: String(total) }
+    starRows.value = rows
+    starsTotal.value = String(total)
+  } catch (err) {
+    console.error('[getStarBranchInfo] 请求失败', err)
+    starRows.value = []
+    starsTotal.value = '0'
+  } finally {
+    starsLoading.value = false
+  }
+}
+
+/**
+ * 地区：多条记录，每条含 oneNum / twoNum / threeNum
+ * → 汇总各星级数量，再重新计算占比
+ */
+const loadStarsDistrict = async () => {
+  starsLoading.value = true
+  try {
+    const list = pickList(await getStarBranch())
+
+    let oneSum = 0
+    let twoSum = 0
+    let threeSum = 0
+
+    list.forEach((it: any) => {
+      oneSum += Number(it.oneNum ?? 0)
+      twoSum += Number(it.twoNum ?? 0)
+      threeSum += Number(it.threeNum ?? 0)
+    })
+
+    const total = oneSum + twoSum + threeSum
+    const pct = (n: number) => (total > 0 ? `${((n / total) * 100).toFixed(2)}%` : '0%')
+
+    const rows: StarRow[] = [
+      { label: '三星党支部总数', value: `${threeSum}个`, rate: pct(threeSum), stars: 3 },
+      { label: '二星党支部总数', value: `${twoSum}个`, rate: pct(twoSum), stars: 2 },
+      { label: '一星党支部总数', value: `${oneSum}个`, rate: pct(oneSum), stars: 1 }
+    ]
+
+    starsCache.district = { rows, total: String(total) }
+    starRows.value = rows
+    starsTotal.value = String(total)
+  } catch (err) {
+    console.error('[getStarBranch] 请求失败', err)
+    starRows.value = []
+    starsTotal.value = '0'
+  } finally {
+    starsLoading.value = false
+  }
+}
+
+const switchStarsTab = async (tab: StarsTab) => {
+  if (starsTab.value === tab) return
+  starsTab.value = tab
+
+  const cached = starsCache[tab]
+  if (cached) {
+    starRows.value = cached.rows
+    starsTotal.value = cached.total
+    return
+  }
+  await (tab === 'city' ? loadStarsCity() : loadStarsDistrict())
+}
+
+/* ============ 初始化 ============ */
+
+onMounted(() => {
+  loadCity()
+  loadStarsCity()
 })
 </script>
 
@@ -133,7 +381,9 @@ onMounted(async () => {
   letter-spacing: 2px;
   color: #ffefc8;
   text-shadow: 0 0 8px rgba(255, 196, 112, 0.16);
+  font-size: 40px;
 }
+
 .stars-title {
   position: absolute;
   margin: 0;
@@ -146,16 +396,13 @@ onMounted(async () => {
   font-size: 40px;
 }
 
-.org-title {
-  font-size: 40px;
-}
-
 .org-total {
   position: absolute;
   font-size: 30px;
   color: #ffbf58;
   white-space: nowrap;
 }
+
 .stars-total {
   position: absolute;
   font-size: 30px;
@@ -172,20 +419,9 @@ onMounted(async () => {
   color: #ffd465;
 }
 
-.chip {
-  position: absolute;
-  border: none;
-  border-radius: 22px;
-  color: #fff1cb;
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 241, 190, 0.42),
-    inset 0 0 0 1px rgba(255, 211, 122, 0.34),
-    0 0 10px rgba(255, 170, 52, 0.1);
-  cursor: default;
-}
+/* ---------- Tab 按钮 ---------- */
+
+.chip,
 .chip2 {
   position: absolute;
   border: none;
@@ -193,22 +429,75 @@ onMounted(async () => {
   color: #fff1cb;
   font-size: 28px;
   font-weight: 700;
-  margin-left: 300px;
-  margin-top: 30px;
   background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
   box-shadow:
     inset 0 1px 0 rgba(255, 241, 190, 0.42),
     inset 0 0 0 1px rgba(255, 211, 122, 0.34),
     0 0 10px rgba(255, 170, 52, 0.1);
-  cursor: default;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 
-.org-item {
+.chip2 {
+  margin-left: 300px;
+  margin-top: 30px;
+}
+
+.chip--active {
+  color: #fff8dd;
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 218, 0.65),
+    inset 0 0 0 1px rgba(255, 226, 154, 0.6),
+    0 0 16px rgba(255, 186, 66, 0.38);
+}
+
+/* ---------- 列表滚动容器（一屏 5 条） ---------- */
+
+.org-list {
   position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding-top: 30px; /* 与原 margin-top: 30px 视觉对齐 */
+  padding-right: 12px; /* 给滚动条留空间，避免内容被挤 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 201, 93, 0.7) rgba(255, 200, 100, 0.06);
+}
+
+.org-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.org-list::-webkit-scrollbar-track {
+  background: rgba(255, 200, 100, 0.06);
+  border-radius: 5px;
+}
+
+.org-list::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(255, 201, 93, 0.75), rgba(255, 145, 31, 0.55));
+  box-shadow: inset 0 0 0 1px rgba(255, 226, 154, 0.45);
+}
+
+.org-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(255, 220, 130, 0.95), rgba(255, 165, 50, 0.75));
+}
+
+.org-list::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ---------- 列表项 ---------- */
+
+.org-item {
+  position: relative;
+  height: 84px;
   line-height: 84px;
   text-align: center;
   font-size: 28px;
-  margin-top: 30px;
   font-weight: 700;
   color: #ffeec8;
   border-radius: 32px;
@@ -217,7 +506,29 @@ onMounted(async () => {
     inset 0 1px 0 rgba(255, 241, 197, 0.65),
     inset 0 0 0 1px rgba(255, 207, 106, 0.22),
     0 0 10px rgba(255, 164, 54, 0.08);
+  margin-bottom: 40px; /* 84 + 40 = 124，与原 stepY 一致 */
 }
+
+.org-item:last-child {
+  margin-bottom: 0;
+}
+
+.org-item__value {
+  margin-left: 14px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffd465;
+}
+
+.org-empty {
+  height: 84px;
+  line-height: 84px;
+  text-align: center;
+  font-size: 26px;
+  color: rgba(255, 228, 170, 0.6);
+}
+
+/* ---------- 星级行 ---------- */
 
 .star-row {
   position: absolute;
@@ -297,6 +608,8 @@ onMounted(async () => {
   text-align: right;
   white-space: nowrap;
 }
+
+/* ---------- 党员结构缩放容器 ---------- */
 
 .panel-structure {
   position: absolute;

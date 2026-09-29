@@ -4,52 +4,59 @@
       <div class="panel-head">
         <div class="panel-title">发展党员</div>
         <div class="panel-tabs">
-          <span class="tab tab--active">学历构成</span>
-          <span class="tab">年龄构成</span>
+          <span
+            v-for="tab in recruitTabs"
+            :key="tab.value"
+            class="tab"
+            :class="{ 'tab--active': tab.value === activeRecruitType }"
+            @click="handleRecruitTabClick(tab.value)"
+          >
+            {{ tab.label }}
+          </span>
         </div>
       </div>
 
       <div class="table">
         <div class="table-head">
-          <span class="c1">学历</span>
+          <span class="c1">{{ currentRecruitTab.columnTitle }}</span>
           <span class="c2">人数</span>
           <span class="c3">占比</span>
         </div>
 
-        <div class="table-row">
-          <span class="c1">{{ data.rankingRows?.[0]?.label || '' }}</span>
-          <span class="c2">{{ data.rankingRows?.[0]?.value || '' }}</span>
-          <span class="c3">{{ getRate(data.rankingRows?.[0]?.value, data.rankingRows) }}</span>
+        <div
+          v-for="(item, index) in recruitList"
+          :key="`${activeRecruitType}-${item.label}-${index}`"
+          class="table-row"
+        >
+          <span class="c1">{{ item.label }}</span>
+          <span class="c2">{{ item.value }}</span>
+          <span class="c3">{{ item.rate }}</span>
         </div>
-        <div class="table-row">
-          <span class="c1">{{ data.rankingRows?.[1]?.label || '' }}</span>
-          <span class="c2">{{ data.rankingRows?.[1]?.value || '' }}</span>
-          <span class="c3">{{ getRate(data.rankingRows?.[1]?.value, data.rankingRows) }}</span>
-        </div>
-        <div class="table-row">
-          <span class="c1">{{ data.rankingRows?.[2]?.label || '' }}</span>
-          <span class="c2">{{ data.rankingRows?.[2]?.value || '' }}</span>
-          <span class="c3">{{ getRate(data.rankingRows?.[2]?.value, data.rankingRows) }}</span>
-        </div>
-        <div class="table-row">
-          <span class="c1">{{ data.rankingRows?.[3]?.label || '' }}</span>
-          <span class="c2">{{ data.rankingRows?.[3]?.value || '' }}</span>
-          <span class="c3">{{ getRate(data.rankingRows?.[3]?.value, data.rankingRows) }}</span>
-        </div>
+
+        <div v-if="recruitLoading" class="table-empty">加载中…</div>
+        <div v-else-if="!recruitList.length" class="table-empty">暂无数据</div>
       </div>
     </section>
 
+    <!-- ==================== 人才政策（接口驱动） ==================== -->
     <section class="panel panel--talent">
       <div class="panel-head">
         <div class="panel-title">人才政策</div>
         <div class="panel-tabs">
-          <span class="tab tab--active">人才总量</span>
-          <span class="tab">认定高层次人才数量</span>
+          <span
+            v-for="tab in talentTabs"
+            :key="tab.value"
+            class="tab"
+            :class="{ 'tab--active': tab.value === activeTalentType }"
+            @click="handleTalentTabClick(tab.value)"
+          >
+            {{ tab.label }}
+          </span>
         </div>
         <div class="panel-total panel-total--talent">
           <span class="total-dot"></span>
           <span class="total-label">合计：</span>
-          <span class="total-value">{{ sumValues(data.ringStats) }}</span>
+          <span class="total-value">{{ sumValues(talentList) }}</span>
         </div>
       </div>
 
@@ -58,37 +65,44 @@
       </div>
     </section>
 
+    <!-- ==================== 群团组织（接口驱动） ==================== -->
     <section class="panel panel--mass">
       <div class="panel-head">
         <div class="panel-title">群团组织</div>
         <div class="panel-tabs">
-          <span class="tab tab--active">工会</span>
-          <span class="tab">共青团</span>
-          <span class="tab">妇联</span>
+          <span
+            v-for="tab in massTabs"
+            :key="tab.value"
+            class="tab"
+            :class="{ 'tab--active': tab.value === activeMassType }"
+            @click="handleMassTabClick(tab.value)"
+          >
+            {{ tab.label }}
+          </span>
         </div>
       </div>
 
       <div class="mass-list">
-        <div class="mass-row">
+        <div
+          v-for="(item, index) in massList"
+          :key="`${activeMassType}-${item.label}-${index}`"
+          class="mass-row"
+        >
           <div class="mass-left">
-            <span class="mass-badge mass-badge--a"></span>
-            <div class="mass-name">{{ data.topStats?.[0]?.label || '' }}</div>
+            <span
+              class="mass-badge"
+              :class="index % 2 === 0 ? 'mass-badge--a' : 'mass-badge--b'"
+            ></span>
+            <div class="mass-name">{{ item.label }}</div>
           </div>
           <div class="mass-right">
-            <span class="mass-num">{{ getNumText(data.topStats?.[0]?.value) }}个</span>
-            <span class="mass-unit">{{ getUnitText(data.topStats?.[0]?.value) }}</span>
+            <span class="mass-num">{{ item.value }}</span>
+            <span class="mass-unit">{{ item.unit }}</span>
           </div>
         </div>
-        <div class="mass-row">
-          <div class="mass-left">
-            <span class="mass-badge mass-badge--b"></span>
-            <div class="mass-name">{{ data.topStats?.[1]?.label || '' }}</div>
-          </div>
-          <div class="mass-right">
-            <span class="mass-num">{{ getNumText(data.topStats?.[1]?.value) }}人</span>
-            <span class="mass-unit">{{ getUnitText(data.topStats?.[1]?.value) }}</span>
-          </div>
-        </div>
+
+        <div v-if="massLoading" class="mass-empty">加载中…</div>
+        <div v-else-if="!massList.length" class="mass-empty">暂无数据</div>
       </div>
     </section>
 
@@ -144,23 +158,30 @@
       </div>
     </section>
 
+    <!-- ==================== 志愿服务（接口驱动） ==================== -->
     <section class="panel panel--vol">
       <div class="panel-head">
         <div class="panel-title">志愿服务</div>
         <div class="panel-tabs">
-          <span class="tab tab--active">志愿者</span>
-          <span class="tab">志愿服务队伍</span>
-          <span class="tab">志愿服务活动</span>
+          <span
+            v-for="tab in volTabs"
+            :key="tab.value"
+            class="tab"
+            :class="{ 'tab--active': tab.value === activeVolType }"
+            @click="handleVolTabClick(tab.value)"
+          >
+            {{ tab.label }}
+          </span>
         </div>
       </div>
 
       <div class="vol-meta">
-        <div class="vol-unit">单位：人</div>
+        <div class="vol-unit">单位：{{ currentVolTab.unit }}</div>
         <div class="vol-total">
           <span class="total-dot"></span>
           <span class="total-label">合计：</span>
           <span class="total-value">{{ sumValues(volRows) }}</span>
-          <span class="total-suffix">人</span>
+          <span class="total-suffix">{{ currentVolTab.unit }}</span>
         </div>
       </div>
 
@@ -240,11 +261,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 
 import EChart from '@/components/echarts/EChart.vue'
 import 'echarts-gl'
 import type { PartyRightData } from '../data'
+import {
+  getRecruitPartyMembers,
+  getTalentPolicy,
+  getOrganizaSituation,
+  getIdealService
+} from '@/api/party'
 
 const props = defineProps<{
   data: PartyRightData
@@ -290,16 +317,6 @@ const getFillX = (value: unknown, rows: unknown) => {
   if (!max) return '0'
   const scale = Math.max(0, Math.min(1, cur / max))
   return scale.toFixed(4)
-}
-
-const getFillPercent = (value: unknown, rows: unknown) => {
-  const cur = pickNumber(value) ?? 0
-  const txt = String(value ?? '')
-  if (txt.includes('%')) {
-    const scale = Math.max(0, Math.min(1, cur / 100))
-    return scale.toFixed(4)
-  }
-  return getFillX(value, rows)
 }
 
 const getNumText = (value: unknown) => {
@@ -517,19 +534,238 @@ const getPie3DOption = (rows: any[]) => {
   }
 }
 
-const talentOption = computed(() => {
-  const rows = Array.isArray(props.data?.ringStats) ? props.data.ringStats : []
-  return getPie3DOption(rows)
+/* =========================================================
+   人才政策 Tab（接口驱动）
+   ========================================================= */
+
+type TalentType = '1' | '2'
+
+type TalentRow = {
+  label: string
+  value: string
+}
+
+const talentTabs: Array<{ label: string; value: TalentType }> = [
+  { label: '人才总量', value: '1' },
+  { label: '认定高层次人才数量', value: '2' }
+]
+
+const activeTalentType = ref<TalentType>('1')
+const talentList = ref<TalentRow[]>([])
+const talentLoading = ref(false)
+
+const talentCache: Record<TalentType, TalentRow[] | null> = {
+  '1': null,
+  '2': null
+}
+
+const pickTalentList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchTalentData = async (type: TalentType = activeTalentType.value) => {
+  talentLoading.value = true
+  try {
+    const res: any = await getTalentPolicy(type)
+    console.log('[talentpolicy] type=', type, 'res=', res)
+
+    const list = pickTalentList(res)
+    const sorted = [...list].sort((a: any, b: any) => Number(a?.sort ?? 0) - Number(b?.sort ?? 0))
+    const rows: TalentRow[] = sorted.map((it: any) => ({
+      label: it?.name ?? '',
+      value: String(it?.num ?? 0)
+    }))
+
+    talentCache[type] = rows
+    talentList.value = rows
+  } catch (e) {
+    console.error('人才政策查询失败', e)
+    talentList.value = []
+  } finally {
+    talentLoading.value = false
+  }
+}
+
+const handleTalentTabClick = async (type: TalentType) => {
+  if (activeTalentType.value === type) return
+  activeTalentType.value = type
+
+  const cached = talentCache[type]
+  if (cached) {
+    talentList.value = cached
+    return
+  }
+  await fetchTalentData(type)
+}
+
+const talentOption = computed(() => getPie3DOption(talentList.value))
+
+/* =========================================================
+   群团组织 Tab（接口驱动）
+   共青团 = 1，妇联 = 2，工会 = 3
+   ========================================================= */
+
+type MassType = 1 | 2 | 3
+
+type MassRow = {
+  label: string
+  value: string
+  unit: string
+}
+
+const massTabs: Array<{ label: string; value: MassType }> = [
+  { label: '工会', value: 3 },
+  { label: '共青团', value: 1 },
+  { label: '妇联', value: 2 }
+]
+
+const activeMassType = ref<MassType>(3)
+const massList = ref<MassRow[]>([])
+const massLoading = ref(false)
+
+const massCache: Record<MassType, MassRow[] | null> = {
+  1: null,
+  2: null,
+  3: null
+}
+
+const pickMassList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchMassData = async (type: MassType = activeMassType.value) => {
+  massLoading.value = true
+  try {
+    const res: any = await getOrganizaSituation(String(type))
+    console.log('[organizasituation] type=', type, 'res=', res)
+
+    const list = pickMassList(res)
+    const rows: MassRow[] = list.map((it: any) => ({
+      label: it?.label ?? '',
+      value: String(it?.value ?? ''),
+      unit: it?.unit ?? ''
+    }))
+
+    massCache[type] = rows
+    massList.value = rows
+  } catch (e) {
+    console.error('群团组织查询失败', e)
+    massList.value = []
+  } finally {
+    massLoading.value = false
+  }
+}
+
+const handleMassTabClick = async (type: MassType) => {
+  if (activeMassType.value === type) return
+  activeMassType.value = type
+
+  const cached = massCache[type]
+  if (cached) {
+    massList.value = cached
+    return
+  }
+  await fetchMassData(type)
+}
+
+/* =========================================================
+   志愿服务 Tab（接口驱动）
+   - 志愿者        → num
+   - 志愿服务队伍  → organiza
+   - 志愿服务活动  → activity
+   ========================================================= */
+
+type VolType = 'volunteer' | 'team' | 'activity'
+
+type VolRow = {
+  label: string
+  value: string
+}
+
+// 接口返回的原始记录（含三个指标）
+type VolRawItem = {
+  areaName: string
+  num: string
+  organiza: string
+  activity: string
+}
+
+const volTabs: Array<{ label: string; value: VolType; unit: string }> = [
+  { label: '志愿者', value: 'volunteer', unit: '人' },
+  { label: '志愿服务队伍', value: 'team', unit: '支' },
+  { label: '志愿服务活动', value: 'activity', unit: '场' }
+]
+
+// 默认志愿者
+const activeVolType = ref<VolType>('volunteer')
+
+// 原始数据只拉一次，三个 tab 从同一份数据里挑字段
+const volRaw = ref<VolRawItem[]>([])
+const volLoading = ref(false)
+
+const currentVolTab = computed(
+  () => volTabs.find((t) => t.value === activeVolType.value) || volTabs[0]
+)
+
+const pickVolList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchVolData = async () => {
+  volLoading.value = true
+  try {
+    const res: any = await getIdealService()
+    console.log('[idealservice] res=', res)
+
+    const list = pickVolList(res)
+    volRaw.value = list.map((it: any) => ({
+      areaName: it?.areaName ?? '',
+      num: String(it?.num ?? '0'),
+      organiza: String(it?.organiza ?? '0'),
+      activity: String(it?.activity ?? '0')
+    }))
+  } catch (e) {
+    console.error('志愿服务查询失败', e)
+    volRaw.value = []
+  } finally {
+    volLoading.value = false
+  }
+}
+
+// 按当前 tab 从原始数据里抽对应字段，转成 { label, value }
+const volRows = computed<VolRow[]>(() => {
+  const key: keyof VolRawItem =
+    activeVolType.value === 'volunteer'
+      ? 'num'
+      : activeVolType.value === 'team'
+        ? 'organiza'
+        : 'activity'
+
+  return volRaw.value.map((it) => ({
+    label: it.areaName,
+    value: it[key]
+  }))
 })
 
-const volRows = computed(() => {
-  const d: any = props.data ?? {}
-  const candidates = [d.volRows, d.volunteerRows, d.volunteerStats, d.rankingRows, d.chartRows]
-  for (const c of candidates) {
-    if (Array.isArray(c) && c.length) return c
-  }
-  return []
-})
+// 切换 tab 不用重新请求
+const handleVolTabClick = (type: VolType) => {
+  activeVolType.value = type
+}
 
 const calcAxisStep = (maxValue: number) => {
   if (!maxValue) return 1
@@ -613,6 +849,91 @@ const volOption = computed(() => {
     ]
   }
 })
+
+/* =========================================================
+   发展党员 Tab（接口驱动）
+   ========================================================= */
+
+type RecruitType = 1 | 2
+
+type RecruitRow = {
+  label: string
+  value: string
+  rate: string
+}
+
+const recruitTabs: Array<{ label: string; columnTitle: string; value: RecruitType }> = [
+  { label: '学历构成', columnTitle: '学历', value: 1 },
+  { label: '年龄构成', columnTitle: '年龄', value: 2 }
+]
+
+const activeRecruitType = ref<RecruitType>(1)
+const recruitList = ref<RecruitRow[]>([])
+const recruitLoading = ref(false)
+
+const recruitCache: Record<RecruitType, RecruitRow[] | null> = {
+  1: null,
+  2: null
+}
+
+const currentRecruitTab = computed(
+  () => recruitTabs.find((t) => t.value === activeRecruitType.value) || recruitTabs[0]
+)
+
+const pickRecruitList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchRecruitData = async (type: RecruitType = activeRecruitType.value) => {
+  recruitLoading.value = true
+  try {
+    const res: any = await getRecruitPartyMembers(String(type))
+    console.log('[recruitpartymembers] type=', type, 'res=', res)
+
+    const list = pickRecruitList(res)
+    const rows: RecruitRow[] = list.map((it: any) => ({
+      label: it.label ?? '',
+      value: String(it.value ?? ''),
+      rate: it.rate ?? ''
+    }))
+
+    recruitCache[type] = rows
+    recruitList.value = rows
+  } catch (e) {
+    console.error('发展党员查询失败', e)
+    recruitList.value = []
+  } finally {
+    recruitLoading.value = false
+  }
+}
+
+const handleRecruitTabClick = async (type: RecruitType) => {
+  if (activeRecruitType.value === type) return
+  activeRecruitType.value = type
+
+  const cached = recruitCache[type]
+  if (cached) {
+    recruitList.value = cached
+    return
+  }
+  await fetchRecruitData(type)
+}
+
+/* =========================================================
+   初始化
+   ========================================================= */
+
+onMounted(() => {
+  fetchRecruitData(1)
+  fetchTalentData('1')
+  fetchMassData(3)
+  fetchVolData()
+})
 </script>
 
 <style scoped>
@@ -663,6 +984,7 @@ const volOption = computed(() => {
   line-height: 60px;
   font-size: 30px;
   border-radius: 30px;
+  cursor: pointer;
 }
 
 .panel--dev .table {
@@ -672,6 +994,16 @@ const volOption = computed(() => {
   bottom: 22px;
   padding: 14px 14px 18px;
   box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.panel--dev .table::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel--dev .table::-webkit-scrollbar-thumb {
+  background: rgba(255, 200, 130, 0.4);
+  border-radius: 4px;
 }
 
 .panel--dev .table-head {
@@ -714,6 +1046,15 @@ const volOption = computed(() => {
   font-size: 32px;
 }
 
+.panel--dev .table-empty {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: rgba(255, 238, 206, 0.6);
+}
+
 .panel--talent {
   left: 1460px;
   top: 180px;
@@ -747,6 +1088,7 @@ const volOption = computed(() => {
   line-height: 52px;
   font-size: 34px;
   border-radius: 26px;
+  cursor: pointer;
 }
 
 .panel--talent .panel-total--talent {
@@ -819,6 +1161,7 @@ const volOption = computed(() => {
   line-height: 52px;
   font-size: 34px;
   border-radius: 26px;
+  cursor: pointer;
 }
 
 .panel--service {
@@ -897,6 +1240,7 @@ const volOption = computed(() => {
   line-height: 56px;
   font-size: 26px;
   border-radius: 28px;
+  cursor: pointer;
 }
 
 .panel--vol .vol-meta {
@@ -1287,6 +1631,15 @@ const volOption = computed(() => {
   font-weight: 800;
   color: rgba(255, 220, 140, 0.9);
   padding-top: 6px;
+}
+
+.mass-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 170px;
+  font-size: 28px;
+  color: rgba(255, 238, 206, 0.6);
 }
 
 .service-list {
