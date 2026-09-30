@@ -1,7 +1,7 @@
 <template>
   <div class="center-wrap">
     <div class="top-stats">
-      <div v-for="item in data.topStats" :key="item.label" class="top-stat">
+      <div v-for="item in topStats" :key="item.label" class="top-stat">
         <span class="top-label">{{ item.label }}</span>
         <span class="top-value">{{ item.value }}</span>
       </div>
@@ -13,148 +13,15 @@
           <div class="list-title">{{ data.leftBlocks?.[0]?.title || '' }}</div>
           <div class="list-rows">
             <div
+              v-for="(row, index) in data.leftBlocks?.[0]?.rows || []"
+              :key="`la-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[0]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
+                '--fill': getFill(row.value, data.leftBlocks?.[0]?.rows)
               }"
             >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[0]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[0]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[1]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[1]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[1]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[2]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[2]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[2]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[3]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[3]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[3]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[4]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[4]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[4]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[5]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[5]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[5]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[6]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[6]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[6]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[7]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[7]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[7]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[8]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[8]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[8]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[9]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[9]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[9]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[10]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[10]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[10]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.leftBlocks?.[0]?.rows?.[11]?.value,
-                  data.leftBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.leftBlocks?.[0]?.rows?.[11]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[0]?.rows?.[11]?.value || '' }}</span>
+              <span class="list-label">{{ row.label }}</span>
+              <span class="list-value">{{ row.value }}</span>
             </div>
           </div>
         </section>
@@ -162,53 +29,13 @@
         <section class="list list--left-b">
           <div class="list-title">{{ data.leftBlocks?.[1]?.title || '' }}</div>
           <div class="list-rows">
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[0]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[0]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[1]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[1]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[2]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[2]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[3]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[3]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[4]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[4]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[5]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[5]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[6]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[6]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[7]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[7]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[8]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[8]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[9]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[9]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[10]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[10]?.value || '' }}</span>
-            </div>
-            <div class="list-row">
-              <span class="list-label">{{ data.leftBlocks?.[1]?.rows?.[11]?.label || '' }}</span>
-              <span class="list-value">{{ data.leftBlocks?.[1]?.rows?.[11]?.value || '' }}</span>
+            <div
+              v-for="(row, index) in data.leftBlocks?.[1]?.rows || []"
+              :key="`lb-${row.label}-${index}`"
+              class="list-row"
+            >
+              <span class="list-label">{{ row.label }}</span>
+              <span class="list-value">{{ row.value }}</span>
             </div>
           </div>
         </section>
@@ -219,148 +46,15 @@
           <div class="list-title">{{ data.rightBlocks?.[0]?.title || '' }}</div>
           <div class="list-rows">
             <div
+              v-for="(row, index) in data.rightBlocks?.[0]?.rows || []"
+              :key="`ra-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[0]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
+                '--fill': getFill(row.value, data.rightBlocks?.[0]?.rows)
               }"
             >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[0]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[0]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[1]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[1]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[1]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[2]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[2]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[2]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[3]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[3]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[3]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[4]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[4]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[4]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[5]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[5]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[5]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[6]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[6]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[6]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[7]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[7]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[7]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[8]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[8]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[8]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[9]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[9]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[9]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[10]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[10]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[10]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fill': getFill(
-                  data.rightBlocks?.[0]?.rows?.[11]?.value,
-                  data.rightBlocks?.[0]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[0]?.rows?.[11]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[0]?.rows?.[11]?.value || '' }}</span>
+              <span class="list-label">{{ row.label }}</span>
+              <span class="list-value">{{ row.value }}</span>
             </div>
           </div>
         </section>
@@ -369,148 +63,15 @@
           <div class="list-title">{{ data.rightBlocks?.[1]?.title || '' }}</div>
           <div class="list-rows">
             <div
+              v-for="(row, index) in data.rightBlocks?.[1]?.rows || []"
+              :key="`rb-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[0]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
+                '--fillx': getFillX(row.value, data.rightBlocks?.[1]?.rows)
               }"
             >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[0]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[0]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[1]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[1]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[1]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[2]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[2]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[2]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[3]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[3]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[3]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[4]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[4]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[4]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[5]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[5]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[5]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[6]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[6]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[6]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[7]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[7]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[7]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[8]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[8]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[8]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[9]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[9]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[9]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[10]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[10]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[10]?.value || '' }}</span>
-            </div>
-            <div
-              class="list-row"
-              :style="{
-                '--fillx': getFillX(
-                  data.rightBlocks?.[1]?.rows?.[11]?.value,
-                  data.rightBlocks?.[1]?.rows
-                )
-              }"
-            >
-              <span class="list-label">{{ data.rightBlocks?.[1]?.rows?.[11]?.label || '' }}</span>
-              <span class="list-value">{{ data.rightBlocks?.[1]?.rows?.[11]?.value || '' }}</span>
+              <span class="list-label">{{ row.label }}</span>
+              <span class="list-value">{{ row.value }}</span>
             </div>
           </div>
         </section>
@@ -520,7 +81,9 @@
 </template>
 
 <script setup lang="ts">
-import type { PartyCenterData } from '../data'
+import { ref, onMounted } from 'vue'
+import type { PartyCenterData, PartyMetric } from '../data'
+import { getMemberTopStats } from '@/api/party'
 
 const props = defineProps<{
   data: PartyCenterData
@@ -557,6 +120,56 @@ const getFillX = (value: unknown, rows: unknown) => {
   const scale = Math.max(0, Math.min(1, cur / max))
   return scale.toFixed(4)
 }
+
+/* =========================================================
+   顶部 5 项统计（接口驱动）
+   - 接口：/partybuilding/bigscreen/membertopstats
+   - 返回单条记录：
+       memberTotal    党员总数
+       memberPrepare  预备党员
+       memberDevelop  发展党员
+       memberDegree   大专及以上
+       memberOrgan    基层党组织总数
+   - 拼成 topStats: { label, value }[]
+   ========================================================= */
+
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const topStats = ref<PartyMetric[]>([])
+
+const fetchTopStats = async () => {
+  try {
+    const res: any = await getMemberTopStats()
+    console.log('[membertopstats] res=', res)
+
+    const list = pickList(res)
+    const row = list[0] || {}
+
+    const num = (v: unknown) => Number(v ?? 0) || 0
+
+    topStats.value = [
+      { label: '党员总数', value: `${num(row.memberTotal)}名` },
+      { label: '预备党员', value: `${num(row.memberPrepare)}名` },
+      { label: '发展党员', value: `${num(row.memberDevelop)}名` },
+      { label: '大专及以上', value: `${num(row.memberDegree)}名` },
+      { label: '基层党组织总数', value: `${num(row.memberOrgan)}个` }
+    ]
+  } catch (e) {
+    console.error('顶部统计查询失败', e)
+    topStats.value = []
+  }
+}
+
+onMounted(() => {
+  fetchTopStats()
+})
 </script>
 
 <style scoped>

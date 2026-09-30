@@ -116,8 +116,7 @@
         </button>
       </div>
       <div class="pile-body">
-        <div class="metric-list">
-        </div>
+        <div class="metric-list"></div>
         <div class="pile-chart">
           <Line />
         </div>
@@ -149,15 +148,17 @@
       </div>
     </section>
 
+    <!-- ==================== 钢价走势（接口驱动） ==================== -->
     <section class="panel panel--steel">
       <div class="panel-head">
         <div class="panel-title">钢价走势</div>
-        <select v-model="dateSteel" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateSteel" class="panel-date" @change="fetchSteelData">
+          <option v-for="item in steelDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="steel-body">
-        <!-- 表头 -->
         <div class="steel-header-row">
           <div class="col">品种</div>
           <div class="col">规格</div>
@@ -165,7 +166,7 @@
           <div class="col">上周价格(元)</div>
           <div class="col">环比增长(元)</div>
         </div>
-        <!-- 数据行，每一行独立带左右箭头 -->
+
         <div class="steel-row-wrap" v-for="row in steelTableData" :key="row.id">
           <span class="arrow arrow-left"></span>
           <div class="steel-data-row">
@@ -173,21 +174,28 @@
             <div class="col">{{ row.spec }}</div>
             <div class="col">{{ row.price }}</div>
             <div class="col">{{ row.lastWeekPrice }}</div>
-            <div class="col" :class="{ 'text-down': row.change < 0 }">{{ row.change }}</div>
+            <div class="col" :class="{ 'text-down': row.change < 0 }">
+              {{ row.change }}
+            </div>
           </div>
           <span class="arrow arrow-right"></span>
         </div>
+
+        <div v-if="steelLoading" class="steel-empty">加载中…</div>
+        <div v-else-if="!steelTableData.length" class="steel-empty">暂无数据</div>
       </div>
     </section>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import PieRing from '../charts/PieRing.vue'
 import Line from '../charts/line.vue'
+import { getSteelPrice } from '@/api/econ'
+
 const electricTabs = ['地区', '行业', '园区']
 const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
 const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
@@ -195,15 +203,110 @@ const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
 const dateElectric = ref(dateOptions[0])
 const dateCapacity = ref(dateOptions[0])
 const dateInvest = ref(dateOptions[1])
-const dateSteel = ref('')
-// 模拟截图里表格数据
-const steelTableData = ref([
-  { id: 1, category: '工字钢', spec: '25A', price: 4150, lastWeekPrice: 4150, change: 0 },
-  { id: 2, category: '槽钢', spec: '16#', price: 4400, lastWeekPrice: 4340, change: -60 },
-  { id: 3, category: '槽钢', spec: '25#', price: 4150, lastWeekPrice: 4150, change: 0 },
-  { id: 4, category: '角钢', spec: '50*5', price: 4350, lastWeekPrice: 4290, change: -60 },
-  { id: 5, category: '角钢', spec: '160*10', price: 4110, lastWeekPrice: 4110, change: 0 }
-])
+
+/* =========================================================
+   钢价走势（接口驱动）
+   - 接口：/economicoperation/bigscreen/steelprice?souseDate=xxx
+   - 返回 { type, specification, price, amountIncrease }
+   - 日期选项独立一份，默认 2025.06
+   - 上周价格 = 当前价格 - 环比增长
+   ========================================================= */
+
+const steelDateOptions = [
+  '2023.02',
+  '2023.03',
+  '2023.03.21',
+  '2023.03.22',
+  '2023.03.27',
+  '2023.04.20',
+  '2023.05.05',
+  '2023.05.18',
+  '2023.05.26',
+  '2023.06.02',
+  '2023.06.09',
+  '2023.06.16',
+  '2023.06.21',
+  '2023.06.29',
+  '2023.07.07',
+  '2023.07.14',
+  '2023.07.21',
+  '2023.07.28',
+  '2023.08',
+  '2023.08.04',
+  '2023.08.11',
+  '2023.08.18',
+  '2023.08.25',
+  '2023.09.01',
+  '2023.09.08',
+  '2023.09.15',
+  '2023.09.21',
+  '2023.09.26',
+  '2023.10.09',
+  '2023.10.17',
+  '2023.11.29',
+  '2024.03.13',
+  '2024.05',
+  '2024.07',
+  '2024.12',
+  '2025.06'
+]
+
+// ⭐ 默认 2025.06
+const dateSteel = ref('2025.06')
+const steelLoading = ref(false)
+
+type SteelRow = {
+  id: number
+  category: string
+  spec: string
+  price: number
+  lastWeekPrice: number
+  change: number
+}
+
+const steelTableData = ref<SteelRow[]>([])
+
+/** 兼容多种解包层级 */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchSteelData = async () => {
+  steelLoading.value = true
+  try {
+    const res: any = await getSteelPrice(dateSteel.value)
+    console.log('[steelprice] souseDate=', dateSteel.value, 'res=', res)
+
+    const list = pickList(res)
+    steelTableData.value = list.map((it: any, idx: number) => {
+      const price = Number(it?.price ?? 0)
+      const change = Number(it?.amountIncrease ?? 0)
+      return {
+        id: idx + 1,
+        category: String(it?.type ?? ''),
+        spec: String(it?.specification ?? ''),
+        price,
+        lastWeekPrice: price - change,
+        change
+      }
+    })
+  } catch (e) {
+    console.error('钢价走势查询失败', e)
+    steelTableData.value = []
+  } finally {
+    steelLoading.value = false
+  }
+}
+
+/* =========================================================
+   GDP 增速同比
+   ========================================================= */
+
 const gdpLineOption = computed(() => {
   const x = ['2022年1季度', '2022年2季度', '2022年3季度', '2022年4季度']
   const national = [3.1, 2.4, 2.8, 2.8]
@@ -348,71 +451,11 @@ const regionGdpOption = computed(() => {
 
 const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
 const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
-const capacityMetrics = computed(() => {
-  const map = {
-    全社会用电容量: [
-      { label: '第三产业', value: '408.46', unit: '万千瓦' },
-      { label: '同比', value: '3.95', unit: '%' },
-      { label: '环比', value: '1.24', unit: '%' }
-    ],
-    全行业实际用电容量: [
-      { label: '第二产业', value: '962.25', unit: '万千瓦' },
-      { label: '同比', value: '4.89', unit: '%' },
-      { label: '环比', value: '1.31', unit: '%' }
-    ]
-  } as const
-  return map[activeCapacityTab.value]
-})
-const capacityRingOption = computed(() => {
-  const rings =
-    activeCapacityTab.value === '全行业实际用电容量'
-      ? [
-          { name: '城市居民用电量', value: 48.9, color: '#33d5ff' },
-          { name: '第一产业', value: 12.1, color: '#ffe24a' },
-          { name: '第二产业', value: 66.5, color: '#40f3b8' },
-          { name: '第三产业', value: 35.8, color: '#ffb84a' }
-        ]
-      : [
-          { name: '城市居民用电量', value: 42.6, color: '#33d5ff' },
-          { name: '第一产业', value: 10.8, color: '#ffe24a' },
-          { name: '第二产业', value: 58.4, color: '#40f3b8' },
-          { name: '第三产业', value: 32.3, color: '#ffb84a' }
-        ]
-  const makeRing = (item: (typeof rings)[number], idx: number) => {
-    const outer = 78 - idx * 14
-    const inner = outer - 8
-    return {
-      type: 'pie',
-      radius: [`${inner}%`, `${outer}%`],
-      center: ['58%', '56%'],
-      silent: true,
-      label: {
-        show: true,
-        position: 'outside',
-        formatter: `${item.name}\n{v|${item.value}}`,
-        rich: { v: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 14, fontWeight: 800 } },
-        color: 'rgba(214, 238, 255, 0.7)',
-        fontSize: 12
-      },
-      labelLine: { length: 10, length2: 10, lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
-      data: [
-        { value: item.value, name: item.name, itemStyle: { color: item.color } },
-        {
-          value: 100 - item.value,
-          name: '',
-          itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
-          label: { show: false },
-          labelLine: { show: false }
-        }
-      ]
-    }
-  }
-  return { backgroundColor: 'transparent', tooltip: { show: false }, series: rings.map(makeRing) }
-})
 
-// 固定资产投资
 const investTabs = ['地区', '行业', '园区']
 const activeInvestTab = ref<string>(investTabs[0])
+const activeElectricTab = ref<string>(electricTabs[0])
+
 const investDistrictX = [
   '海城市',
   '台安县',
@@ -422,9 +465,10 @@ const investDistrictX = [
   '立山区',
   '千山区',
   '高新区',
-  '经开区',
+  '经开区'
 ]
 const investDistrictY = [25.8, 42.3, 11.6, 20, 25.8, 14.4, 39.8, 71, 148]
+
 const investOption = computed(() => {
   return {
     backgroundColor: 'transparent',
@@ -476,6 +520,7 @@ const investOption = computed(() => {
     ]
   }
 })
+
 const investDistrictX2 = [
   '钢铁行业',
   '菱镁行业',
@@ -487,6 +532,7 @@ const investDistrictX2 = [
   '铁矿行业',
   '工业辅助'
 ]
+
 const investOption2 = computed(() => {
   return {
     backgroundColor: 'transparent',
@@ -538,147 +584,27 @@ const investOption2 = computed(() => {
     ]
   }
 })
+
 const fourReformMetrics = computed(() => [
   { label: '累计完成投资', value: '7.07', unit: '亿元' },
   { label: '较去年同期增长', value: '2.9', unit: '%' },
   { label: '占工业投资比重', value: '48.5', unit: '%' },
   { label: '较去年同期提升', value: '1.2', unit: '%' }
 ])
+
 const fourReformMetrics2 = computed(() => [
   { label: '营业收入', value: '3014', unit: '亿元' },
   { label: '税金总额', value: '83', unit: '亿元' },
   { label: '平均用工人数', value: '149580', unit: '人' },
   { label: '利润总额', value: '161', unit: '亿元' }
 ])
-const pileOption = computed(() => {
-  const districts = ['海城市', '岫岩县', '台安县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
-  const privateVals = [14, 65, 6, 18, 9, 10, 4, 7]
-  const publicVals = [8, 12, 3, 10, 6, 7, 3, 5]
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 70, right: 26, top: 26, bottom: 34 },
-    legend: {
-      bottom: 6,
-      left: 'center',
-      itemWidth: 10,
-      itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 }
-    },
-    xAxis: {
-      type: 'category',
-      data: districts,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        name: '商用充电站',
-        type: 'bar',
-        data: publicVals,
-        barWidth: 10,
-        itemStyle: {
-          borderRadius: [10, 10, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(51, 213, 255, 0.95)' },
-              { offset: 1, color: 'rgba(51, 213, 255, 0.15)' }
-            ]
-          }
-        }
-      },
-      {
-        name: '民用充电站',
-        type: 'bar',
-        data: privateVals,
-        barWidth: 10,
-        itemStyle: {
-          borderRadius: [10, 10, 0, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(255, 226, 74, 0.95)' },
-              { offset: 1, color: 'rgba(255, 226, 74, 0.15)' }
-            ]
-          }
-        }
-      }
-    ]
-  }
-})
 
-const projectTabs = ['项目报装情况', '已报装项目详情']
-const activeProjectTab = ref<(typeof projectTabs)[number]>(projectTabs[0])
-const projectTotal = computed(() => (activeProjectTab.value === '项目报装情况' ? 35 : 35))
-const projectDone = computed(() => (activeProjectTab.value === '项目报装情况' ? 25 : 25))
-const projectTodo = computed(() => (activeProjectTab.value === '项目报装情况' ? 10 : 10))
-const projectDoneRate = computed(() => Math.round((projectDone.value / projectTotal.value) * 100))
-const projectTodoRate = computed(() => 100 - projectDoneRate.value)
+/* =========================================================
+   初始化
+   ========================================================= */
 
-const energyTabs = ['能源发电量', '能源分布情况']
-const activeEnergyTab = ref<(typeof energyTabs)[number]>(energyTabs[0])
-const energyTotal = computed(() => (activeEnergyTab.value === '能源发电量' ? '618032' : '618032'))
-const energyOption = computed(() => {
-  const categories = ['火电', '水电', '风电', '太阳能', '生物质']
-  const values =
-    activeEnergyTab.value === '能源分布情况' ? [55, 12, 20, 6, 7] : [558130, 714, 20114, 2697, 1269]
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 80, right: 26, top: 16, bottom: 18 },
-    xAxis: {
-      type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'category',
-      data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 14 },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    series: [
-      {
-        type: 'bar',
-        data: values,
-        barWidth: 18,
-        itemStyle: {
-          borderRadius: [0, 10, 10, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 1,
-            y2: 0,
-            colorStops: [
-              { offset: 0, color: 'rgba(255, 120, 120, 0.25)' },
-              { offset: 1, color: 'rgba(255, 120, 120, 0.95)' }
-            ]
-          }
-        }
-      }
-    ]
-  }
+onMounted(() => {
+  fetchSteelData()
 })
 </script>
 
@@ -929,376 +855,13 @@ const energyOption = computed(() => {
   grid-template-rows: 140px 1fr;
   gap: 14px;
 }
-.pile-top {
-  display: grid;
-  grid-template-columns: 520px 1fr;
-  gap: 14px;
-  min-height: 0;
-}
-.pile-top-left,
-.pile-top-right {
-  position: relative;
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: linear-gradient(180deg, rgba(16, 66, 130, 0.22), rgba(6, 18, 48, 0.48));
-  box-shadow:
-    inset 0 0 26px rgba(54, 232, 255, 0.08),
-    0 0 18px rgba(0, 130, 255, 0.1);
-  box-sizing: border-box;
-  min-height: 0;
-  overflow: hidden;
-}
-.pile-top-left::before,
-.pile-top-right::before {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(94, 197, 255, 0.12);
-  pointer-events: none;
-}
-.pile-top-left::after,
-.pile-top-right::after {
-  content: '';
-  position: absolute;
-  left: -20%;
-  top: -40%;
-  width: 160%;
-  height: 120%;
-  background: linear-gradient(
-    45deg,
-    rgba(54, 232, 255, 0),
-    rgba(54, 232, 255, 0.08),
-    rgba(54, 232, 255, 0)
-  );
-  transform: rotate(8deg);
-  opacity: 0.35;
-  pointer-events: none;
-}
-.pile-top-left {
-  padding: 6px 16px;
-  display: grid;
-}
-.pile-top-left-row {
-  height: 58px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-align: center;
-}
-.pile-top-left-row + .pile-top-left-row {
-  border-top: 1px solid rgba(89, 194, 255, 0.12);
-  box-shadow: inset 0 1px 0 rgba(54, 232, 255, 0.08);
-}
-.pile-top-left-label {
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.86);
-  letter-spacing: 2px;
-}
-.pile-top-left-value {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.pile-top-right {
-  padding: 6px 16px;
-  display: grid;
-}
-.pile-top-right-row {
-  height: 58px;
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  align-items: center;
-  gap: 14px;
-  position: relative;
-  padding: 0 6px;
-  box-sizing: border-box;
-}
-.pile-top-right-row + .pile-top-right-row {
-  border-top: 1px solid rgba(89, 194, 255, 0.12);
-  box-shadow: inset 0 1px 0 rgba(54, 232, 255, 0.08);
-}
-.pile-top-right-row::before {
-  content: '';
-  width: 4px;
-  height: 18px;
-  border-radius: 999px;
-  background: rgba(54, 232, 255, 0.35);
-  box-shadow: 0 0 12px rgba(54, 232, 255, 0.16);
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.pile-top-right-name {
-  display: grid;
-  gap: 4px;
-}
-.pile-top-right-sub {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-  letter-spacing: 1px;
-}
-.pile-top-right-main {
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.82);
-  letter-spacing: 2px;
-}
-.pile-top-right-metrics {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-.pile-top-right-val,
-.pile-top-right-yoy {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-}
-.pile-top-right-yoy-label {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-}
-.pile-top-left .pile-num {
-  font-size: 28px;
-}
-.pile-top-right .pile-num {
-  font-size: 22px;
-}
-.pile-num {
-  font-size: 24px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.95);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
-}
-.pile-num--cyan {
-  color: rgba(51, 213, 255, 0.95);
-  text-shadow: 0 0 12px rgba(51, 213, 255, 0.18);
-}
-.pile-num--yellow {
-  color: rgba(255, 226, 74, 0.95);
-  text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
-}
-.pile-unit {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-}
-.pile-split {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.42);
-}
 .pile-chart {
   min-height: 0;
 }
-.project-body {
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 12px;
-  margin-top: 50px;
-}
-.project-kpi {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: rgba(214, 238, 255, 0.82);
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-.project-kpi--bar {
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.32);
-  box-sizing: border-box;
-}
-.project-kpi-icon {
-  width: 30px;
-
-  height: 30px;
-  border-radius: 10px;
-  border: 1px solid rgba(54, 232, 255, 0.18);
-  background: radial-gradient(circle, rgba(54, 232, 255, 0.2), rgba(6, 18, 48, 0.15));
-}
-
-.project-kpi-value {
-  font-size: 26px;
-  color: rgba(240, 251, 255, 0.95);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
-}
-
-.project-stage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-  margin-top: -180px;
-}
-
-.project-base {
-  position: absolute;
-  width: 620px;
-  height: 180px;
-  border-radius: 999px;
-  border: 1px solid rgba(54, 232, 255, 0.14);
-  background: radial-gradient(circle at 50% 40%, rgba(54, 232, 255, 0.16), rgba(6, 18, 48, 0));
-  transform: perspective(900px) rotateX(72deg) translateY(28px);
-  box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
-}
-
-.project-ring {
-  position: absolute;
-  left: 50%;
-  top: 58%;
-  border-radius: 999px;
-  transform: translate(-50%, -50%) perspective(900px) rotateX(72deg);
-  pointer-events: none;
-}
-
-.project-ring--a {
-  width: 700px;
-  height: 250px;
-  border: 2px solid rgba(54, 232, 255, 0.14);
-  box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
-}
-
-.project-ring--b {
-  width: 560px;
-  height: 210px;
-  border: 2px solid rgba(54, 232, 255, 0.1);
-  opacity: 0.75;
-}
-
-.project-table {
-  border-radius: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.42);
-  overflow: hidden;
-  min-height: 0;
-  margin-top: -180px;
-  margin-bottom: 20px;
-}
-
-.project-table-row {
-  height: 64px;
-  display: grid;
-  grid-template-columns: 22px 140px 1fr 1fr;
-  align-items: center;
-  padding: 0 14px;
-  box-sizing: border-box;
-  border-top: 1px solid rgba(89, 194, 255, 0.12);
-}
-
-.project-table-row:first-child {
-  border-top: none;
-}
-
-.project-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  box-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
-}
-
-.project-dot--done {
-  background: rgba(51, 213, 255, 0.95);
-}
-
-.project-dot--todo {
-  background: rgba(255, 226, 74, 0.95);
-  box-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
-}
-
-.project-name {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: rgba(214, 238, 255, 0.82);
-}
-
-.project-stat {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 10px;
-}
-
-.project-stat-label {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: rgba(214, 238, 255, 0.62);
-}
-
-.project-stat-value {
-  font-size: 22px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.94);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
-}
-
-.project-stat-unit {
-  margin-left: 6px;
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-}
-
-.energy-body {
-  height: 100%;
-  min-height: 0;
-  margin-top: 20px;
-  display: grid;
-  grid-template-rows: 72px 1fr;
-  gap: 10px;
-}
-
-.energy-kpi {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.energy-kpi-label {
-  color: rgba(214, 238, 255, 0.78);
-}
-
-.energy-kpi-value {
-  font-size: 28px;
-  color: rgba(255, 226, 74, 0.95);
-  text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
-}
-
-.energy-kpi-unit {
-  color: rgba(214, 238, 255, 0.62);
-}
-
-.energy-chart {
-  min-height: 0;
-  margin-top: -50px;
-}
-
 .steel-body {
   width: 100%;
 }
 
-/* 表头行 */
 .steel-header-row {
   display: flex;
   width: 100%;
@@ -1313,7 +876,6 @@ const energyOption = computed(() => {
   text-shadow: 0 0 8px #2178dd;
 }
 
-/* 数据行容器，放左右箭头 */
 .steel-row-wrap {
   display: flex;
   align-items: center;
@@ -1350,5 +912,15 @@ const energyOption = computed(() => {
 .text-down {
   color: #39f25c;
   text-shadow: 0 0 8px #23d848;
+}
+
+/* ⭐ 新增：钢价走势 空状态 */
+.steel-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 28px;
+  color: rgba(214, 238, 255, 0.6);
 }
 </style>

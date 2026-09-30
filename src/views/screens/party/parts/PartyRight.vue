@@ -106,55 +106,34 @@
       </div>
     </section>
 
+    <!-- ==================== 党员服务中心分布（接口驱动） ==================== -->
     <section class="panel panel--service">
       <div class="panel-head">
         <div class="panel-title panel-title--service">党员服务中心分布</div>
         <div class="panel-total">
           <span class="total-label">合计</span>
-          <span class="total-value" style="margin-left: 100px">{{
-            data.topStats?.[2]?.value || ''
-          }}</span>
+          <span class="total-value" style="margin-left: 100px">{{ serviceTotal }}</span>
           <span>个</span>
         </div>
       </div>
 
       <div class="service-list">
-        <div class="service-row">
+        <div
+          v-for="(item, index) in serviceList"
+          :key="`service-${item.label}-${index}`"
+          class="service-row"
+        >
           <span class="service-dot"></span>
-          <span class="service-label">{{ data.rankingRows?.[0]?.label || '' }}</span>
-          <span class="service-value">{{ data.rankingRows?.[0]?.value || '' }}</span>
+          <span class="service-label">{{ item.label }}</span>
+          <span class="service-value">{{ item.value }}</span>
           <span
             class="service-track"
-            :style="{ '--fillx': getFillX(data.rankingRows?.[0]?.value, data.rankingRows) }"
+            :style="{ '--fillx': getFillX(item.value, serviceList) }"
           ></span>
         </div>
-        <div class="service-row">
-          <span class="service-dot"></span>
-          <span class="service-label">{{ data.rankingRows?.[1]?.label || '' }}</span>
-          <span class="service-value">{{ data.rankingRows?.[1]?.value || '' }}</span>
-          <span
-            class="service-track"
-            :style="{ '--fillx': getFillX(data.rankingRows?.[1]?.value, data.rankingRows) }"
-          ></span>
-        </div>
-        <div class="service-row">
-          <span class="service-dot"></span>
-          <span class="service-label">{{ data.rankingRows?.[2]?.label || '' }}</span>
-          <span class="service-value">{{ data.rankingRows?.[2]?.value || '' }}</span>
-          <span
-            class="service-track"
-            :style="{ '--fillx': getFillX(data.rankingRows?.[2]?.value, data.rankingRows) }"
-          ></span>
-        </div>
-        <div class="service-row">
-          <span class="service-dot"></span>
-          <span class="service-label">{{ data.rankingRows?.[3]?.label || '' }}</span>
-          <span class="service-value">{{ data.rankingRows?.[3]?.value || '' }}</span>
-          <span
-            class="service-track"
-            :style="{ '--fillx': getFillX(data.rankingRows?.[3]?.value, data.rankingRows) }"
-          ></span>
-        </div>
+
+        <div v-if="serviceLoading" class="service-empty">加载中…</div>
+        <div v-else-if="!serviceList.length" class="service-empty">暂无数据</div>
       </div>
     </section>
 
@@ -190,6 +169,7 @@
       </div>
     </section>
 
+    <!-- ==================== 两新组织（接口驱动） ==================== -->
     <section class="panel panel--two">
       <div class="panel-head">
         <div class="panel-title">两新组织</div>
@@ -204,22 +184,22 @@
         <div class="two-grid">
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.rankingRows?.[4]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.rankingRows?.[4]?.value) || '个' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.nonPublicOrgan) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicOrgan) || '个' }}</span>
             </div>
             <div class="two-label">非公有制企业<br />党组织</div>
           </div>
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.rankingRows?.[5]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.rankingRows?.[5]?.value) || '名' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.nonPublicMember) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicMember) || '名' }}</span>
             </div>
             <div class="two-label">非公有制企业<br />党员</div>
           </div>
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.chartRows?.[0]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.chartRows?.[0]?.value) || '%' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.nonPublicRate) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicRate) || '%' }}</span>
             </div>
             <div class="two-label">非公有制企业<br />党组织覆盖率</div>
           </div>
@@ -235,22 +215,22 @@
         <div class="two-grid">
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.topStats?.[2]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.topStats?.[2]?.value) || '个' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.socialOrgan) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.socialOrgan) || '个' }}</span>
             </div>
             <div class="two-label">社会组织<br />党组织</div>
           </div>
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.topStats?.[3]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.topStats?.[3]?.value) || '名' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.socialMember) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.socialMember) || '名' }}</span>
             </div>
             <div class="two-label">社会组织<br />党员</div>
           </div>
           <div class="two-item">
             <div class="two-value">
-              <span class="two-num">{{ getNumText(data.chartRows?.[1]?.value) }}</span>
-              <span class="two-unit">{{ getUnitText(data.chartRows?.[1]?.value) || '%' }}</span>
+              <span class="two-num">{{ getNumText(twoNewStats.socialRate) }}</span>
+              <span class="two-unit">{{ getUnitText(twoNewStats.socialRate) || '%' }}</span>
             </div>
             <div class="two-label">社会组织<br />党组织覆盖率</div>
           </div>
@@ -270,7 +250,9 @@ import {
   getRecruitPartyMembers,
   getTalentPolicy,
   getOrganizaSituation,
-  getIdealService
+  getIdealService,
+  getServiceCentre,
+  getTwoNewOrgan
 } from '@/api/party'
 
 const props = defineProps<{
@@ -535,7 +517,19 @@ const getPie3DOption = (rows: any[]) => {
 }
 
 /* =========================================================
-   人才政策 Tab（接口驱动）
+   通用：兼容多种解包层级
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+/* =========================================================
+   1. 人才政策 Tab
    ========================================================= */
 
 type TalentType = '1' | '2'
@@ -559,22 +553,13 @@ const talentCache: Record<TalentType, TalentRow[] | null> = {
   '2': null
 }
 
-const pickTalentList = (res: any): any[] => {
-  const body = res?.data ?? res
-  if (Array.isArray(body?.datalist)) return body.datalist
-  if (Array.isArray(body?.dataList)) return body.dataList
-  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
-  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
-  return []
-}
-
 const fetchTalentData = async (type: TalentType = activeTalentType.value) => {
   talentLoading.value = true
   try {
     const res: any = await getTalentPolicy(type)
     console.log('[talentpolicy] type=', type, 'res=', res)
 
-    const list = pickTalentList(res)
+    const list = pickList(res)
     const sorted = [...list].sort((a: any, b: any) => Number(a?.sort ?? 0) - Number(b?.sort ?? 0))
     const rows: TalentRow[] = sorted.map((it: any) => ({
       label: it?.name ?? '',
@@ -606,8 +591,7 @@ const handleTalentTabClick = async (type: TalentType) => {
 const talentOption = computed(() => getPie3DOption(talentList.value))
 
 /* =========================================================
-   群团组织 Tab（接口驱动）
-   共青团 = 1，妇联 = 2，工会 = 3
+   2. 群团组织 Tab（共青团=1，妇联=2，工会=3）
    ========================================================= */
 
 type MassType = 1 | 2 | 3
@@ -634,22 +618,13 @@ const massCache: Record<MassType, MassRow[] | null> = {
   3: null
 }
 
-const pickMassList = (res: any): any[] => {
-  const body = res?.data ?? res
-  if (Array.isArray(body?.datalist)) return body.datalist
-  if (Array.isArray(body?.dataList)) return body.dataList
-  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
-  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
-  return []
-}
-
 const fetchMassData = async (type: MassType = activeMassType.value) => {
   massLoading.value = true
   try {
     const res: any = await getOrganizaSituation(String(type))
     console.log('[organizasituation] type=', type, 'res=', res)
 
-    const list = pickMassList(res)
+    const list = pickList(res)
     const rows: MassRow[] = list.map((it: any) => ({
       label: it?.label ?? '',
       value: String(it?.value ?? ''),
@@ -679,10 +654,47 @@ const handleMassTabClick = async (type: MassType) => {
 }
 
 /* =========================================================
-   志愿服务 Tab（接口驱动）
-   - 志愿者        → num
-   - 志愿服务队伍  → organiza
-   - 志愿服务活动  → activity
+   3. 党员服务中心分布（接口驱动）
+   - 接口：/partybuilding/bigscreen/servicecentre
+   - 返回 { areaName, num }
+   - 合计 = 所有 num 之和
+   ========================================================= */
+
+type ServiceRow = {
+  label: string
+  value: string
+}
+
+const serviceList = ref<ServiceRow[]>([])
+const serviceTotal = ref<string>('0')
+const serviceLoading = ref(false)
+
+const fetchServiceData = async () => {
+  serviceLoading.value = true
+  try {
+    const res: any = await getServiceCentre()
+    console.log('[servicecentre] res=', res)
+
+    const list = pickList(res)
+    const rows: ServiceRow[] = list.map((it: any) => ({
+      label: String(it?.areaName ?? ''),
+      value: String(it?.num ?? '0')
+    }))
+
+    serviceList.value = rows
+    const total = rows.reduce((s, r) => s + (Number(r.value) || 0), 0)
+    serviceTotal.value = String(total)
+  } catch (e) {
+    console.error('党员服务中心分布查询失败', e)
+    serviceList.value = []
+    serviceTotal.value = '0'
+  } finally {
+    serviceLoading.value = false
+  }
+}
+
+/* =========================================================
+   4. 志愿服务 Tab（志愿者=num、队伍=organiza、活动=activity）
    ========================================================= */
 
 type VolType = 'volunteer' | 'team' | 'activity'
@@ -692,7 +704,6 @@ type VolRow = {
   value: string
 }
 
-// 接口返回的原始记录（含三个指标）
 type VolRawItem = {
   areaName: string
   num: string
@@ -706,10 +717,8 @@ const volTabs: Array<{ label: string; value: VolType; unit: string }> = [
   { label: '志愿服务活动', value: 'activity', unit: '场' }
 ]
 
-// 默认志愿者
 const activeVolType = ref<VolType>('volunteer')
 
-// 原始数据只拉一次，三个 tab 从同一份数据里挑字段
 const volRaw = ref<VolRawItem[]>([])
 const volLoading = ref(false)
 
@@ -717,22 +726,13 @@ const currentVolTab = computed(
   () => volTabs.find((t) => t.value === activeVolType.value) || volTabs[0]
 )
 
-const pickVolList = (res: any): any[] => {
-  const body = res?.data ?? res
-  if (Array.isArray(body?.datalist)) return body.datalist
-  if (Array.isArray(body?.dataList)) return body.dataList
-  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
-  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
-  return []
-}
-
 const fetchVolData = async () => {
   volLoading.value = true
   try {
     const res: any = await getIdealService()
     console.log('[idealservice] res=', res)
 
-    const list = pickVolList(res)
+    const list = pickList(res)
     volRaw.value = list.map((it: any) => ({
       areaName: it?.areaName ?? '',
       num: String(it?.num ?? '0'),
@@ -747,7 +747,6 @@ const fetchVolData = async () => {
   }
 }
 
-// 按当前 tab 从原始数据里抽对应字段，转成 { label, value }
 const volRows = computed<VolRow[]>(() => {
   const key: keyof VolRawItem =
     activeVolType.value === 'volunteer'
@@ -762,7 +761,6 @@ const volRows = computed<VolRow[]>(() => {
   }))
 })
 
-// 切换 tab 不用重新请求
 const handleVolTabClick = (type: VolType) => {
   activeVolType.value = type
 }
@@ -851,7 +849,64 @@ const volOption = computed(() => {
 })
 
 /* =========================================================
-   发展党员 Tab（接口驱动）
+   5. 两新组织（接口驱动）
+   - 接口返回 { key, label, value }，key 依次为 one ~ six
+       one   非公有制企业党组织
+       two   非公有制企业党员
+       three 非公有制企业党组织覆盖率
+       four  社会组织
+       five  社会组织党员
+       six   社会组织党组织覆盖率
+   - 按 key 存 Map，不依赖数组顺序
+   ========================================================= */
+
+type TwoNewStats = {
+  nonPublicOrgan: string
+  nonPublicMember: string
+  nonPublicRate: string
+  socialOrgan: string
+  socialMember: string
+  socialRate: string
+}
+
+const twoNewMap = ref<Record<string, string>>({})
+const twoNewLoading = ref(false)
+
+const twoNewStats = computed<TwoNewStats>(() => {
+  const map = twoNewMap.value
+  return {
+    nonPublicOrgan: map.one ?? '',
+    nonPublicMember: map.two ?? '',
+    nonPublicRate: map.three ?? '',
+    socialOrgan: map.four ?? '',
+    socialMember: map.five ?? '',
+    socialRate: map.six ?? ''
+  }
+})
+
+const fetchTwoNewData = async () => {
+  twoNewLoading.value = true
+  try {
+    const res: any = await getTwoNewOrgan()
+    console.log('[twoneworgan] res=', res)
+
+    const list = pickList(res)
+    const map: Record<string, string> = {}
+    list.forEach((it: any) => {
+      const k = String(it?.key ?? '')
+      if (k) map[k] = String(it?.value ?? '')
+    })
+    twoNewMap.value = map
+  } catch (e) {
+    console.error('两新组织查询失败', e)
+    twoNewMap.value = {}
+  } finally {
+    twoNewLoading.value = false
+  }
+}
+
+/* =========================================================
+   6. 发展党员 Tab（学历=1、年龄=2）
    ========================================================= */
 
 type RecruitType = 1 | 2
@@ -880,22 +935,13 @@ const currentRecruitTab = computed(
   () => recruitTabs.find((t) => t.value === activeRecruitType.value) || recruitTabs[0]
 )
 
-const pickRecruitList = (res: any): any[] => {
-  const body = res?.data ?? res
-  if (Array.isArray(body?.datalist)) return body.datalist
-  if (Array.isArray(body?.dataList)) return body.dataList
-  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
-  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
-  return []
-}
-
 const fetchRecruitData = async (type: RecruitType = activeRecruitType.value) => {
   recruitLoading.value = true
   try {
     const res: any = await getRecruitPartyMembers(String(type))
     console.log('[recruitpartymembers] type=', type, 'res=', res)
 
-    const list = pickRecruitList(res)
+    const list = pickList(res)
     const rows: RecruitRow[] = list.map((it: any) => ({
       label: it.label ?? '',
       value: String(it.value ?? ''),
@@ -932,7 +978,9 @@ onMounted(() => {
   fetchRecruitData(1)
   fetchTalentData('1')
   fetchMassData(3)
+  fetchServiceData()
   fetchVolData()
+  fetchTwoNewData()
 })
 </script>
 
@@ -1710,6 +1758,16 @@ onMounted(() => {
   background: linear-gradient(90deg, rgba(255, 210, 120, 0.85), rgba(255, 120, 0, 0.55));
   transform: scaleX(var(--fillx, 0));
   transform-origin: left;
+}
+
+/* ⭐ 新增：党员服务中心 空状态 */
+.service-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+  font-size: 28px;
+  color: rgba(255, 238, 206, 0.6);
 }
 
 .bar-list {

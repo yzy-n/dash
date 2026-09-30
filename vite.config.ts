@@ -48,6 +48,18 @@ export default defineConfig(({ mode }) => {
               changeOrigin: true,
               timeout: 5000,
               proxyTimeout: 5000
+            },
+            '/economicoperation': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
+            },
+            '/businessenvironment': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
             }
           }
         }

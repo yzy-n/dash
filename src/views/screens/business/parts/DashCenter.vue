@@ -1,57 +1,45 @@
 <template>
   <div class="center-shell">
     <div class="main">
-      <!-- 左侧面板：双公示 完全还原截图 -->
+      <!-- 左侧面板：双公示（接口驱动） -->
       <section class="panel panel--left">
         <div class="panel-title">双公示</div>
         <div class="left-block-wrap">
-          <!-- 左侧6个指标卡片 -->
           <div class="left-stat-list">
-            <div class="left-stat-item">
+            <div
+              v-for="(item, index) in announcementList"
+              :key="`${item.key}-${index}`"
+              class="left-stat-item"
+            >
               <div class="left-stat-icon"></div>
-              <div class="left-stat-name">行政许可</div>
-              <div class="left-stat-val">154743<span class="unit">条</span></div>
+              <div class="left-stat-name">{{ item.label }}</div>
+              <div class="left-stat-val">
+                {{ item.value }}<span class="unit">{{ item.unit }}</span>
+              </div>
             </div>
-            <div class="left-stat-item">
-              <div class="left-stat-icon"></div>
-              <div class="left-stat-name">行政处罚</div>
-              <div class="left-stat-val">7471<span class="unit">条</span></div>
-            </div>
-            <div class="left-stat-item">
-              <div class="left-stat-icon"></div>
-              <div class="left-stat-name">我市现存黑名单企业</div>
-              <div class="left-stat-val">684<span class="unit">家</span></div>
-            </div>
-            <div class="left-stat-item">
-              <div class="left-stat-icon"></div>
-              <div class="left-stat-name">本月新增黑名单企业</div>
-              <div class="left-stat-val">32<span class="unit">家</span></div>
-            </div>
-            <div class="left-stat-item">
-              <div class="left-stat-icon"></div>
-              <div class="left-stat-name">本月退出黑名单企业</div>
-              <div class="left-stat-val">9<span class="unit">家</span></div>
-            </div>
+
+            <div v-if="announcementLoading" class="left-stat-empty">加载中…</div>
+            <div v-else-if="!announcementList.length" class="left-stat-empty">暂无数据</div>
           </div>
         </div>
       </section>
 
       <section class="panel panel--map">
-        <!--地图上方悬浮小卡片 还原截图三个指标：本年、本月、今日办件量 -->
+        <!--地图上方悬浮小卡片：三个指标改为接口驱动（用 summary 的值）-->
         <div class="map-top-cards">
           <div class="map-card-group"></div>
           <div class="map-card-group map-card-group--center">
             <div class="map-card">
               <div class="map-card-label">本年办件量</div>
-              <div class="map-card-num">196275件</div>
+              <div class="map-card-num">{{ fileSummary.yearTotal }}件</div>
             </div>
             <div class="map-card">
               <div class="map-card-label">本月办件量</div>
-              <div class="map-card-num">32161件</div>
+              <div class="map-card-num">{{ fileSummary.moonTotal }}件</div>
             </div>
             <div class="map-card">
               <div class="map-card-label">今日办件量</div>
-              <div class="map-card-num">1158件</div>
+              <div class="map-card-num">{{ fileSummary.dayTotal }}件</div>
             </div>
           </div>
           <div class="map-card-group"></div>
@@ -68,7 +56,7 @@
         </div>
       </section>
 
-      <!--右侧面板：各地区各类办件数量统计 表格还原截图 -->
+      <!-- 右侧面板：各地区各类办件数量统计（接口驱动） -->
       <section class="panel panel--right">
         <div class="panel-title">各地区各类办件数量统计</div>
         <div class="right-block-wrap">
@@ -85,6 +73,9 @@
               <span>{{ item.immediate }}</span>
               <span>{{ item.promise }}</span>
             </div>
+
+            <div v-if="regionLoading" class="region-empty">加载中…</div>
+            <div v-else-if="!regionTableData.length" class="region-empty">暂无数据</div>
           </div>
         </div>
       </section>
@@ -93,9 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import CityMapChart from '../charts/CityMapChart.vue'
 import type { GridInfoRow } from '../types'
+import { getAnnouncement, getFileCity, getFile } from '@/api/business'
 
 const selectedAreaName = ref('铁东区')
 const gridInfoRows: GridInfoRow[] = [
@@ -109,19 +101,147 @@ const gridInfoRows: GridInfoRow[] = [
   { name: '岫岩县', town: 0, village: 0, grid: 7 }
 ]
 
-// 右侧表格原始截图数据
-const regionTableData = ref([
-  { area: '市本级', total: 187784, immediate: 180073, promise: 7711 },
-  { area: '海城市', total: 3930, immediate: 1741, promise: 2189 },
-  { area: '台安县', total: 3194, immediate: 1483, promise: 1711 },
-  { area: '岫岩县', total: 446, immediate: 278, promise: 168 },
-  { area: '铁东区', total: 551, immediate: 260, promise: 291 },
-  { area: '铁西区', total: 123, immediate: 92, promise: 31 },
-  { area: '立山区', total: 113, immediate: 48, promise: 65 },
-  { area: '千山区', total: 92, immediate: 56, promise: 36 },
-  { area: '高新区', total: 33, immediate: 21, promise: 12 },
-  { area: '经开区', total: 7, immediate: 1, promise: 6 }
-])
+/* =========================================================
+   通用：兼容多种解包层级
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const pickSummary = (res: any): Record<string, any> => {
+  const body = res?.data ?? res
+  if (body?.summary && typeof body.summary === 'object') return body.summary
+  if (body?.data?.summary && typeof body.data.summary === 'object') return body.data.summary
+  return {}
+}
+
+/* =========================================================
+   1. 双公示（接口驱动）
+   ========================================================= */
+
+type AnnouncementItem = {
+  key: string
+  label: string
+  value: string
+  unit: string
+}
+
+const getUnitByKey = (key: string) => {
+  if (key.toLowerCase().includes('blacklist')) return '家'
+  return '条'
+}
+
+const announcementList = ref<AnnouncementItem[]>([])
+const announcementLoading = ref(false)
+
+const fetchAnnouncement = async () => {
+  announcementLoading.value = true
+  try {
+    const res: any = await getAnnouncement()
+    console.log('[announcement] res=', res)
+
+    const list = pickList(res)
+    announcementList.value = list.map((it: any) => {
+      const key = String(it?.key ?? '')
+      return {
+        key,
+        label: String(it?.label ?? ''),
+        value: String(it?.value ?? ''),
+        unit: getUnitByKey(key)
+      }
+    })
+  } catch (e) {
+    console.error('双公示查询失败', e)
+    announcementList.value = []
+  } finally {
+    announcementLoading.value = false
+  }
+}
+
+/* =========================================================
+   2. 地图上方悬浮卡片：本年 / 本月 / 今日办件量（接口驱动）
+   - 接口：/businessenvironment/bigscreen/file
+   - summary: { yearTotal, moonTotal, dayTotal }
+   ========================================================= */
+
+type FileSummary = {
+  yearTotal: string
+  moonTotal: string
+  dayTotal: string
+}
+
+const fileSummary = ref<FileSummary>({
+  yearTotal: '0',
+  moonTotal: '0',
+  dayTotal: '0'
+})
+
+const fetchFile = async () => {
+  try {
+    const res: any = await getFile()
+    console.log('[file] res=', res)
+
+    const summary = pickSummary(res)
+    fileSummary.value = {
+      yearTotal: String(summary?.yearTotal ?? '0'),
+      moonTotal: String(summary?.moonTotal ?? '0'),
+      dayTotal: String(summary?.dayTotal ?? '0')
+    }
+  } catch (e) {
+    console.error('办件量查询失败', e)
+    fileSummary.value = { yearTotal: '0', moonTotal: '0', dayTotal: '0' }
+  }
+}
+
+/* =========================================================
+   3. 各地区各类办件数量统计（接口驱动）
+   ========================================================= */
+
+type RegionRow = {
+  area: string
+  total: number
+  immediate: number
+  promise: number
+}
+
+const regionTableData = ref<RegionRow[]>([])
+const regionLoading = ref(false)
+
+const fetchFileCity = async () => {
+  regionLoading.value = true
+  try {
+    const res: any = await getFileCity()
+    console.log('[filecity] res=', res)
+
+    const list = pickList(res)
+    regionTableData.value = list.map((it: any) => ({
+      area: String(it?.cityName ?? ''),
+      total: Number(it?.fileNum ?? 0),
+      immediate: Number(it?.instantServiceNum ?? 0),
+      promise: Number(it?.promiseNum ?? 0)
+    }))
+  } catch (e) {
+    console.error('各地区各类办件查询失败', e)
+    regionTableData.value = []
+  } finally {
+    regionLoading.value = false
+  }
+}
+
+/* =========================================================
+   初始化
+   ========================================================= */
+
+onMounted(() => {
+  fetchAnnouncement()
+  fetchFile()
+  fetchFileCity()
+})
 </script>
 
 <style scoped>
@@ -278,6 +398,15 @@ const regionTableData = ref([
   color: #82c8ff;
 }
 
+.left-stat-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  font-size: 26px;
+  color: rgba(214, 238, 255, 0.5);
+}
+
 /* ----------------右侧表格面板---------------- */
 .panel--right {
   padding: 70px 24px 24px;
@@ -322,6 +451,15 @@ const regionTableData = ref([
 }
 .region-table-row:last-child {
   border-bottom: none;
+}
+
+.region-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  font-size: 26px;
+  color: rgba(214, 238, 255, 0.5);
 }
 
 .map-base {

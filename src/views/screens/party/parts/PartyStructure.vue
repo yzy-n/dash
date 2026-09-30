@@ -4,12 +4,12 @@
 
     <div class="gender-row">
       <div class="gender-card">
-        <span class="gender-label">{{ data.genderStats?.[0]?.label || '' }}</span>
-        <strong class="gender-value">{{ data.genderStats?.[0]?.value || '' }}</strong>
+        <span class="gender-label">{{ genderStats[0]?.label || '' }}</span>
+        <strong class="gender-value">{{ genderStats[0]?.value || '' }}</strong>
       </div>
       <div class="gender-card">
-        <span class="gender-label">{{ data.genderStats?.[1]?.label || '' }}</span>
-        <strong class="gender-value">{{ data.genderStats?.[1]?.value || '' }}</strong>
+        <span class="gender-label">{{ genderStats[1]?.label || '' }}</span>
+        <strong class="gender-value">{{ genderStats[1]?.value || '' }}</strong>
       </div>
     </div>
     <div class="title2">学历分布</div>
@@ -19,20 +19,20 @@
         <div class="block-tag">年龄分布</div>
         <div class="dist-grid">
           <div class="dist-item">
-            <div class="dist-name">{{ data.ageStats?.[0]?.label || '' }}</div>
-            <div class="dist-value">{{ data.ageStats?.[0]?.value || '' }}</div>
+            <div class="dist-name">{{ ageStats[0]?.label || '' }}</div>
+            <div class="dist-value">{{ ageStats[0]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.ageStats?.[1]?.label || '' }}</div>
-            <div class="dist-value">{{ data.ageStats?.[1]?.value || '' }}</div>
+            <div class="dist-name">{{ ageStats[1]?.label || '' }}</div>
+            <div class="dist-value">{{ ageStats[1]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.ageStats?.[2]?.label || '' }}</div>
-            <div class="dist-value">{{ data.ageStats?.[2]?.value || '' }}</div>
+            <div class="dist-name">{{ ageStats[2]?.label || '' }}</div>
+            <div class="dist-value">{{ ageStats[2]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.ageStats?.[3]?.label || '' }}</div>
-            <div class="dist-value">{{ data.ageStats?.[3]?.value || '' }}</div>
+            <div class="dist-name">{{ ageStats[3]?.label || '' }}</div>
+            <div class="dist-value">{{ ageStats[3]?.value || '' }}</div>
           </div>
         </div>
       </section>
@@ -41,20 +41,20 @@
         <div class="block-tag2">入党时间分布</div>
         <div class="dist-grid">
           <div class="dist-item">
-            <div class="dist-name">{{ data.joinStats?.[0]?.label || '' }}</div>
-            <div class="dist-value">{{ data.joinStats?.[0]?.value || '' }}</div>
+            <div class="dist-name">{{ joinStats[0]?.label || '' }}</div>
+            <div class="dist-value">{{ joinStats[0]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.joinStats?.[1]?.label || '' }}</div>
-            <div class="dist-value">{{ data.joinStats?.[1]?.value || '' }}</div>
+            <div class="dist-name">{{ joinStats[1]?.label || '' }}</div>
+            <div class="dist-value">{{ joinStats[1]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.joinStats?.[2]?.label || '' }}</div>
-            <div class="dist-value">{{ data.joinStats?.[2]?.value || '' }}</div>
+            <div class="dist-name">{{ joinStats[2]?.label || '' }}</div>
+            <div class="dist-value">{{ joinStats[2]?.value || '' }}</div>
           </div>
           <div class="dist-item">
-            <div class="dist-name">{{ data.joinStats?.[3]?.label || '' }}</div>
-            <div class="dist-value">{{ data.joinStats?.[3]?.value || '' }}</div>
+            <div class="dist-name">{{ joinStats[3]?.label || '' }}</div>
+            <div class="dist-value">{{ joinStats[3]?.value || '' }}</div>
           </div>
         </div>
       </section>
@@ -63,81 +63,250 @@
     <div class="middle-row">
       <div class="edu-col edu-col--left">
         <div class="edu-item">
-          <div class="edu-pill">{{ data.eduLeft?.[0]?.label || '' }}</div>
-          <div class="edu-value">{{ data.eduLeft?.[0]?.value || '' }}</div>
+          <div class="edu-pill">{{ eduStats[0]?.label || '' }}</div>
+          <div class="edu-value">{{ eduStats[0]?.value || '' }}</div>
         </div>
         <div class="edu-item">
-          <div class="edu-pill">{{ data.eduLeft?.[1]?.label || '' }}</div>
-          <div class="edu-value">{{ data.eduLeft?.[1]?.value || '' }}</div>
+          <div class="edu-pill">{{ eduStats[1]?.label || '' }}</div>
+          <div class="edu-value">{{ eduStats[1]?.value || '' }}</div>
         </div>
       </div>
 
       <div class="edu-col edu-col--right">
         <div class="edu-item">
-          <div class="edu-pill">
-            {{ data.eduRight?.[0]?.label || data.eduLeft?.[2]?.label || '' }}
-          </div>
-          <div class="edu-value">
-            {{ data.eduRight?.[0]?.value || data.eduLeft?.[2]?.value || '' }}
-          </div>
+          <div class="edu-pill">{{ eduStats[2]?.label || '' }}</div>
+          <div class="edu-value">{{ eduStats[2]?.value || '' }}</div>
         </div>
         <div class="edu-item">
-          <div class="edu-pill">
-            {{ data.eduRight?.[1]?.label || data.eduLeft?.[3]?.label || '' }}
-          </div>
-          <div class="edu-value">
-            {{ data.eduRight?.[1]?.value || data.eduLeft?.[3]?.value || '' }}
-          </div>
+          <div class="edu-pill">{{ eduStats[3]?.label || '' }}</div>
+          <div class="edu-value">{{ eduStats[3]?.value || '' }}</div>
         </div>
       </div>
     </div>
 
     <div class="job-row">
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[0]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[0]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[0]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[1]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[1]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[1]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[2]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[2]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[2]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[3]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[3]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[3]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[4]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[4]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[4]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[5]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[5]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[5]?.count || '' }}</div>
-      </div>
-      <div class="job-item">
-        <div class="job-bubble">{{ data.jobStats?.[6]?.rate || '' }}</div>
-        <div class="job-label">{{ data.jobStats?.[6]?.label || '' }}</div>
-        <div class="job-count">{{ data.jobStats?.[6]?.count || '' }}</div>
+      <div v-for="(item, index) in jobStats" :key="`${item.label}-${index}`" class="job-item">
+        <div class="job-bubble">{{ item.rate }}</div>
+        <div class="job-label">{{ item.label }}</div>
+        <div class="job-count">{{ item.count }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed, ref, onMounted } from 'vue'
 import type { PartyStructureData } from '../data'
+import { getMemberSex, getMemberAge, getRecruitPartyMembers, getMemberTrade } from '@/api/party'
 
-defineProps<{
+const props = defineProps<{
   data: PartyStructureData
 }>()
+
+/** 兼容多种解包层级：datalist / dataList / res.data.* */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+/* =========================================================
+   1. 性别比例（接口驱动）
+   ========================================================= */
+
+type GenderRaw = {
+  sex: string
+  name: string
+  num: number
+}
+
+const genderRaw = ref<GenderRaw[]>([])
+
+const genderStats = computed(() => {
+  const list = genderRaw.value
+  const total = list.reduce((s, it) => s + (Number(it.num) || 0), 0)
+
+  return list.map((it) => ({
+    label: it.name,
+    value: total > 0 ? `${((it.num / total) * 100).toFixed(2)}%` : '0%'
+  }))
+})
+
+const fetchGender = async () => {
+  try {
+    const res: any = await getMemberSex()
+    console.log('[membersex] res=', res)
+
+    const list = pickList(res)
+    genderRaw.value = list
+      .map((it: any) => ({
+        sex: String(it?.sex ?? ''),
+        name: String(it?.name ?? ''),
+        num: Number(it?.num ?? 0)
+      }))
+      .sort((a, b) => Number(a.sex) - Number(b.sex))
+  } catch (e) {
+    console.error('性别比例查询失败', e)
+    genderRaw.value = []
+  }
+}
+
+/* =========================================================
+   2. 年龄 / 入党时间分布（接口驱动）
+   ========================================================= */
+
+type MemberAgeRaw = {
+  nameType: string
+  name: string
+  num: number
+}
+
+const ageRaw = ref<MemberAgeRaw[]>([])
+const joinRaw = ref<MemberAgeRaw[]>([])
+
+const buildStats = (rows: MemberAgeRaw[]) => {
+  const total = rows.reduce((s, it) => s + (Number(it.num) || 0), 0)
+  return rows.map((it) => {
+    const num = Number(it.num) || 0
+    const pct = total > 0 ? ((num / total) * 100).toFixed(2) : '0.00'
+    return {
+      label: it.name,
+      value: `${num}名 / ${pct}%`
+    }
+  })
+}
+
+const ageStats = computed(() => buildStats(ageRaw.value))
+const joinStats = computed(() => buildStats(joinRaw.value))
+
+const normalizeAgeList = (list: any[]): MemberAgeRaw[] =>
+  list
+    .map((it: any) => ({
+      nameType: String(it?.nameType ?? ''),
+      name: String(it?.name ?? ''),
+      num: Number(it?.num ?? 0)
+    }))
+    .sort((a, b) => Number(a.nameType) - Number(b.nameType))
+
+const fetchAge = async () => {
+  try {
+    const res: any = await getMemberAge('1')
+    console.log('[memberage] type=1 res=', res)
+    ageRaw.value = normalizeAgeList(pickList(res))
+  } catch (e) {
+    console.error('党员年龄查询失败', e)
+    ageRaw.value = []
+  }
+}
+
+const fetchJoin = async () => {
+  try {
+    const res: any = await getMemberAge('2')
+    console.log('[memberage] type=2 res=', res)
+    joinRaw.value = normalizeAgeList(pickList(res))
+  } catch (e) {
+    console.error('入党时间查询失败', e)
+    joinRaw.value = []
+  }
+}
+
+/* =========================================================
+   3. 学历分布（接口驱动）
+   ========================================================= */
+
+type EduRow = {
+  label: string
+  value: string
+}
+
+const eduStats = ref<EduRow[]>([])
+
+const fetchEdu = async () => {
+  try {
+    const res: any = await getRecruitPartyMembers('2')
+    console.log('[recruitpartymembers] type=2 res=', res)
+
+    const list = pickList(res)
+    eduStats.value = list.map((it: any) => {
+      const num = Number(it?.value ?? 0)
+      const rate = String(it?.rate ?? '')
+      return {
+        label: String(it?.label ?? ''),
+        value: `${num}名 / ${rate}`
+      }
+    })
+  } catch (e) {
+    console.error('学历分布查询失败', e)
+    eduStats.value = []
+  }
+}
+
+/* =========================================================
+   4. 职业分布（接口驱动）
+   - 接口返回 { induName, name, num }
+   - 前端计算 rate，并拼 count
+   - rate: num / 总数 * 100
+   - count: `${num}名`
+   ========================================================= */
+
+type JobRaw = {
+  induName: string
+  name: string
+  num: number
+}
+
+type JobRow = {
+  rate: string
+  label: string
+  count: string
+}
+
+const jobRaw = ref<JobRaw[]>([])
+
+const jobStats = computed<JobRow[]>(() => {
+  const list = jobRaw.value
+  const total = list.reduce((s, it) => s + (Number(it.num) || 0), 0)
+  return list.map((it) => {
+    const num = Number(it.num) || 0
+    const pct = total > 0 ? ((num / total) * 100).toFixed(2) : '0.00'
+    return {
+      rate: `${pct}%`,
+      label: it.name,
+      count: `${num}名`
+    }
+  })
+})
+
+const fetchJob = async () => {
+  try {
+    const res: any = await getMemberTrade()
+    console.log('[membertrade] res=', res)
+
+    const list = pickList(res)
+    jobRaw.value = list
+      .map((it: any) => ({
+        induName: String(it?.induName ?? ''),
+        name: String(it?.name ?? ''),
+        num: Number(it?.num ?? 0)
+      }))
+      // 按 induName 升序，保证 1→2→3→... 的显示顺序稳定
+      .sort((a, b) => Number(a.induName) - Number(b.induName))
+  } catch (e) {
+    console.error('职业分布查询失败', e)
+    jobRaw.value = []
+  }
+}
+
+onMounted(() => {
+  fetchGender()
+  fetchAge()
+  fetchJoin()
+  fetchEdu()
+  fetchJob()
+})
 </script>
 
 <style scoped>
