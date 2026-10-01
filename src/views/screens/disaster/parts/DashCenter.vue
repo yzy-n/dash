@@ -2,54 +2,16 @@
   <div class="center-shell">
     <div class="hazard-tabs">
       <button
+        v-for="item in hazardTabs"
+        :key="item.key"
         type="button"
         class="hazard-tab"
-        :class="{ 'hazard-tab--active': activeHazard === 'eq' }"
-        @click="activeHazard = 'eq'"
+        :class="{ 'hazard-tab--active': activeHazard === item.key }"
+        @click="activeHazard = item.key as HazardKey"
       >
-        <span class="hazard-icon hazard-icon--eq"></span>
-        <span class="hazard-name">地震灾害</span>
-        <span class="hazard-num">9</span>
-      </button>
-      <button
-        type="button"
-        class="hazard-tab"
-        :class="{ 'hazard-tab--active': activeHazard === 'geo' }"
-        @click="activeHazard = 'geo'"
-      >
-        <span class="hazard-icon hazard-icon--geo"></span>
-        <span class="hazard-name">地质灾害</span>
-        <span class="hazard-num">40</span>
-      </button>
-      <button
-        type="button"
-        class="hazard-tab"
-        :class="{ 'hazard-tab--active': activeHazard === 'fire' }"
-        @click="activeHazard = 'fire'"
-      >
-        <span class="hazard-icon hazard-icon--fire"></span>
-        <span class="hazard-name">森林火灾</span>
-        <span class="hazard-num">3</span>
-      </button>
-      <button
-        type="button"
-        class="hazard-tab"
-        :class="{ 'hazard-tab--active': activeHazard === 'met' }"
-        @click="activeHazard = 'met'"
-      >
-        <span class="hazard-icon hazard-icon--met"></span>
-        <span class="hazard-name">气象灾害</span>
-        <span class="hazard-num">7</span>
-      </button>
-      <button
-        type="button"
-        class="hazard-tab"
-        :class="{ 'hazard-tab--active': activeHazard === 'flood' }"
-        @click="activeHazard = 'flood'"
-      >
-        <span class="hazard-icon hazard-icon--flood"></span>
-        <span class="hazard-name">汛情灾害</span>
-        <span class="hazard-num">2</span>
+        <span class="hazard-icon" :class="`hazard-icon--${item.icon}`"></span>
+        <span class="hazard-name">{{ item.name }}</span>
+        <span class="hazard-num">{{ item.num }}</span>
       </button>
     </div>
 
@@ -121,32 +83,22 @@
       <section class="panel panel--right">
         <div class="panel-title">近七天气象灾害预报</div>
         <div class="forecast">
-          <div class="forecast-card">
-            <div class="forecast-head">鞍山市发布雷雨大风预警</div>
+          <div
+            class="forecast-card"
+            v-for="(item, idx) in warningList"
+            :key="`${item.title}-${idx}`"
+          >
+            <div class="forecast-head">{{ item.title }}</div>
             <div class="forecast-body">
-              <div class="forecast-text">
-                预计21日夜间23时，鞍山市将出现雷雨大风天气，局地伴有短时强降水、冰雹等强对流天气。
-              </div>
+              <div class="forecast-text">{{ item.text }}</div>
               <div class="forecast-steps">
-                <div class="forecast-step">1. 政府及相关部门做好防风防雷准备工作。</div>
-                <div class="forecast-step">2. 相关水域水上作业和过往船舶采取措施回港避风。</div>
-                <div class="forecast-step">3. 关好门窗，加固搭建物，妥善安置室外物品。</div>
-                <div class="forecast-step">4. 做好防御冰雹、雷电等灾害的应急工作。</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="forecast-card">
-            <div class="forecast-head">台安县发布雷雨大风预警</div>
-            <div class="forecast-body">
-              <div class="forecast-text">
-                预计21日夜间32时，台安县将出现雷雨大风天气，局地伴有短时强降水、冰雹等强对流天气。
-              </div>
-              <div class="forecast-steps">
-                <div class="forecast-step">1. 政府及相关部门做好防风防雷准备工作。</div>
-                <div class="forecast-step">2. 相关水域水上作业和过往船舶采取措施回港避风。</div>
-                <div class="forecast-step">3. 关好门窗，加固搭建物，妥善安置室外物品。</div>
-                <div class="forecast-step">4. 做好防御冰雹、雷电等灾害的应急工作。</div>
+                <div
+                  class="forecast-step"
+                  v-for="(step, si) in item.steps"
+                  :key="si"
+                >
+                  {{ step }}
+                </div>
               </div>
             </div>
           </div>
@@ -157,12 +109,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
+import { computed, ref, onMounted } from 'vue'
 import CityMapChart from '../charts/CityMapChart.vue'
 import type { GridInfoRow } from '../types'
+import { getReliefStats, getDamageWarning } from '@/api/disaster'
 
-const activeHazard = ref<'eq' | 'geo' | 'fire' | 'met' | 'flood'>('geo')
+/* =========================================================
+   顶部五个灾害 Tab（接口驱动）
+   ========================================================= */
+type HazardKey = 'eq' | 'geo' | 'fire' | 'met' | 'flood'
+
+type ReliefStatRow = {
+  type: string
+  label: string
+  cnt: number
+}
+
+const HAZARD_BASE = [
+  { key: 'eq' as const, icon: 'eq', type: '1' },
+  { key: 'geo' as const, icon: 'geo', type: '2' },
+  { key: 'fire' as const, icon: 'fire', type: '3' },
+  { key: 'met' as const, icon: 'met', type: '4' },
+  { key: 'flood' as const, icon: 'flood', type: '5' }
+]
+
+const activeHazard = ref<HazardKey>('geo')
 const areaOptions = ['铁东区', '铁西区', '立山区', '高新区', '风景区', '台安县', '海城市', '岫岩县']
 const selectedAreaName = ref('铁西区')
 
@@ -176,9 +147,171 @@ const gridInfoRows: GridInfoRow[] = [
   { name: '海城市', town: 0, village: 0, grid: 14 },
   { name: '岫岩县', town: 0, village: 0, grid: 7 }
 ]
+
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const toNum = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+const reliefStats = ref<ReliefStatRow[]>([])
+
+const fetchReliefStats = async () => {
+  try {
+    const res: any = await getReliefStats()
+    console.log('[reliefstats] res=', res)
+
+    const list = pickList(res)
+    reliefStats.value = list.map((it: any) => ({
+      type: String(it?.type ?? ''),
+      label: String(it?.label ?? ''),
+      cnt: toNum(it?.cnt)
+    }))
+  } catch (e) {
+    console.error('灾害统计查询失败', e)
+    reliefStats.value = []
+  }
+}
+
+const FALLBACK_NAME: Record<string, string> = {
+  '1': '地震灾害',
+  '2': '地质灾害',
+  '3': '森林火灾',
+  '4': '气象灾害',
+  '5': '汛情灾害'
+}
+
+const hazardTabs = computed(() => {
+  return HAZARD_BASE.map((base) => {
+    const found = reliefStats.value.find((s) => s.type === base.type)
+    return {
+      key: base.key,
+      icon: base.icon,
+      name: found?.label || FALLBACK_NAME[base.type] || '',
+      num: found?.cnt ?? 0
+    }
+  })
+})
+
+/* =========================================================
+   气象灾害预警（接口驱动）
+   - 接口：/disaster/bigscreen/damagewarning
+   - 返回：{ data: { datalist: [{ title, subtitle, snapshot,
+             content, warningStartTime, warningEndTime }] } }
+   - 只取前 2 条；把 snapshot / content 拆成正文 + 步骤
+   ========================================================= */
+type WarningRow = {
+  title: string
+  text: string
+  steps: string[]
+}
+
+const warningList = ref<WarningRow[]>([])
+
+/** 兜底数据（接口失败/空时展示） */
+const defaultWarnings: WarningRow[] = [
+  {
+    title: '鞍山市发布雷雨大风预警',
+    text: '预计21日夜间23时，鞍山市将出现雷雨大风天气，局地伴有短时强降水、冰雹等强对流天气。',
+    steps: [
+      '政府及相关部门做好防风防雷准备工作。',
+      '相关水域水上作业和过往船舶采取措施回港避风。',
+      '关好门窗，加固搭建物，妥善安置室外物品。',
+      '做好防御冰雹、雷电等灾害的应急工作。'
+    ]
+  },
+  {
+    title: '台安县发布雷雨大风预警',
+    text: '预计21日夜间32时，台安县将出现雷雨大风天气，局地伴有短时强降水、冰雹等强对流天气。',
+    steps: [
+      '政府及相关部门做好防风防雷准备工作。',
+      '相关水域水上作业和过往船舶采取措施回港避风。',
+      '关好门窗，加固搭建物，妥善安置室外物品。',
+      '做好防御冰雹、雷电等灾害的应急工作。'
+    ]
+  }
+]
+
+/** 清洗正文里的 \r\n / \n，去掉末尾空格 */
+const normalizeText = (v: any) =>
+  String(v ?? '')
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .trim()
+
+/**
+ * 把 content 拆成「正文 + 步骤列表」
+ * content 里常见形式：
+ *   1、xxx；2、xxx；3、xxx；4、xxx；
+ *   1.xxx；2.xxx；3.xxx
+ *   1. xxx 2. xxx 3. xxx
+ * 这里统一按「数字+、/.+空格」切分。
+ */
+const parseContent = (raw: string): { text: string; steps: string[] } => {
+  const content = normalizeText(raw)
+  if (!content) return { text: '', steps: [] }
+
+  // 用正则在「数字 + 顿号/点/空格」的位置切分
+  const parts = content
+    .split(/(?:\d+[、.．]\s*)/g)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+
+  if (parts.length >= 2) {
+    return { text: '', steps: parts }
+  }
+
+  return { text: content, steps: [] }
+}
+
+const fetchWarnings = async () => {
+  try {
+    const res: any = await getDamageWarning()
+    console.log('[damagewarning] res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      warningList.value = defaultWarnings
+      return
+    }
+
+    warningList.value = list.slice(0, 2).map((it: any) => {
+      const title = String(it?.title ?? '').trim()
+      const snapshot = normalizeText(it?.snapshot)
+      const { text, steps } = parseContent(it?.content)
+
+      // 正文优先用 content 拆出来的 text；没有就用 snapshot
+      const finalText = text || snapshot
+
+      return {
+        title: title || '灾害预警',
+        text: finalText,
+        steps
+      }
+    })
+  } catch (e) {
+    console.error('气象灾害预警查询失败', e)
+    warningList.value = defaultWarnings
+  }
+}
+
+onMounted(() => {
+  fetchReliefStats()
+  fetchWarnings()
+})
 </script>
 
 <style scoped>
+/* 样式保持与上一版一致，仅新增 steps 的兜底排版 */
 .center-shell {
   width: 100%;
   height: 100%;
@@ -330,23 +463,6 @@ const gridInfoRows: GridInfoRow[] = [
   min-height: 0;
 }
 
-.map-caption {
-  position: absolute;
-  left: 50%;
-  top: 26px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 420px;
-  height: 74px;
-  font-size: 36px;
-  letter-spacing: 6px;
-  color: rgba(214, 238, 255, 0.9);
-  background-size: 100% 100%;
-  z-index: 3;
-}
-
 .panel--left .panel-title,
 .panel--right .panel-title {
   left: 34px;
@@ -380,7 +496,6 @@ const gridInfoRows: GridInfoRow[] = [
   background: rgba(6, 18, 48, 0.58);
   border-radius: 14px;
   padding: 10px 16px 10px 22px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
   box-sizing: border-box;
   display: grid;
   grid-template-columns: 16px 1fr;
@@ -453,7 +568,7 @@ const gridInfoRows: GridInfoRow[] = [
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
-  --webkit-line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -535,6 +650,7 @@ const gridInfoRows: GridInfoRow[] = [
     transform: translateZ(12px);
   }
 }
+
 .forecast-head {
   height: 42px;
   display: flex;
@@ -546,6 +662,9 @@ const gridInfoRows: GridInfoRow[] = [
   color: rgba(30, 20, 0, 0.9);
   background: rgba(255, 206, 74, 0.9);
   border-bottom: 1px solid rgba(255, 206, 74, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .forecast-body {
@@ -563,7 +682,7 @@ const gridInfoRows: GridInfoRow[] = [
   line-height: 1.45;
   color: rgba(214, 238, 255, 0.78);
   display: -webkit-box;
-  --webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -572,6 +691,7 @@ const gridInfoRows: GridInfoRow[] = [
   min-height: 0;
   display: grid;
   gap: 8px;
+  overflow: hidden;
 }
 
 .forecast-step {
@@ -580,10 +700,10 @@ const gridInfoRows: GridInfoRow[] = [
   color: rgba(214, 238, 255, 0.82);
   padding-left: 14px;
   position: relative;
-}
-
-.forecast-step:nth-child(n + 3) {
-  display: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .forecast-step::before {
@@ -634,52 +754,5 @@ const gridInfoRows: GridInfoRow[] = [
   width: 320px;
   height: 320px;
   border-color: rgba(54, 232, 255, 0.1);
-}
-
-.event-table {
-  margin-top: 10px;
-  display: grid;
-  gap: 12px;
-}
-
-.event-row {
-  height: 64px;
-  display: grid;
-  grid-template-columns: 130px 1fr 120px;
-  align-items: center;
-  padding: 0 16px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.58);
-  border-radius: 12px;
-  box-sizing: border-box;
-  gap: 14px;
-  font-size: 20px;
-}
-
-.event-row span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.event-row--head {
-  background: rgba(20, 30, 75, 0.55);
-  color: rgba(234, 240, 255, 0.95);
-  font-weight: 700;
-}
-
-.st {
-  justify-self: end;
-  font-weight: 800;
-}
-
-.st--run {
-  color: rgba(255, 190, 94, 0.95);
-  text-shadow: 0 0 10px rgba(255, 169, 60, 0.18);
-}
-
-.st--done {
-  color: rgba(92, 255, 178, 0.95);
-  text-shadow: 0 0 10px rgba(34, 255, 154, 0.16);
 }
 </style>

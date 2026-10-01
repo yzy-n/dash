@@ -2,33 +2,46 @@
 import { computed } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 
-interface AreaRatioItem {
-  name: string
-  area: number
-  ratio: number
+/** 与 econ/index.vue 中 fetchHouseData 的映射保持一致 */
+interface HouseDataItem {
+  /** 地区名（来自 departmentName） */
+  area: string
+  /** 内部水平 / 面积值（来自 internalLevel） */
+  internalLevel: number
+  /** 同比增速（来自 yoyGrowth） */
+  yoyGrowth: number
+  /** 数据类型：'1'=新房，'2'=二手房 */
+  type?: string
 }
 
 const props = defineProps<{
-  data?: AreaRatioItem[]
+  data?: HouseDataItem[]
+  /** 当前激活的 tab（新房/二手房），用于将来按 tab 差异化展示 */
+  tabKey?: string
 }>()
 
-// 参考截图模拟数据：面积单位万平方米，同比单位 %
-const defaultData: AreaRatioItem[] = [
-  { name: '海城区', area: 1.6, ratio: -32.5 },
-  { name: '合浦县', area: 1.2, ratio: -18.4 },
-  { name: '银海区', area: 2.3, ratio: 5.6 },
-  { name: '铁山港区', area: 0.8, ratio: -25.2 },
-  { name: '防城区', area: 2.1, ratio: 12.8 },
-  { name: '上思县', area: 3.5, ratio: 8.4 },
-  { name: '东兴市', area: 1.9, ratio: -5.7 }
+// 兜底数据（接口无数据时展示，字段与后端一致）
+const defaultData: HouseDataItem[] = [
+  { area: '海城市', internalLevel: 14.6, yoyGrowth: 11.5, type: '1' },
+  { area: '台安县', internalLevel: 4.5, yoyGrowth: -12.8, type: '1' },
+  { area: '岫岩县', internalLevel: 4.4, yoyGrowth: 9.9, type: '1' },
+  { area: '铁东区', internalLevel: 2.7, yoyGrowth: 5.2, type: '1' }
 ]
 
-const chartData = computed(() => props.data ?? defaultData)
+const chartData = computed<HouseDataItem[]>(() => {
+  const list = props.data && props.data.length ? props.data : defaultData
+  return list.map((it) => ({
+    area: String(it?.area ?? ''),
+    internalLevel: Number(it?.internalLevel) || 0,
+    yoyGrowth: Number(it?.yoyGrowth) || 0,
+    type: it?.type
+  }))
+})
 
 const option = computed(() => {
-  const xAxisData = chartData.value.map((item) => item.name)
-  const areaData = chartData.value.map((item) => item.area)
-  const ratioData = chartData.value.map((item) => item.ratio)
+  const xAxisData = chartData.value.map((item) => item.area)
+  const levelData = chartData.value.map((item) => item.internalLevel)
+  const growthData = chartData.value.map((item) => item.yoyGrowth)
 
   const opt = {
     backgroundColor: 'transparent',
@@ -41,10 +54,10 @@ const option = computed(() => {
         let result = params[0].axisValue
         params.forEach((p: any) => {
           if (p.seriesType === 'bar') {
-            result += `<br/>面积：${p.value}万平方米`
+            result += `<br/>面积：${p.value} 万平方米`
           }
           if (p.seriesType === 'line') {
-            result += `<br/>同比：${p.value}%`
+            result += `<br/>同比：${p.value} %`
           }
         })
         return result
@@ -78,8 +91,6 @@ const option = computed(() => {
         splitLine: {
           lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
         },
-        min: 0,
-        max: 10,
         axisLabel: { color: '#82d8e8', fontSize: 30 },
         axisLine: { show: false }
       },
@@ -88,8 +99,6 @@ const option = computed(() => {
         name: '单位：%',
         nameTextStyle: { color: '#82d8e8', fontSize: 16 },
         splitLine: { show: false },
-        min: -100,
-        max: 400,
         axisLabel: { color: '#82d8e8', fontSize: 20 },
         axisLine: { show: false }
       }
@@ -99,7 +108,7 @@ const option = computed(() => {
         name: '面积',
         type: 'bar',
         barWidth: '32%',
-        data: areaData,
+        data: levelData,
         itemStyle: {
           color: {
             type: 'linear',
@@ -128,7 +137,7 @@ const option = computed(() => {
         itemStyle: {
           color: '#ff6677'
         },
-        data: ratioData
+        data: growthData
       }
     ]
   }

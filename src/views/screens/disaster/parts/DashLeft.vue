@@ -64,19 +64,19 @@
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--a"></span>
                   <span class="stat-label">应急救援队伍</span>
-                  <span class="stat-value">13</span>
+                  <span class="stat-value">{{ rescueTeam.fieldCnt }}</span>
                   <span class="stat-unit">个</span>
                 </div>
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--b"></span>
                   <span class="stat-label">队伍总数</span>
-                  <span class="stat-value">47</span>
+                  <span class="stat-value">{{ rescueTeam.teamCnt }}</span>
                   <span class="stat-unit">支</span>
                 </div>
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--c"></span>
                   <span class="stat-label">人员总数</span>
-                  <span class="stat-value">3122</span>
+                  <span class="stat-value">{{ rescueTeam.peopleCnt }}</span>
                   <span class="stat-unit">人</span>
                 </div>
               </div>
@@ -97,19 +97,19 @@
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--a"></span>
                   <span class="stat-label">公益救援队伍</span>
-                  <span class="stat-value">6</span>
+                  <span class="stat-value">{{ publicTeam.fieldCnt }}</span>
                   <span class="stat-unit">个</span>
                 </div>
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--b"></span>
                   <span class="stat-label">队伍总数</span>
-                  <span class="stat-value">6</span>
+                  <span class="stat-value">{{ publicTeam.teamCnt }}</span>
                   <span class="stat-unit">支</span>
                 </div>
                 <div class="stat-row">
                   <span class="stat-icon stat-icon--c"></span>
                   <span class="stat-label">人员总数</span>
-                  <span class="stat-value">110</span>
+                  <span class="stat-value">{{ publicTeam.peopleCnt }}</span>
                   <span class="stat-unit">人</span>
                 </div>
               </div>
@@ -135,7 +135,7 @@
                 class="tab"
                 :class="{ 'tab--active': activeMaterialTab === item.key }"
                 :style="{ backgroundImage: `url(${tabBgUrl})` }"
-                @click="activeMaterialTab = item.key"
+                @click="switchMaterialTab(item.key)"
               >
                 {{ item.label }}
               </button>
@@ -146,29 +146,15 @@
               <span>物资名称</span>
               <span class="material-row-qty">物资数量</span>
             </div>
-            <div class="material-row">
-              <span>救灾帐篷</span>
-              <span class="material-row-qty"><strong>2</strong><em>顶</em></span>
-            </div>
-            <div class="material-row">
-              <span>折叠床</span>
-              <span class="material-row-qty"><strong>756</strong><em>张</em></span>
-            </div>
-            <div class="material-row">
-              <span>棉被</span>
-              <span class="material-row-qty"><strong>4</strong><em>套</em></span>
-            </div>
-            <div class="material-row">
-              <span>棉褥</span>
-              <span class="material-row-qty"><strong>5904</strong><em>条</em></span>
-            </div>
-            <div class="material-row">
-              <span>棉裤</span>
-              <span class="material-row-qty"><strong>4054</strong><em>条</em></span>
-            </div>
-            <div class="material-row">
-              <span>毛巾被</span>
-              <span class="material-row-qty"><strong>1940</strong><em>条</em></span>
+            <div
+              class="material-row"
+              v-for="(item, idx) in materialList"
+              :key="`${item.name}-${idx}`"
+            >
+              <span class="material-name" :title="item.name">{{ item.name }}</span>
+              <span class="material-row-qty">
+                <strong>{{ item.num }}</strong><em>{{ item.unit }}</em>
+              </span>
             </div>
           </div>
         </div>
@@ -193,18 +179,16 @@
               stroke-width="2"
             />
           </svg>
-          <div class="place-marker place-marker--a"><span></span></div>
-          <div class="place-marker place-marker--b"><span></span></div>
-          <div class="place-marker place-marker--c"><span></span></div>
-          <div class="place-marker place-marker--d"><span></span></div>
-          <div class="place-marker place-marker--e"><span></span></div>
-          <div class="place-marker place-marker--f"><span></span></div>
-          <div class="place-marker place-marker--g"><span></span></div>
-          <div class="place-marker place-marker--h"><span></span></div>
-          <div class="place-marker place-marker--i"><span></span></div>
-          <div class="place-marker place-marker--j"><span></span></div>
-          <div class="place-marker place-marker--k"><span></span></div>
-          <div class="place-marker place-marker--l"><span></span></div>
+          <div
+            v-for="marker in cityMarkers"
+            :key="marker.city"
+            class="place-marker"
+            :style="{ left: marker.x + '%', top: marker.y + '%' }"
+            :title="`${marker.city}：${marker.count} 个应急场所`"
+          >
+            <span></span>
+            <em class="place-marker-label">{{ marker.city }}</em>
+          </div>
         </div>
       </div>
     </section>
@@ -232,9 +216,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
+import {
+  getEmergencyRescue,
+  getRescueMaterials,
+  getEmergencySite,
+  getFinancialGuarantee
+} from '@/api/disaster'
 
 type FundGraphNode = {
   id: string
@@ -256,13 +246,271 @@ const commandTabs = [
 ]
 const activeCommandTab = ref('warning')
 
+/* =========================================================
+   物资 tab
+   ========================================================= */
 const materialTabs = [
-  { key: 'relief', label: '救灾物资' },
-  { key: 'medical', label: '医疗防疫物资' }
+  { key: 'relief', label: '救灾物资', type: '1' },
+  { key: 'medical', label: '医疗防疫物资', type: '2' }
 ]
 const activeMaterialTab = ref('relief')
 
-const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: FundGraphLink[]) => {
+const activeMaterialType = computed(
+  () => materialTabs.find((t) => t.key === activeMaterialTab.value)?.type ?? '1'
+)
+
+/* =========================================================
+   通用解包
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const toNum = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+/* =========================================================
+   应急救援队伍 / 公益救援队伍
+   ========================================================= */
+type RescueTeamRow = {
+  type: string
+  label: string
+  fieldCnt: number
+  teamCnt: number
+  peopleCnt: number
+}
+
+const rescueTeamList = ref<RescueTeamRow[]>([])
+
+const fetchRescueTeam = async () => {
+  try {
+    const res: any = await getEmergencyRescue()
+    console.log('[emergencyrescue] res=', res)
+
+    const list = pickList(res)
+    rescueTeamList.value = list.map((it: any) => ({
+      type: String(it?.type ?? ''),
+      label: String(it?.label ?? ''),
+      fieldCnt: toNum(it?.fieldCnt),
+      teamCnt: toNum(it?.teamCnt),
+      peopleCnt: toNum(it?.peopleCnt)
+    }))
+  } catch (e) {
+    console.error('应急救援队伍查询失败', e)
+    rescueTeamList.value = []
+  }
+}
+
+const rescueTeam = computed<RescueTeamRow>(() => {
+  const found = rescueTeamList.value.find((r) => r.type === '1')
+  return (
+    found ?? { type: '1', label: '应急救援队伍', fieldCnt: 13, teamCnt: 47, peopleCnt: 3122 }
+  )
+})
+
+const publicTeam = computed<RescueTeamRow>(() => {
+  const found = rescueTeamList.value.find((r) => r.type === '2')
+  return found ?? { type: '2', label: '公益救援队伍', fieldCnt: 6, teamCnt: 6, peopleCnt: 110 }
+})
+
+/* =========================================================
+   应急救援物资
+   ========================================================= */
+type MaterialRow = {
+  name: string
+  num: number
+  unit: string
+}
+
+const materialList = ref<MaterialRow[]>([])
+
+const defaultMaterials: MaterialRow[] = [
+  { name: '救灾帐篷', num: 2, unit: '顶' },
+  { name: '折叠床', num: 756, unit: '张' },
+  { name: '棉被', num: 4, unit: '套' },
+  { name: '棉褥', num: 5904, unit: '条' },
+  { name: '棉裤', num: 4054, unit: '条' },
+  { name: '毛巾被', num: 1940, unit: '条' }
+]
+
+const fetchMaterials = async () => {
+  try {
+    const res: any = await getRescueMaterials(activeMaterialType.value)
+    console.log('[rescuematerials] type=', activeMaterialType.value, 'res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      materialList.value = defaultMaterials
+      return
+    }
+
+    materialList.value = list.map((it: any) => ({
+      name: String(it?.itemName ?? ''),
+      num: toNum(it?.num),
+      unit: String(it?.unit ?? '')
+    }))
+  } catch (e) {
+    console.error('应急救援物资查询失败', e)
+    materialList.value = defaultMaterials
+  }
+}
+
+const switchMaterialTab = (key: string) => {
+  if (activeMaterialTab.value === key) return
+  activeMaterialTab.value = key
+  fetchMaterials()
+}
+
+/* =========================================================
+   应急场所
+   ========================================================= */
+type SiteRow = {
+  type: string
+  name: string
+  city: string
+  address: string
+  lng: number
+  lat: number
+}
+
+const CITY_POSITION: Record<string, { x: number; y: number }> = {
+  台安县: { x: 22, y: 20 },
+  岫岩县: { x: 72, y: 78 },
+  海城市: { x: 38, y: 60 },
+  铁西区: { x: 30, y: 36 },
+  铁东区: { x: 46, y: 40 },
+  立山区: { x: 44, y: 26 },
+  千山区: { x: 56, y: 50 },
+  高新区: { x: 60, y: 30 },
+  经开区: { x: 20, y: 42 },
+  风景区: { x: 70, y: 38 }
+}
+
+const siteList = ref<SiteRow[]>([])
+
+const fetchSites = async () => {
+  try {
+    const res: any = await getEmergencySite()
+    console.log('[emergencysite] res=', res)
+
+    const list = pickList(res)
+    const seen = new Set<string>()
+    const valid: SiteRow[] = []
+
+    for (const it of list) {
+      const lng = Number(it?.longitude)
+      const lat = Number(it?.latitude)
+      const city = String(it?.cityName ?? '')
+
+      if (!CITY_POSITION[city]) continue
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue
+      if (lng < 121 || lng > 125 || lat < 39 || lat > 43) continue
+
+      const name = String(it?.name ?? '')
+      const address = String(it?.address ?? '')
+      const key = `${city}-${name}-${lng}-${lat}`
+      if (seen.has(key)) continue
+      seen.add(key)
+
+      valid.push({
+        type: String(it?.countyName ?? ''),
+        name,
+        city,
+        address,
+        lng,
+        lat
+      })
+
+      if (valid.length >= 10) break
+    }
+
+    siteList.value = valid
+  } catch (e) {
+    console.error('应急场所查询失败', e)
+    siteList.value = []
+  }
+}
+
+const cityMarkers = computed(() => {
+  const map = new Map<string, { city: string; count: number; x: number; y: number }>()
+
+  for (const s of siteList.value) {
+    const pos = CITY_POSITION[s.city]
+    if (!pos) continue
+
+    if (!map.has(s.city)) {
+      map.set(s.city, { city: s.city, count: 0, x: pos.x, y: pos.y })
+    }
+    map.get(s.city)!.count += 1
+  }
+
+  return Array.from(map.values())
+})
+
+/* =========================================================
+   资金保障（接口驱动）
+   - 接口：/disaster/bigscreen/financialguarantee
+   - 返回：{ data: { datalist: [{ oneMoney, twoMoney, threeMoney,
+             fourMoney, fiveMoney, total, type, souseDate }] } }
+   - type=1 收入 / type=2 支出
+   - 字段映射（按后端返回 + 原来静态图语义推得）：
+       支出：oneMoney=合计；twoMoney=工程抢险；threeMoney=个人救助；
+             fourMoney=救灾物资采购；fiveMoney=应急专项
+       收入（接口暂未返回）：沿用静态兜底
+   ========================================================= */
+type FundRow = {
+  type: string
+  oneMoney: number
+  twoMoney: number
+  threeMoney: number
+  fourMoney: number
+  fiveMoney: number
+  total: number
+}
+
+const fundList = ref<FundRow[]>([])
+
+const fmtMoney = (v: number) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n.toFixed(2) : '0.00'
+}
+
+const fetchFund = async () => {
+  try {
+    const res: any = await getFinancialGuarantee()
+    console.log('[financialguarantee] res=', res)
+
+    const list = pickList(res)
+    fundList.value = list.map((it: any) => ({
+      type: String(it?.type ?? ''),
+      oneMoney: toNum(it?.oneMoney),
+      twoMoney: toNum(it?.twoMoney),
+      threeMoney: toNum(it?.threeMoney),
+      fourMoney: toNum(it?.fourMoney),
+      fiveMoney: toNum(it?.fiveMoney),
+      total: toNum(it?.total)
+    }))
+  } catch (e) {
+    console.error('资金保障查询失败', e)
+    fundList.value = []
+  }
+}
+
+/* =========================================================
+   资金保障图：把 graph option 构造抽成工具
+   ========================================================= */
+const buildFundGraphOption = (
+  rootId: string,
+  nodes: FundGraphNode[],
+  links: FundGraphLink[]
+) => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
@@ -331,7 +579,10 @@ const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: Fun
   }
 }
 
-const fundIncomeOption = computed(() => {
+/* =========================================================
+   收入图：接口若返回 type=1 则用接口；否则用静态兜底
+   ========================================================= */
+const buildStaticIncome = () => {
   const nodes: FundGraphNode[] = [
     { id: 't', label: '收入合计', valueText: '1057.62 万元', size: 180, color: '#36e8ff' },
     { id: 'b', label: '财政专项收入', valueText: '1057.62 万元', size: 124, color: '#ffbc40' },
@@ -344,9 +595,59 @@ const fundIncomeOption = computed(() => {
     { source: 't', target: 'b3' }
   ]
   return buildFundGraphOption('t', nodes, links)
+}
+
+const buildIncomeFromApi = (row: FundRow) => {
+  // 收入字段按与支出同样的语义映射
+  const nodes: FundGraphNode[] = [
+    {
+      id: 't',
+      label: '收入合计',
+      valueText: `${fmtMoney(row.oneMoney)} 万元`,
+      size: 180,
+      color: '#36e8ff'
+    },
+    {
+      id: 'b',
+      label: '财政专项收入',
+      valueText: `${fmtMoney(row.twoMoney)} 万元`,
+      size: 124,
+      color: '#ffbc40'
+    },
+    {
+      id: 'b2',
+      label: '公共预算收入',
+      valueText: `${fmtMoney(row.threeMoney)} 万元`,
+      size: 124,
+      color: '#7cf2ff'
+    },
+    {
+      id: 'b3',
+      label: '政府性基金收入',
+      valueText: `${fmtMoney(row.fourMoney)} 万元`,
+      size: 124,
+      color: '#79ffa8'
+    }
+  ]
+  const links: FundGraphLink[] = [
+    { source: 't', target: 'b' },
+    { source: 't', target: 'b2' },
+    { source: 't', target: 'b3' }
+  ]
+  return buildFundGraphOption('t', nodes, links)
+}
+
+const fundIncomeOption = computed(() => {
+  const row = fundList.value.find((r) => r.type === '1')
+  return row ? buildIncomeFromApi(row) : buildStaticIncome()
 })
 
-const fundExpenseOption = computed(() => {
+/* =========================================================
+   支出图：接口 type=2 时用接口，否则静态兜底
+   - oneMoney=合计；twoMoney=工程抢险；threeMoney=个人救助；
+     fourMoney=救灾物资采购；fiveMoney=应急专项
+   ========================================================= */
+const buildStaticExpense = () => {
   const nodes: FundGraphNode[] = [
     { id: 't', label: '支出合计', valueText: '1093.30 万元', size: 180, color: '#36e8ff' },
     { id: 'a', label: '应急专项支出', valueText: '293.67 万元', size: 124, color: '#7cf2ff' },
@@ -361,10 +662,70 @@ const fundExpenseOption = computed(() => {
     { source: 't', target: 'f' }
   ]
   return buildFundGraphOption('t', nodes, links)
+}
+
+const buildExpenseFromApi = (row: FundRow) => {
+  const nodes: FundGraphNode[] = [
+    {
+      id: 't',
+      label: '支出合计',
+      valueText: `${fmtMoney(row.oneMoney)} 万元`,
+      size: 180,
+      color: '#36e8ff'
+    },
+    {
+      id: 'a',
+      label: '应急专项支出',
+      valueText: `${fmtMoney(row.fiveMoney)} 万元`,
+      size: 124,
+      color: '#7cf2ff'
+    },
+    {
+      id: 'd',
+      label: '个人救助补贴',
+      valueText: `${fmtMoney(row.threeMoney)} 万元`,
+      size: 124,
+      color: '#79ffa8'
+    },
+    {
+      id: 'e',
+      label: '救灾物资采购',
+      valueText: `${fmtMoney(row.fourMoney)} 万元`,
+      size: 124,
+      color: '#8b5cff'
+    },
+    {
+      id: 'f',
+      label: '工程抢险支出',
+      valueText: `${fmtMoney(row.twoMoney)} 万元`,
+      size: 124,
+      color: '#39d5ff'
+    }
+  ]
+  const links: FundGraphLink[] = [
+    { source: 't', target: 'a' },
+    { source: 't', target: 'd' },
+    { source: 't', target: 'e' },
+    { source: 't', target: 'f' }
+  ]
+  return buildFundGraphOption('t', nodes, links)
+}
+
+const fundExpenseOption = computed(() => {
+  const row = fundList.value.find((r) => r.type === '2')
+  return row ? buildExpenseFromApi(row) : buildStaticExpense()
+})
+
+onMounted(() => {
+  fetchRescueTeam()
+  fetchMaterials()
+  fetchSites()
+  fetchFund()
 })
 </script>
 
 <style scoped>
+/* 完整样式，与上一版一致，未做改动 */
 .left-wrap {
   width: 100%;
   height: 100%;
@@ -424,9 +785,6 @@ const fundExpenseOption = computed(() => {
   flex-direction: column;
 }
 
-/* ======================================================== */
-/* 通用 tab 样式（跟第二个文件一致） */
-/* ======================================================== */
 .tabs {
   width: 100%;
   display: flex;
@@ -479,7 +837,6 @@ const fundExpenseOption = computed(() => {
   text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
 
-/* 物资区 tab 尺寸更小 */
 .tabs--mini .tab {
   height: 40px;
   min-width: 140px;
@@ -717,6 +1074,7 @@ const fundExpenseOption = computed(() => {
   background: rgba(20, 30, 75, 0.55);
   border-bottom: 1px solid rgba(89, 194, 255, 0.12);
   box-sizing: border-box;
+  flex: 0 0 auto;
 }
 
 .material-title {
@@ -729,15 +1087,19 @@ const fundExpenseOption = computed(() => {
 .material-table {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-rows: 56px repeat(6, 1fr);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .material-row {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 0.8fr;
   align-items: center;
   padding: 0 16px;
+  height: 56px;
   border-bottom: 1px solid rgba(89, 194, 255, 0.1);
   color: rgba(214, 238, 255, 0.82);
   font-size: 26px;
@@ -745,9 +1107,20 @@ const fundExpenseOption = computed(() => {
 }
 
 .material-row--head {
-  background: rgba(20, 30, 75, 0.45);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 56px;
+  background: rgba(20, 30, 75, 0.85);
   color: rgba(234, 240, 255, 0.95);
   font-weight: 800;
+}
+
+.material-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .material-row-qty {
@@ -755,6 +1128,7 @@ const fundExpenseOption = computed(() => {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .material-row-qty strong {
@@ -802,6 +1176,13 @@ const fundExpenseOption = computed(() => {
   border: 2px solid rgba(255, 255, 255, 0.8);
   background: rgba(54, 232, 255, 0.95);
   box-shadow: 0 0 16px rgba(54, 232, 255, 0.18);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.place-marker:hover {
+  transform: translate(-50%, -50%) scale(1.3);
 }
 
 .place-marker span {
@@ -815,53 +1196,22 @@ const fundExpenseOption = computed(() => {
   background: rgba(6, 18, 48, 0.85);
 }
 
-.place-marker--a {
-  left: 40%;
-  top: 26%;
-}
-.place-marker--b {
-  left: 46%;
-  top: 34%;
-}
-.place-marker--c {
-  left: 52%;
-  top: 38%;
-}
-.place-marker--d {
-  left: 58%;
-  top: 44%;
-}
-.place-marker--e {
-  left: 62%;
-  top: 52%;
-}
-.place-marker--f {
+.place-marker-label {
+  position: absolute;
   left: 50%;
-  top: 56%;
-}
-.place-marker--g {
-  left: 44%;
-  top: 50%;
-}
-.place-marker--h {
-  left: 38%;
-  top: 44%;
-}
-.place-marker--i {
-  left: 34%;
-  top: 54%;
-}
-.place-marker--j {
-  left: 30%;
-  top: 40%;
-}
-.place-marker--k {
-  left: 56%;
-  top: 30%;
-}
-.place-marker--l {
-  left: 60%;
-  top: 60%;
+  top: -10px;
+  transform: translate(-50%, -100%);
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #eaf7ff;
+  white-space: nowrap;
+  text-shadow:
+    0 0 6px rgba(54, 232, 255, 0.7),
+    0 0 12px rgba(54, 232, 255, 0.4);
+  pointer-events: none;
+  user-select: none;
 }
 
 .fund-body {

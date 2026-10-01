@@ -60,6 +60,18 @@ export default defineConfig(({ mode }) => {
               changeOrigin: true,
               timeout: 5000,
               proxyTimeout: 5000
+            },
+            '/weatherenvironment': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
+            },
+            '/disaster/bigscreen': {
+              target: proxyTarget,
+              changeOrigin: true,
+              timeout: 5000,
+              proxyTimeout: 5000
             }
           }
         }

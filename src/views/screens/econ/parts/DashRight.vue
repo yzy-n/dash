@@ -4,31 +4,47 @@
       <section class="panel market-panel">
         <div class="panel-head">
           <div class="panel-title">各地区市场主体</div>
-          <select v-model="dateCapacity" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="dateMarket"
+            class="panel-date"
+            @change="fetchMarketData"
+          >
+            <option v-for="item in marketDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
-        <!-- 5个指标卡片，第一行3个，第二行2个居中 -->
+        <!-- 5个指标卡片 -->
         <div class="market-metrics-wrap">
           <div class="metric-item">
             <div class="metric-label">总计</div>
-            <div class="metric-value">314493 <span class="unit">户</span></div>
+            <div class="metric-value">
+              {{ marketTotals.total }} <span class="unit">户</span>
+            </div>
           </div>
           <div class="metric-item">
             <div class="metric-label">内资企业</div>
-            <div class="metric-value">53425 <span class="unit">户</span></div>
+            <div class="metric-value">
+              {{ marketTotals.domestic }} <span class="unit">户</span>
+            </div>
           </div>
           <div class="metric-item">
             <div class="metric-label">个体工商户</div>
-            <div class="metric-value">256312 <span class="unit">户</span></div>
+            <div class="metric-value">
+              {{ marketTotals.individual }} <span class="unit">户</span>
+            </div>
           </div>
           <div class="metric-item">
             <div class="metric-label">农民专业合作社</div>
-            <div class="metric-value">4601 <span class="unit">户</span></div>
+            <div class="metric-value">
+              {{ marketTotals.cooperative }} <span class="unit">户</span>
+            </div>
           </div>
           <div class="metric-item">
             <div class="metric-label">外资企业</div>
-            <div class="metric-value">155 <span class="unit">户</span></div>
+            <div class="metric-value">
+              {{ marketTotals.overseas }} <span class="unit">户</span>
+            </div>
           </div>
         </div>
         <!-- 柱状图区域 -->
@@ -36,15 +52,21 @@
           <EChart :option="barOption" />
         </div>
       </section>
-      <!-- ========== 价格监测：替换为表格+tab，移除原ECharts tower-chart ========== -->
+
+      <!-- 价格监测（接口驱动） -->
       <section class="panel panel--tower">
         <div class="panel-head">
           <div class="panel-title">价格监测</div>
-          <select v-model="dateElectric" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="datePrice"
+            class="panel-date"
+            @change="fetchPriceData"
+          >
+            <option v-for="item in priceDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
-        <!-- 【修复】价格监测tab统一使用全局tab class，和供暖样式对齐，删除错误price-tab-active -->
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in priceTabList"
@@ -53,7 +75,7 @@
             class="tab"
             :class="{ 'tab--active': tab === activePriceTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activePriceTab = tab"
+            @click="switchPriceTab(tab)"
           >
             {{ tab }}
           </button>
@@ -66,7 +88,11 @@
             <div class="price-cell">环比增长(元)</div>
           </div>
           <div class="price-table-body">
-            <div v-for="row in priceTableData" :key="row.name" class="price-table-row">
+            <div
+              v-for="(row, idx) in priceTableData"
+              :key="`${row.name}-${idx}`"
+              class="price-table-row"
+            >
               <div class="price-cell">{{ row.name }}</div>
               <div class="price-cell">{{ row.lastWeek }}</div>
               <div class="price-cell">{{ row.thisWeek }}</div>
@@ -85,23 +111,38 @@
         </div>
       </section>
     </div>
+
     <div class="col">
       <section class="panel panel--water">
         <div class="panel-head">
           <div class="panel-title">消费品总额增速</div>
-          <select v-model="dateWater" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="dateWater"
+            class="panel-date"
+            @change="fetchWaterData"
+          >
+            <option v-for="item in waterDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="water-chart">
           <productChart :data="waterData" />
         </div>
       </section>
+
+      <!-- 建筑业增值增速（接口驱动） -->
       <section class="panel panel--heat">
         <div class="panel-head">
           <div class="panel-title">建筑业增值增速</div>
-          <select v-model="dateHeat" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="dateHeat"
+            class="panel-date"
+            @change="fetchHeatData"
+          >
+            <option v-for="item in heatDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="panel-tabs panel-tabs--center">
@@ -122,41 +163,56 @@
         </div>
       </section>
     </div>
+
     <div class="col">
-      <!-- 红十字会：高度由内容撑开，不抢占剩余高度 -->
       <section class="panel panel--red">
         <div class="panel-head red-panel-head">
           <div class="panel-title">数字经济与服务</div>
-          <select v-model="dateRed" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="dateRed"
+            class="panel-date"
+            @change="fetchRedData"
+          >
+            <option v-for="item in redDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="red-inner">
-          <!-- 顶部两行 -->
           <div class="red-top-item">
             <div class="red-top-icon"></div>
             <div class="red-top-label">互联网和相关服务情况</div>
-            <div class="red-top-val">1.0 亿元<span>11.8%</span></div>
+            <div class="red-top-val">
+              {{ internetService.taking }} 亿元<span>{{ internetService.speed }}%</span>
+            </div>
           </div>
           <div class="red-top-item">
             <div class="red-top-icon"></div>
             <div class="red-top-label">软件和信息技术服务业情况</div>
-            <div class="red-top-val">1.4 亿元<span>11.4%</span></div>
+            <div class="red-top-val">
+              {{ softwareService.taking }} 亿元<span>{{ softwareService.speed }}%</span>
+            </div>
           </div>
           <div class="chart-wrap">
-            <serviceChart :option="barOption" />
+            <serviceChart :option="serviceBarOption" />
           </div>
         </div>
       </section>
-      <!-- AED占剩下全部高度 【新增商品房交易tab切换，和建筑业完全同样式】 -->
+
+      <!-- 商品房交易情况（接口驱动） -->
       <section class="panel panel--aed">
         <div class="panel-head red-panel-head">
           <div class="panel-title">商品房交易情况</div>
-          <select v-model="dateRed" class="panel-date">
-            <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+          <select
+            v-model="dateHouse"
+            class="panel-date"
+            @change="fetchHouseData"
+          >
+            <option v-for="item in houseDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
           </select>
         </div>
-        <!-- 商品房tab 复用全局panel-tabs样式 -->
         <div class="panel-tabs panel-tabs--center">
           <button
             v-for="tab in houseTabs"
@@ -165,7 +221,7 @@
             class="tab"
             :class="{ 'tab--active': tab === activeHouseTab }"
             :style="{ backgroundImage: `url(${tabBgUrl})` }"
-            @click="activeHouseTab = tab"
+            @click="switchHouseTab(tab)"
           >
             {{ tab }}
           </button>
@@ -179,253 +235,153 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import productChart from '@/views/screens/econ/charts/product.vue'
 import plusChart from '@/views/screens/econ/charts/plus.vue'
 import houseChart from '@/views/screens/econ/charts/house.vue'
 import serviceChart from '@/views/screens/econ/charts/service.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
+import {
+  getEachRegion,
+  getAmountGrowth,
+  getRentabilityAnalyseIndustry,
+  getPrice,
+  getConstruction,
+  getCondo
+} from '@/api/econ'
 
-const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
-const dateCapacity = ref(dateOptions[0])
-const dateElectric = ref(dateOptions[0])
-const dateWater = ref(dateOptions[0])
-const dateRed = ref(dateOptions[0])
-const dateHeat = ref(dateOptions[0])
-const houseTabs = ['新房', '二手房']
-const activeHouseTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
+/* =========================================================
+   各地区市场主体（接口驱动）
+   ========================================================= */
+const marketDateOptions = ref<string[]>([
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.10',
+  '2023.11',
+  '20231121',
+  '2023.12',
+  '2023.1~9',
+  '2024.04',
+  '2024.11',
+  '2025年6月'
+])
+const dateMarket = ref('2025年6月')
 
-const gasMetrics = computed(() => {
-  const map = {
-    煤气: [
-      { pos: 'lt', label: '家庭用户', value: '738000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '13743', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '136.3', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '9124', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '2033', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '745763', unit: '户' }
-    ],
-    天然气: [
-      { pos: 'lt', label: '家庭用户', value: '812000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '15240', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '152.1', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '10230', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '2360', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '801340', unit: '户' }
-    ],
-    液化石油气: [
-      { pos: 'lt', label: '家庭用户', value: '398000', unit: '户' },
-      { pos: 'rt', label: '供气总量', value: '6240', unit: '万立方米' },
-      { pos: 'lm', label: '用气人口', value: '86.6', unit: '万人' },
-      { pos: 'rm', label: '家庭用量', value: '4312', unit: '万立方米' },
-      { pos: 'lb', label: '管道长度', value: '980', unit: '公里' },
-      { pos: 'rb', label: '用户户数', value: '402115', unit: '户' }
-    ]
-  } as const
-  return map[activeGasTab.value]
-})
+type MarketRow = {
+  area: string
+  domestic: number
+  individual: number
+  cooperative: number
+  overseas: number
+}
 
-// 价格监测表格数据
-const priceTabList = ref(['农副产品', '蔬菜'])
-const activePriceTab = ref('农副产品')
-const priceTableData = computed(() => {
-  const source: Record<
-    string,
-    Array<{ name: string; lastWeek: number; thisWeek: number; diff: number }>
-  > = {
-    农副产品: [
-      { name: '鲜羊肉', lastWeek: 37.57, thisWeek: 37.57, diff: 0.0 },
-      { name: '鸡蛋', lastWeek: 5.35, thisWeek: 5.43, diff: 0.08 },
-      { name: '白条鸡', lastWeek: 8, thisWeek: 8, diff: 0.0 },
-      { name: '鲤鱼', lastWeek: 8.3, thisWeek: 8.3, diff: 0.0 },
-      { name: '鲫鱼', lastWeek: 12.53, thisWeek: 12.6, diff: 0.07 },
-      { name: '草鱼', lastWeek: 9.93, thisWeek: 9.93, diff: 0.0 },
-      { name: '带鱼', lastWeek: 14.82, thisWeek: 14.8, diff: -0.02 }
-    ],
-    蔬菜: [
-      { name: '大白菜', lastWeek: 2.12, thisWeek: 2.25, diff: 0.13 },
-      { name: '土豆', lastWeek: 1.85, thisWeek: 1.8, diff: -0.05 },
-      { name: '黄瓜', lastWeek: 3.4, thisWeek: 3.55, diff: 0.15 },
-      { name: '西红柿', lastWeek: 2.88, thisWeek: 2.91, diff: 0.03 },
-      { name: '青椒', lastWeek: 4.2, thisWeek: 4.1, diff: -0.1 }
-    ]
+const marketList = ref<MarketRow[]>([])
+const marketLoading = ref(false)
+
+/** 兼容多种解包层级 */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const toNum = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+const fetchMarketData = async () => {
+  marketLoading.value = true
+  try {
+    const res: any = await getEachRegion(dateMarket.value)
+    console.log('[eachregion] souseDate=', dateMarket.value, 'res=', res)
+
+    const list = pickList(res)
+    marketList.value = list.map((it: any) => ({
+      area: String(it?.departmentName ?? ''),
+      domestic: toNum(it?.domesticEnterprise),
+      individual: toNum(it?.individualBusiness),
+      cooperative: toNum(it?.professionalCooperative),
+      overseas: toNum(it?.overseasFundedEnterprise)
+    }))
+  } catch (e) {
+    console.error('各地区市场主体查询失败', e)
+    marketList.value = []
+  } finally {
+    marketLoading.value = false
   }
-  return source[activePriceTab.value]
-})
+}
 
-// 市场主体柱状图
-const barOption = ref<EChartsOption>({
-  backgroundColor: 'transparent',
-  tooltip: {
-    trigger: 'axis',
-    backgroundColor: 'rgba(4,24,48,0.85)',
-    borderColor: '#26c9dd',
-    textStyle: { color: '#fff' },
-    formatter: (params: any) => {
-      return `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
-    }
-  },
-  grid: {
-    left: '8%',
-    right: '4%',
-    top: '12%',
-    bottom: '22%'
-  },
-  xAxis: {
-    type: 'category',
-    data: [
-      '海城市',
-      '台安县',
-      '岫岩县',
-      '铁东区',
-      '铁西区',
-      '立山区',
-      '千山区',
-      '高新区',
-      '经开区',
-      '风景区'
-    ],
-    axisLine: { lineStyle: { color: '#287892' } },
-    axisLabel: {
-      color: '#82d8e8',
-      rotate: 40,
-      fontSize: 36
-    }
-  },
-  yAxis: {
-    name: '单位：户',
-    nameTextStyle: { color: '#82d8e8' },
-    type: 'value',
-    splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
-    axisLine: { show: false },
-    axisLabel: { color: '#82d8e8', fontSize: 30 }
-  },
-  series: [
-    {
-      name: '内资企业',
-      type: 'bar',
-      barWidth: '40%',
-      data: [17200, 4600, 6200, 9800, 6100, 5088, 4300, 1200, 800, 300],
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: '#26e2dd' },
-            { offset: 1, color: '#086c94' }
-          ]
-        }
-      }
-    }
-  ]
-})
-const gasOption = computed(() => {
-  const value = activeGasTab.value === '煤气' ? 68 : activeGasTab.value === '天然气' ? 72 : 55
+const marketTotals = computed(() => {
+  const list = marketList.value
+  const domestic = list.reduce((s, r) => s + r.domestic, 0)
+  const individual = list.reduce((s, r) => s + r.individual, 0)
+  const cooperative = list.reduce((s, r) => s + r.cooperative, 0)
+  const overseas = list.reduce((s, r) => s + r.overseas, 0)
+  const total = domestic + individual + cooperative + overseas
   return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    series: [
-      {
-        type: 'gauge',
-        startAngle: 210,
-        endAngle: -30,
-        radius: '88%',
-        center: ['50%', '52%'],
-        progress: {
-          show: true,
-          width: 14,
-          itemStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 1,
-              y2: 0,
-              colorStops: [
-                { offset: 0, color: 'rgba(51, 213, 255, 0.18)' },
-                { offset: 1, color: 'rgba(51, 213, 255, 0.95)' }
-              ]
-            }
-          }
-        },
-        axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(89, 194, 255, 0.12)']] } },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: { show: false },
-        pointer: { show: false },
-        detail: { show: false },
-        data: [{ value }]
-      },
-      {
-        type: 'pie',
-        radius: ['76%', '78%'],
-        center: ['50%', '52%'],
-        silent: true,
-        label: { show: false },
-        data: [{ value: 100, itemStyle: { color: 'rgba(54, 232, 255, 0.12)' } }]
-      },
-      {
-        type: 'pie',
-        radius: ['64%', '66%'],
-        center: ['50%', '52%'],
-        silent: true,
-        label: { show: false },
-        data: [
-          {
-            value: 100,
-            itemStyle: {
-              color: {
-                type: 'linear',
-                x: 0,
-                y: 0,
-                x2: 1,
-                y2: 0,
-                colorStops: [
-                  { offset: 0, color: 'rgba(255, 226, 74, 0.15)' },
-                  { offset: 1, color: 'rgba(255, 226, 74, 0.42)' }
-                ]
-              }
-            }
-          }
-        ]
-      }
-    ]
+    total: String(total),
+    domestic: String(domestic),
+    individual: String(individual),
+    cooperative: String(cooperative),
+    overseas: String(overseas)
   }
 })
-const waterTypes = ['综合生产能力', '城区合计']
-const activeWaterType = ref<(typeof waterTypes)[number]>(waterTypes[0])
-const waterOption = computed(() => {
-  const x = ['城区合计', '海城市', '台安县', '岫岩县']
-  const y = activeWaterType.value === '综合生产能力' ? [55, 10, 3, 2] : [36, 12, 4, 3]
+
+const barOption = computed(() => {
+  const names = marketList.value.map((r) => r.area)
+  const values = marketList.value.map((r) => r.domestic)
+
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
-    grid: { left: 70, right: 26, top: 26, bottom: 30 },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(4,24,48,0.85)',
+      borderColor: '#26c9dd',
+      textStyle: { color: '#fff' },
+      formatter: (params: any) =>
+        `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
+    },
+    grid: {
+      left: '8%',
+      right: '4%',
+      top: '12%',
+      bottom: '22%'
+    },
     xAxis: {
       type: 'category',
-      data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: false }
+      data: names,
+      axisLine: { lineStyle: { color: '#287892' } },
+      axisLabel: {
+        color: '#82d8e8',
+        rotate: 40,
+        fontSize: 36
+      }
     },
     yAxis: {
+      name: '单位：户',
+      nameTextStyle: { color: '#82d8e8' },
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
+      splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
       axisLine: { show: false },
-      axisTick: { show: false }
+      axisLabel: { color: '#82d8e8', fontSize: 30 }
     },
     series: [
       {
+        name: '内资企业',
         type: 'bar',
-        data: y,
-        barWidth: 22,
+        barWidth: '40%',
+        data: values,
         itemStyle: {
-          borderRadius: [10, 10, 0, 0],
           color: {
             type: 'linear',
             x: 0,
@@ -433,8 +389,8 @@ const waterOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(51, 213, 255, 0.95)' },
-              { offset: 1, color: 'rgba(51, 213, 255, 0.12)' }
+              { offset: 0, color: '#26e2dd' },
+              { offset: 1, color: '#086c94' }
             ]
           }
         }
@@ -442,79 +398,591 @@ const waterOption = computed(() => {
     ]
   }
 })
-const towerTotal = '4710'
-const towerLegend = [
-  { label: '地面站', value: '2564', unit: '个', rate: '54.44%' },
-  { label: '楼面站', value: '1674', unit: '个', rate: '35.54%' },
-  { label: 'H杆', value: '472', unit: '个', rate: '10.02%' }
-]
-const towerOption = computed(() => {
-  const data = [
-    { name: '地面站', value: 2564 },
-    { name: '楼面站', value: 1674 },
-    { name: 'H杆', value: 472 }
-  ]
-  return {
-    backgroundColor: 'transparent',
-    tooltip: { show: false },
-    series: [
-      {
-        type: 'pie',
-        radius: ['40%', '72%'],
-        center: ['45%', '56%'],
-        label: { show: false },
-        itemStyle: { borderWidth: 2, borderColor: 'rgba(2, 10, 30, 0.9)' },
-        data
-      }
-    ],
-    color: ['#33d5ff', '#40f3b8', '#ffe24a']
+
+/* =========================================================
+   价格监测（接口驱动）
+   ========================================================= */
+const priceDateOptions = ref<string[]>([
+  '05.29~06.04',
+  '06.05~06.11',
+  '06.19~06.25',
+  '06.26~07.02',
+  '07.03~07.09',
+  '07.10~07.16',
+  '07.17~07.23',
+  '07.24~07.30',
+  '08.07~08.13',
+  '08.14~08.20',
+  '08.21~08.27',
+  '08.28~09.03',
+  '09.04~09.10',
+  '09.11~09.17',
+  '09.18~09.24',
+  '10.01~10.08',
+  '11.11~11.17',
+  '11.25~12.1',
+  '11.4~11.10',
+  '12.2~12.8',
+  '2023.04.10~04.16',
+  '2023.04.24~04.30',
+  '2023.05.08~05.14',
+  '2023.05.15~21',
+  '2023.05.22~28',
+  '2023.10.09~10.15',
+  '2023.10.16~10.22',
+  '2023.10.23~10.29',
+  '2023.10.26',
+  '2023.10.30~11.05',
+  '2023.11.06~11.12',
+  '2023.11.13~11.19',
+  '2023.11.20~11.26',
+  '2023.11.27~12.03',
+  '2023.12.04~12.10',
+  '2023.12.11~12.17',
+  '2023.12.18~12.24',
+  '2023.12.25~12.31',
+  '2024.01.01~01.07',
+  '2024.01.08~01.14',
+  '2024.01.15~1.21',
+  '2024.01.22~01.28',
+  '2024.01.29~02.04',
+  '2024.02.05~02.10',
+  '2024.02.12~02.18',
+  '2024.02.19~02.25',
+  '2024.02.26~03.03',
+  '2024.06.03-06.09',
+  '2024.06.10-06.16',
+  '2024.08.19~08.25',
+  '2024.10.14~10.20',
+  '2024.10.21~10.27',
+  '2024.10. 28~11.3',
+  '2024.10.7~10.13',
+  '2024.11.18~11.24',
+  '2024.1.13~1.19',
+  '2024.12.16~12.22',
+  '2024.12.23~12.29',
+  '2024.12.8~12.15',
+  '2024.3.11~3.17',
+  '2024.3.18~3.24',
+  '2024.3.25~3.31',
+  '2024.3.3~3.10',
+  '2024.4.1~4.7',
+  '2024.4.15~4.21',
+  '2024.4.22~4.28',
+  '2024.4.29~5.5',
+  '2024.4.8~4.14',
+  '2024.5.13~5.19',
+  '2024.5.20~5.26',
+  '2024.5.27~6.02',
+  '2024.5.6~5.12',
+  '2024.6.17-6.23',
+  '2024.6.24-6.30',
+  '2024.7.15~7.21',
+  '2024.7.1~7.7',
+  '2024.7.22~7.28',
+  '2024.7.29~8.4',
+  '2024.7.8~7.14',
+  '2024.8.04~8.11',
+  '2024.8.12~8.18',
+  '2024.8.26~9.1',
+  '2024.9.16~9.22',
+  '2024.9.23-9.29',
+  '2024.9.2~9.8',
+  '2024.9.30~10.6',
+  '2024.9.9~9.15',
+  '2025.10.13~10.19',
+  '2025.10.20~10.26',
+  '2025.10.27~11.2',
+  '2025.10.6~10.12',
+  '2025.11.10~11.16',
+  '2025.11.17~11.23',
+  '2025.11.24~11.30',
+  '2025.11.3~11.9',
+  '2025.1.20~1.26',
+  '2025.12.1~12.7',
+  '2025.12.15~12.31',
+  '2025.12.22~12.28',
+  '2025.12.29~1.4',
+  '2025.1.27~2.2',
+  '2025.12.8~12.14',
+  '2025.1.6~1.12',
+  '2025.2.10~2.16',
+  '2025.2.17~2.23',
+  '2025.2.24~3.2',
+  '2025.2.3~2.9',
+  '2025.3.10~3.16',
+  '2025.3.17~3.23',
+  '2025.3.24~3.30',
+  '2025.3.31~4.6',
+  '2025.3.3~3.9',
+  '2025.4.14~4.20',
+  '2025.4.21~4.27',
+  '2025.4.28~5.4',
+  '2025.4.7~4.13',
+  '2025.5.12~5.18',
+  '2025.5.19~5.25',
+  '2025.5.26~6.1',
+  '2025.5.5~5.11',
+  '2025.6.16~6.22',
+  '2025.6.23~6.29',
+  '2025.6.2~6.8',
+  '2025.6.30~7.6',
+  '2025.6.9~6.15',
+  '2025.7.14~7.20',
+  '2025.7.21~7.27',
+  '2025.7.28~8.3',
+  '2025.7.7~7.13',
+  '2025.8.11~8.17',
+  '2025.8.18~8.24',
+  '2025.8.25~8.31',
+  '2025.8.4~8.10',
+  '2025.9.15~9.21',
+  '2025.9.1~9.7',
+  '2025.9.22~9.28',
+  '2025.9.29~10.5',
+  '2025.9.8~9.14',
+  '2026.03.16~03.22',
+  '2026.03.23~03.29',
+  '2026.1.12~1.18',
+  '2026.1.19~1.25',
+  '2026.1.26~2.1',
+  '2026.1.5~1.11',
+  '2026.2.16~2.22',
+  '2026.2.2~2.8',
+  '2026.2.23~3.1',
+  '2026.2.9~2.15',
+  '2026.3.2~3.8',
+  '2026.3.30~4.5',
+  '2026.3.9~3.15',
+  '2026.4.13~4.19',
+  '2026.4.20~4.26',
+  '2026.4.27~5.3',
+  '2026.4.6~4.12',
+  '2026.5.11~5.17',
+  '2026.5.18~5.24',
+  '2026.5.25~5.31',
+  '2026.5.4~5.10'
+])
+const datePrice = ref('2026.5.4~5.10')
+
+const priceTabList = ref(['农副产品', '蔬菜'])
+const activePriceTab = ref('农副产品')
+const priceGoodsTypeMap: Record<string, string> = {
+  农副产品: '1',
+  蔬菜: '2'
+}
+
+type PriceRow = {
+  name: string
+  lastWeek: number
+  thisWeek: number
+  diff: number
+}
+const priceTableData = ref<PriceRow[]>([])
+const priceLoading = ref(false)
+
+const pickPriceList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const fetchPriceData = async () => {
+  priceLoading.value = true
+  try {
+    const goodsType = priceGoodsTypeMap[activePriceTab.value] ?? '1'
+    const res: any = await getPrice(datePrice.value, goodsType)
+    console.log(
+      '[price] souseDate=', datePrice.value,
+      'goodsType=', goodsType,
+      'res=', res
+    )
+
+    const list = pickPriceList(res)
+    priceTableData.value = list.map((it: any) => ({
+      name: String(it?.goodsT ?? it?.goods ?? ''),
+      lastWeek: toNum(it?.yesterdayPrice),
+      thisWeek: toNum(it?.todayPrice),
+      diff: toNum(it?.changeD)
+    }))
+  } catch (e) {
+    console.error('价格监测查询失败', e)
+    priceTableData.value = []
+  } finally {
+    priceLoading.value = false
   }
-})
+}
+
+const switchPriceTab = (tab: string) => {
+  if (activePriceTab.value === tab) return
+  activePriceTab.value = tab
+  fetchPriceData()
+}
+
+/* =========================================================
+   消费品总额增速（接口驱动）
+   ========================================================= */
+const waterDateOptions = ref<string[]>([
+  '1',
+  '2022.01~12',
+  '2023.01~03',
+  '2023.01-12',
+  '2023.06',
+  '2023.09',
+  '2024.01-06',
+  '2024.01-09',
+  '2024.01-12',
+  '2024.1-3'
+])
+const dateWater = ref('2024.1-3')
+const waterData = ref<any[]>([])
+const waterLoading = ref(false)
+
+const fetchWaterData = async () => {
+  waterLoading.value = true
+  try {
+    const res: any = await getAmountGrowth(dateWater.value)
+    console.log('[amountgrowth] souseDate=', dateWater.value, 'res=', res)
+
+    const body = res?.data ?? res
+
+    const opts = body?.summary?.timeOptions
+    if (Array.isArray(opts) && opts.length) {
+      waterDateOptions.value = opts
+    }
+    const souseDate = body?.summary?.souseDate
+    if (souseDate && souseDate !== dateWater.value) {
+      dateWater.value = souseDate
+    }
+
+    const list = body?.dataList
+    waterData.value = Array.isArray(list) ? list : []
+  } catch (e) {
+    console.error('消费品总额增速查询失败', e)
+    waterData.value = []
+  } finally {
+    waterLoading.value = false
+  }
+}
+
+/* =========================================================
+   建筑业增值增速（接口驱动）
+   ========================================================= */
+type HeatRow = { year: string; addedValue: number; speed: number }
+
+const heatDateOptions = ref<string[]>([
+  '1',
+  '2022.01~12',
+  '2023.01~03',
+  '2023.01~06',
+  '2023.01~09',
+  '2023.01～09',
+  '2023.01-12',
+  '2024.01-06',
+  '2024.01-09',
+  '2024.01-12',
+  '2024.03',
+  '2024.1-3',
+  '2025.01-03'
+])
+const dateHeat = ref('2025.01-03')
+const heatSourceData = ref<HeatRow[]>([])
+const heatLoading = ref(false)
+
 const heatTabs = ['增加值', '同比']
 const activeHeatTab = ref<(typeof heatTabs)[number]>(heatTabs[0])
 
-const aedOption = computed(() => {
-  const points = [
-    [26, 70],
-    [34, 62],
-    [42, 58],
-    [56, 64],
-    [62, 52],
-    [48, 46],
-    [38, 44],
-    [30, 40],
-    [70, 38],
-    [78, 44],
-    [68, 58],
-    [58, 72],
-    [40, 76],
-    [22, 56],
-    [82, 62]
-  ]
+const fetchHeatData = async () => {
+  heatLoading.value = true
+  try {
+    const res: any = await getConstruction(dateHeat.value)
+    console.log('[construction] souseDate=', dateHeat.value, 'res=', res)
+
+    const body = res?.data ?? res
+
+    const opts = body?.summary?.timeOptions
+    if (Array.isArray(opts) && opts.length) {
+      heatDateOptions.value = opts
+    }
+    const souseDate = body?.summary?.souseDate
+    if (souseDate && souseDate !== dateHeat.value) {
+      dateHeat.value = souseDate
+    }
+
+    const list = body?.dataList
+    heatSourceData.value = Array.isArray(list)
+      ? list.map((it: any) => ({
+          year: String(it?.year ?? ''),
+          addedValue: toNum(it?.addedValue),
+          speed: toNum(it?.speed)
+        }))
+      : []
+  } catch (e) {
+    console.error('建筑业增值增速查询失败', e)
+    heatSourceData.value = []
+  } finally {
+    heatLoading.value = false
+  }
+}
+
+const heatData = computed(() => {
+  const isSpeed = activeHeatTab.value === '同比'
+  return heatSourceData.value.map((r) => ({
+    name: r.year,
+    value: isSpeed ? r.speed : r.addedValue
+  }))
+})
+
+/* =========================================================
+   数字经济与服务（接口驱动）
+   ========================================================= */
+type RedRow = { industry: string; taking: number; speed: number }
+
+const redDateOptions = ref<string[]>([
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~10',
+  '2023.01-12',
+  '2023-01~2023-11',
+  '2024.01-03',
+  '2024.01-04',
+  '2024.01-05',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2024.1-2',
+  '2025.01-02',
+  '2025.01-04'
+])
+const dateRed = ref('2025.01-04')
+const redData = ref<RedRow[]>([])
+const redLoading = ref(false)
+
+const fetchRedData = async () => {
+  redLoading.value = true
+  try {
+    const res: any = await getRentabilityAnalyseIndustry(dateRed.value)
+    console.log('[rentabilityanalyseindustry] souseDate=', dateRed.value, 'res=', res)
+
+    const body = res?.data ?? res
+
+    const opts = body?.summary?.timeOptions
+    if (Array.isArray(opts) && opts.length) {
+      redDateOptions.value = opts
+    }
+    const souseDate = body?.summary?.souseDate
+    if (souseDate && souseDate !== dateRed.value) {
+      dateRed.value = souseDate
+    }
+
+    const list = body?.dataList
+    redData.value = Array.isArray(list)
+      ? list.map((it: any) => ({
+          industry: String(it?.industry ?? ''),
+          taking: toNum(it?.taking),
+          speed: toNum(it?.speed)
+        }))
+      : []
+  } catch (e) {
+    console.error('数字经济与服务查询失败', e)
+    redData.value = []
+  } finally {
+    redLoading.value = false
+  }
+}
+
+const findRedByKeyword = (keywords: string[]): RedRow => {
+  const hit = redData.value.find((r) => keywords.some((k) => r.industry.includes(k)))
+  return hit ?? { industry: '', taking: 0, speed: 0 }
+}
+
+const internetService = computed(() => findRedByKeyword(['互联网']))
+const softwareService = computed(() => findRedByKeyword(['软件']))
+
+const serviceBarOption = computed(() => {
+  const names = redData.value.map((r) => r.industry)
+  const values = redData.value.map((r) => r.taking)
+
   return {
     backgroundColor: 'transparent',
-    grid: { left: 0, right: 0, top: 0, bottom: 0 },
-    xAxis: { show: false, min: 0, max: 100 },
-    yAxis: { show: false, min: 0, max: 100 },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: 'rgba(4,24,48,0.85)',
+      borderColor: '#26c9dd',
+      textStyle: { color: '#fff' },
+      formatter: (params: any) => {
+        const p = params[0]
+        const row = redData.value[p.dataIndex]
+        return `${p.name}<br/>营业收入：${row?.taking ?? 0} 亿元<br/>增速：${row?.speed ?? 0} %`
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '6%',
+      top: '6%',
+      bottom: '4%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      name: '单位：亿元',
+      nameTextStyle: { color: '#82d8e8' },
+      splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#82d8e8', fontSize: 22 }
+    },
+    yAxis: {
+      type: 'category',
+      data: names,
+      axisLine: { lineStyle: { color: '#287892' } },
+      axisLabel: { color: '#82d8e8', fontSize: 22 }
+    },
     series: [
       {
-        type: 'scatter',
-        coordinateSystem: 'cartesian2d',
-        data: points.map((p) => ({ value: [p[0], p[1]] })),
-        symbol: 'pin',
-        symbolSize: 34,
-        itemStyle: { color: '#ff3b3b' },
-        label: {
-          show: true,
-          formatter: 'AED',
-          color: '#fff',
-          fontSize: 12,
-          fontWeight: 900,
-          offset: [0, -6]
+        name: '营业收入',
+        type: 'bar',
+        barWidth: '50%',
+        data: values,
+        itemStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              { offset: 0, color: '#086c94' },
+              { offset: 1, color: '#26e2dd' }
+            ]
+          }
         }
       }
     ]
   }
+})
+
+/* =========================================================
+   商品房交易情况（接口驱动）
+   - 接口：/economicoperation/bigscreen/condo?souseDate=xxx&type=1|2
+   - 返回：{ data: { moduleName, datalist: [{ departmentName, type,
+             internalLevel, yoyGrowth }] } }
+   - Tab：新房 → type=1；二手房 → type=2
+   ========================================================= */
+type HouseRow = {
+  area: string
+  internalLevel: number
+  yoyGrowth: number
+  type: string
+}
+
+const houseDateOptions = ref<string[]>([
+  '1',
+  '20180101-20181231',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01-10',
+  '2023.01~10',
+  '2023.01~11',
+  '2023.01-12',
+  '2023.08',
+  '2024.01~02',
+  '2024.01-04',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-09',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2024.1-3',
+  '2024.1-5',
+  '2025.01-02',
+  '2025.01-03',
+  '2025.01-04',
+  '2025-06-23'
+])
+const dateHouse = ref('2025.01-04')
+
+const houseTabs = ['新房', '二手房']
+const activeHouseTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
+const houseTypeMap: Record<string, string> = {
+  新房: '1',
+  二手房: '2'
+}
+
+const houseData = ref<HouseRow[]>([])
+const houseLoading = ref(false)
+
+const fetchHouseData = async () => {
+  houseLoading.value = true
+  try {
+    const type = houseTypeMap[activeHouseTab.value] ?? '1'
+    const res: any = await getCondo(dateHouse.value, type)
+    console.log('[condo] souseDate=', dateHouse.value, 'type=', type, 'res=', res)
+
+    const body = res?.data ?? res
+
+    const opts = body?.summary?.timeOptions
+    if (Array.isArray(opts) && opts.length) {
+      houseDateOptions.value = opts
+    }
+    const souseDate = body?.summary?.souseDate
+    if (souseDate && souseDate !== dateHouse.value) {
+      dateHouse.value = souseDate
+    }
+
+    // 注意：字段名是 datalist（小写 L）
+    const list = pickList(res)
+    houseData.value = list.map((it: any) => ({
+      area: String(it?.departmentName ?? ''),
+      internalLevel: toNum(it?.internalLevel),
+      yoyGrowth: toNum(it?.yoyGrowth),
+      type: String(it?.type ?? type)
+    }))
+  } catch (e) {
+    console.error('商品房交易情况查询失败', e)
+    houseData.value = []
+  } finally {
+    houseLoading.value = false
+  }
+}
+
+const switchHouseTab = (tab: string) => {
+  if (activeHouseTab.value === tab) return
+  activeHouseTab.value = tab
+  fetchHouseData()
+}
+
+/* =========================================================
+   初始化
+   ========================================================= */
+onMounted(() => {
+  fetchMarketData()
+  fetchPriceData()
+  fetchWaterData()
+  fetchHeatData()
+  fetchRedData()
+  fetchHouseData()
 })
 </script>
 
@@ -583,7 +1051,6 @@ const aedOption = computed(() => {
   justify-content: space-between;
   z-index: 2;
 }
-/* ========== 仅市场主体模块新增样式，不污染其他panel ========== */
 .market-panel {
   flex: 1;
   min-height: 0;
@@ -596,7 +1063,6 @@ const aedOption = computed(() => {
   margin-bottom: 20px;
   margin-top: 40px;
 }
-/* 第4、5个卡片，第二行居中摆放 */
 .market-metrics-wrap .metric-item:nth-child(4) {
   grid-column: 1 / 2;
 }
@@ -654,36 +1120,10 @@ const aedOption = computed(() => {
   width: 100%;
   height: calc(100% - 180px);
 }
-/* ====================== 价格监测表格样式 ====================== */
 .panel--tower {
   flex: 1;
   min-height: 0;
   padding-top: 86px;
-}
-.price-tab-wrap {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin-bottom: 16px;
-}
-.price-tab {
-  min-width: 160px;
-  height: 44px;
-  line-height: 44px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: 900;
-  color: rgba(120, 190, 240, 0.6);
-  background: rgba(10, 40, 80, 0.35);
-  border: 1px solid rgba(84, 188, 255, 0.2);
-  border-radius: 8px;
-  cursor: pointer;
-}
-.price-tab-active {
-  color: #ffffff;
-  border-color: rgba(60, 200, 255, 0.6);
-  box-shadow: 0 0 14px rgba(51, 216, 255, 0.25);
-  text-shadow: 0 0 8px rgba(70, 200, 255, 0.4);
 }
 .price-table-wrap {
   width: 100%;
@@ -729,8 +1169,6 @@ const aedOption = computed(() => {
 .price-zero {
   color: #e6f4ff;
 }
-/* ========================================================= */
-/* 红十字头部：标题左，日期右 */
 .red-panel-head {
   justify-content: space-between;
 }
@@ -796,205 +1234,15 @@ const aedOption = computed(() => {
     0 0 40px #00a8ff;
   letter-spacing: 2px;
 }
-
 .tab--active {
   color: #eaf4ff;
   opacity: 1;
   filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
   text-shadow: 0 0 10px rgba(54, 232, 255, 0.28);
 }
-.panel--gas {
-  flex: 1;
-  min-height: 0;
-}
-.gas-stage {
-  position: absolute;
-  inset: 0;
-  padding: 128px 26px 26px;
-  box-sizing: border-box;
-}
-.gas-gauge {
-  position: absolute;
-  left: 50%;
-  top: 56%;
-  width: 540px;
-  height: 540px;
-  transform: translate(-50%, -50%);
-}
-.gas-icon {
-  position: absolute;
-  left: 50%;
-  top: 56%;
-  width: 140px;
-  height: 140px;
-  transform: translate(-50%, -50%);
-  border-radius: 70px;
-  border: 1px solid rgba(84, 188, 255, 0.18);
-  background: radial-gradient(circle at 50% 40%, rgba(54, 232, 255, 0.26), rgba(6, 18, 48, 0.25));
-  box-shadow: 0 0 26px rgba(54, 232, 255, 0.14);
-}
-.gas-metric {
-  position: absolute;
-  width: 360px;
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.32);
-  padding: 14px 16px 12px;
-  box-sizing: border-box;
-  display: grid;
-  gap: 10px;
-}
-.gas-metric-label {
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.78);
-}
-.gas-metric-value {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 10px;
-}
-.gas-metric-num {
-  font-size: 24px;
-  font-weight: 900;
-  color: rgba(255, 226, 74, 0.95);
-  text-shadow: 0 0 14px rgba(255, 226, 74, 0.18);
-}
-.gas-metric-unit {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-}
-.gas-metric--lt {
-  left: 40px;
-  top: 140px;
-}
-.gas-metric--rt {
-  right: 40px;
-  top: 140px;
-}
-.gas-metric--lm {
-  left: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.gas-metric--rm {
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.gas-metric--lb {
-  left: 40px;
-  bottom: 46px;
-}
-.gas-metric--rb {
-  right: 40px;
-  bottom: 46px;
-}
-.tower-kpi {
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: rgba(214, 238, 255, 0.78);
-}
-.tower-kpi-value {
-  font-size: 26px;
-  color: rgba(255, 226, 74, 0.95);
-  text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
-}
-.tower-kpi-unit {
-  color: rgba(214, 238, 255, 0.62);
-}
-.tower-body {
-  height: calc(100% - 54px);
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 14px;
-  align-items: center;
-}
-.tower-chart {
-  height: 100%;
-  min-height: 0;
-}
-.tower-legend {
-  display: grid;
-  gap: 12px;
-}
-.tower-legend-row {
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.32);
-  padding: 14px 14px;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 10px;
-  align-items: baseline;
-}
-.tower-legend-label {
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.78);
-}
-.tower-legend-value {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.tower-legend-num {
-  font-size: 22px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.94);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
-}
-.tower-legend-unit {
-  font-size: 16px;
-  font-weight: 900;
-  color: rgba(214, 238, 255, 0.62);
-}
-.tower-legend-rate {
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(255, 226, 74, 0.9);
-  text-shadow: 0 0 12px rgba(255, 226, 74, 0.14);
-}
 .panel--water {
   flex: 1;
   min-height: 0;
-}
-.water-filter {
-  position: absolute;
-  top: 78px;
-  right: 26px;
-  width: 360px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid rgba(84, 188, 255, 0.22);
-  background: rgba(6, 18, 48, 0.34);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  box-sizing: border-box;
-  z-index: 2;
-}
-.water-select {
-  width: 100%;
-  height: 100%;
-  appearance: none;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: rgba(240, 251, 255, 0.92);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
 }
 .water-chart {
   height: 100%;
@@ -1007,41 +1255,6 @@ const aedOption = computed(() => {
 .heat-chart {
   height: 100%;
   min-height: 0;
-}
-.heat-row {
-  height: 92px;
-  border-radius: 12px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.34);
-  display: grid;
-  grid-template-columns: 42px 1fr auto auto;
-  gap: 14px;
-  align-items: center;
-  padding: 0 14px;
-  box-sizing: border-box;
-  color: rgba(214, 238, 255, 0.82);
-  font-size: 18px;
-  font-weight: 900;
-}
-.heat-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  border: 1px solid rgba(54, 232, 255, 0.18);
-  background: radial-gradient(circle, rgba(54, 232, 255, 0.2), rgba(6, 18, 48, 0.15));
-}
-.heat-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.heat-value {
-  font-size: 22px;
-  color: rgba(240, 251, 255, 0.94);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
-}
-.heat-unit {
-  color: rgba(214, 238, 255, 0.62);
 }
 .panel--red {
   flex: 1;
@@ -1127,55 +1340,6 @@ const aedOption = computed(() => {
   color: rgba(124, 242, 255, 0.9);
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.14);
   margin-left: 0;
-}
-.red-top-rate {
-  font-size: 20px;
-  color: #fff;
-  margin-left: 4px;
-}
-.red-card-wrap {
-  flex: 1;
-  min-height: 0;
-}
-.red-card-wrap {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  align-content: stretch;
-}
-.red-card {
-  position: relative;
-  min-height: 140px;
-  border: 1px solid rgba(80, 160, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(12, 30, 60, 0.4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 24px;
-}
-.red-card-icon {
-  position: absolute;
-  top: -14px;
-  width: 48px;
-  height: 48px;
-}
-.red-card-name {
-  font-size: 20px;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 12px;
-}
-.red-card-num {
-  font-size: 34px;
-  color: #f9e784;
-}
-.red-card-num span {
-  font-size: 18px;
-  color: #fff;
 }
 .panel--aed {
   flex: 1;

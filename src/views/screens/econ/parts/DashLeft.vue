@@ -3,8 +3,10 @@
     <section class="panel panel--electric">
       <div class="panel-head">
         <div class="panel-title">地区生产总值增速</div>
-        <select v-model="dateElectric" class="panel-date">
-          <option v-for="item in gdpDateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateGdp" class="panel-date" @change="fetchGdpData">
+          <option v-for="item in gdpDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="gdp-wrap">
@@ -29,38 +31,31 @@
       </div>
     </section>
 
+    <!-- ==================== 三次产业分析（接口驱动） ==================== -->
     <section class="panel panel--capacity">
       <div class="panel-head">
         <div class="panel-title">三次产业分析</div>
-        <select v-model="dateCapacity" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateCapacity" class="panel-date" @change="fetchCapacityData">
+          <option v-for="item in capacityDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
-      </div>
-      <div class="panel-tabs">
-        <button
-          v-for="tab in capacityTabs"
-          :key="tab"
-          type="button"
-          class="tab"
-          :class="{ 'tab--active': tab === activeCapacityTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeCapacityTab = tab"
-        >
-          {{ tab }}
-        </button>
       </div>
       <div class="capacity-body">
         <div class="capacity-chart">
-          <PieRing />
+          <PieRing :data="capacityData" />
         </div>
       </div>
     </section>
 
+    <!-- ==================== 固定资产投资增速（接口驱动） ==================== -->
     <section class="panel panel--resume">
       <div class="panel-head">
         <div class="panel-title">固定资产投资增速</div>
-        <select v-model="dateInvest" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="currentInvestDate" class="panel-date" @change="fetchInvestData">
+          <option v-for="item in currentInvestDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="panel-tabs">
@@ -71,7 +66,7 @@
           class="tab"
           :class="{ 'tab--active': tab === activeInvestTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeInvestTab = tab"
+          @click="handleInvestTabClick(tab)"
         >
           {{ tab }}
         </button>
@@ -95,11 +90,14 @@
       </div>
     </section>
 
+    <!-- ==================== 规模以上工业增项（接口驱动） ==================== -->
     <section class="panel panel--pile">
       <div class="panel-head">
         <div class="panel-title">规模以上工业增项</div>
-        <select v-model="dateElectric" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="currentPileDate" class="panel-date" @change="fetchPileData">
+          <option v-for="item in currentPileDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="panel-tabs">
@@ -108,9 +106,9 @@
           :key="tab"
           type="button"
           class="tab"
-          :class="{ 'tab--active': tab === activeElectricTab }"
+          :class="{ 'tab--active': tab === activePileTab }"
           :style="{ backgroundImage: `url(${tabBgUrl})` }"
-          @click="activeElectricTab = tab"
+          @click="handlePileTabClick(tab)"
         >
           {{ tab }}
         </button>
@@ -118,16 +116,19 @@
       <div class="pile-body">
         <div class="metric-list"></div>
         <div class="pile-chart">
-          <Line />
+          <Line :data="pileData" />
         </div>
       </div>
     </section>
 
+    <!-- ==================== 规模以上工业效益（接口驱动） ==================== -->
     <section class="panel panel--resume">
       <div class="panel-head">
         <div class="panel-title">规模以上工业效益</div>
-        <select v-model="dateInvest" class="panel-date">
-          <option v-for="item in dateOptions" :key="item" :value="item">{{ item }}</option>
+        <select v-model="dateBenefit" class="panel-date" @change="fetchBenefitData">
+          <option v-for="item in benefitDateOptions" :key="item" :value="item">
+            {{ item }}
+          </option>
         </select>
       </div>
       <div class="four-reform-wrap">
@@ -194,79 +195,161 @@ import EChart from '@/components/echarts/EChart.vue'
 import tabBgUrl from '@/assets/img/tabBg.png'
 import PieRing from '../charts/PieRing.vue'
 import Line from '../charts/line.vue'
-import { getSteelPrice } from '@/api/econ'
+import {
+  getSteelPrice,
+  getNationwide,
+  getGrossRegional,
+  getIndustrialAnalysis,
+  getEconomicIndicatorsDName,
+  getFixedInvestments,
+  getParkProperty,
+  getFourChanges,
+  getEconomicIndicatorsIndustry,
+  getEconomicIndicatorsPark,
+  getEconomicBenefit
+} from '@/api/econ'
 
+/* =========================================================
+   基础常量
+   ========================================================= */
 const electricTabs = ['地区', '行业', '园区']
 const dateOptions = ['2023-05', '2023-04', '2022年统计数据']
-const gdpDateOptions = ['2022.01-12', '2021.01-12', '2020.01-12']
+
+const DEFAULT_GDP_YEARS = ['2025', '2024', '2023', '2022']
+const gdpDateOptions = ref<string[]>([...DEFAULT_GDP_YEARS])
+const dateGdp = ref('2024')
+
+const capacityDateOptions = [
+  '1',
+  '2022.01~12',
+  '2023.01~03',
+  '2023.01~06',
+  '2023.01~09',
+  '2023.1-12',
+  '2023.12',
+  '2024.01-06',
+  '2024.01-09',
+  '2024.01-12',
+  '2024.1-3',
+  '2025.01-03',
+  '222'
+]
+const dateCapacity = ref('222')
+
+const investDateOptions = [
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01~10',
+  '2023.01~11',
+  '2023.1-12',
+  '2023.12',
+  '2024.01~02',
+  '2024.01-03',
+  '2024.01-04',
+  '2024.01-05',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-09',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2025.01-02',
+  '2025.01-03',
+  '2025.01-04',
+  '2025.01-06',
+  '2025.01-2025.02'
+]
+const dateInvestFixed = ref('2025.01-2025.02')
+
+const parkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.1-9']
+const dateInvestPark = ref('2023.1-9')
+
+const pileDistrictDateOptions = [
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01-10',
+  '2023.01~10',
+  '2023.01~11',
+  '2023.1-12',
+  '2024.01~02',
+  '2024.01-04',
+  '2024.01-05',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-09',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2024.1-3',
+  '2025.01-02',
+  '2025.01-03',
+  '2025.01-04',
+  '2025.01-06',
+  '2025.01-2025.02'
+]
+const datePileDistrict = ref('2025.01-2025.02')
+
+const pileIndustryDateOptions = [
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01~10',
+  '2023.01~11',
+  '2023-1~2023-12',
+  '2024.01~02'
+]
+const datePileIndustry = ref('2024.01~02')
+
+const pileParkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.01~11']
+const datePilePark = ref('2023.01~11')
+
+// ⭐ 规模以上工业效益卡片专属时间下拉
+const benefitDateOptions = ref<string[]>([
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~10',
+  '2023-01~2023-11',
+  '2023.1-12'
+])
+const dateBenefit = ref('2023.1-12')
 
 const dateElectric = ref(dateOptions[0])
-const dateCapacity = ref(dateOptions[0])
 const dateInvest = ref(dateOptions[1])
 
 /* =========================================================
-   钢价走势（接口驱动）
-   - 接口：/economicoperation/bigscreen/steelprice?souseDate=xxx
-   - 返回 { type, specification, price, amountIncrease }
-   - 日期选项独立一份，默认 2025.06
-   - 上周价格 = 当前价格 - 环比增长
+   通用：兼容多种解包层级
    ========================================================= */
-
-const steelDateOptions = [
-  '2023.02',
-  '2023.03',
-  '2023.03.21',
-  '2023.03.22',
-  '2023.03.27',
-  '2023.04.20',
-  '2023.05.05',
-  '2023.05.18',
-  '2023.05.26',
-  '2023.06.02',
-  '2023.06.09',
-  '2023.06.16',
-  '2023.06.21',
-  '2023.06.29',
-  '2023.07.07',
-  '2023.07.14',
-  '2023.07.21',
-  '2023.07.28',
-  '2023.08',
-  '2023.08.04',
-  '2023.08.11',
-  '2023.08.18',
-  '2023.08.25',
-  '2023.09.01',
-  '2023.09.08',
-  '2023.09.15',
-  '2023.09.21',
-  '2023.09.26',
-  '2023.10.09',
-  '2023.10.17',
-  '2023.11.29',
-  '2024.03.13',
-  '2024.05',
-  '2024.07',
-  '2024.12',
-  '2025.06'
-]
-
-// ⭐ 默认 2025.06
-const dateSteel = ref('2025.06')
-const steelLoading = ref(false)
-
-type SteelRow = {
-  id: number
-  category: string
-  spec: string
-  price: number
-  lastWeekPrice: number
-  change: number
-}
-
-const steelTableData = ref<SteelRow[]>([])
-
-/** 兼容多种解包层级 */
 const pickList = (res: any): any[] => {
   const body = res?.data ?? res
   if (Array.isArray(body?.datalist)) return body.datalist
@@ -276,42 +359,108 @@ const pickList = (res: any): any[] => {
   return []
 }
 
-const fetchSteelData = async () => {
-  steelLoading.value = true
+const pickSummary = (res: any): Record<string, any> => {
+  const body = res?.data ?? res
+  if (body?.summary && typeof body.summary === 'object') return body.summary
+  if (body?.data?.summary && typeof body.data.summary === 'object') return body.data.summary
+  return {}
+}
+
+const toNum = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+/* =========================================================
+   1. GDP 增速同比（接口驱动）
+   ========================================================= */
+
+type GdpGrowthRow = {
+  quarter: string
+  internalLevel: number
+  liaoningLevel: number
+  anshanLevel: number
+}
+
+const gdpGrowthList = ref<GdpGrowthRow[]>([])
+const gdpLoading = ref(false)
+
+const fetchGdpGrowth = async () => {
   try {
-    const res: any = await getSteelPrice(dateSteel.value)
-    console.log('[steelprice] souseDate=', dateSteel.value, 'res=', res)
+    const res: any = await getNationwide(dateGdp.value)
+    console.log('[nationwide] year=', dateGdp.value, 'res=', res)
 
     const list = pickList(res)
-    steelTableData.value = list.map((it: any, idx: number) => {
-      const price = Number(it?.price ?? 0)
-      const change = Number(it?.amountIncrease ?? 0)
-      return {
-        id: idx + 1,
-        category: String(it?.type ?? ''),
-        spec: String(it?.specification ?? ''),
-        price,
-        lastWeekPrice: price - change,
-        change
+    gdpGrowthList.value = list.map((it: any) => ({
+      quarter: String(it?.quarter ?? ''),
+      internalLevel: toNum(it?.internalLevel),
+      liaoningLevel: toNum(it?.liaoningLevel),
+      anshanLevel: toNum(it?.anshanLevel)
+    }))
+
+    const summary = pickSummary(res)
+    const timeOptions = summary?.timeOptions
+    if (Array.isArray(timeOptions) && timeOptions.length) {
+      const opts = timeOptions.map((t: any) => String(t))
+      gdpDateOptions.value = opts
+      if (!opts.includes(dateGdp.value)) {
+        dateGdp.value = opts[0]
       }
-    })
+    }
   } catch (e) {
-    console.error('钢价走势查询失败', e)
-    steelTableData.value = []
-  } finally {
-    steelLoading.value = false
+    console.error('GDP 增速查询失败', e)
+    gdpGrowthList.value = []
   }
 }
 
 /* =========================================================
-   GDP 增速同比
+   2. 各地区生产总值（接口驱动）
+   ========================================================= */
+
+type RegionGdpRow = {
+  area: string
+  gdp: number
+  yoy: number
+}
+
+const regionGdpList = ref<RegionGdpRow[]>([])
+
+const fetchRegionGdp = async () => {
+  try {
+    const res: any = await getGrossRegional(dateGdp.value)
+    console.log('[grossregional] year=', dateGdp.value, 'res=', res)
+
+    const list = pickList(res)
+    regionGdpList.value = list.map((it: any) => ({
+      area: String(it?.departmentName ?? ''),
+      gdp: toNum(it?.grossPro),
+      yoy: toNum(it?.yoy)
+    }))
+  } catch (e) {
+    console.error('各地区生产总值查询失败', e)
+    regionGdpList.value = []
+  }
+}
+
+const fetchGdpData = async () => {
+  gdpLoading.value = true
+  try {
+    await Promise.all([fetchGdpGrowth(), fetchRegionGdp()])
+  } finally {
+    gdpLoading.value = false
+  }
+}
+
+/* =========================================================
+   GDP 增速同比 - 三条折线
    ========================================================= */
 
 const gdpLineOption = computed(() => {
-  const x = ['2022年1季度', '2022年2季度', '2022年3季度', '2022年4季度']
-  const national = [3.1, 2.4, 2.8, 2.8]
-  const liaoning = [2.1, 1.2, 1.8, 1.8]
-  const anshan = [0.5, -0.5, 0.5, 0.5]
+  const x = gdpGrowthList.value.map((r) => r.quarter)
+  const national = gdpGrowthList.value.map((r) => r.internalLevel)
+  const liaoning = gdpGrowthList.value.map((r) => r.liaoningLevel)
+  const anshan = gdpGrowthList.value.map((r) => r.anshanLevel)
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -372,10 +521,15 @@ const gdpLineOption = computed(() => {
   }
 })
 
+/* =========================================================
+   各地区生产总值 - 柱状 + 折线（双 Y 轴）
+   ========================================================= */
+
 const regionGdpOption = computed(() => {
-  const names = ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区', '千山区', '高新区']
-  const gdp = [520, 260, 180, 140, 220, 160, 200, 120]
-  const yoy = [2.3, 1.6, 0.8, 1.2, 2.0, 1.4, 1.8, 0.9]
+  const names = regionGdpList.value.map((r) => r.area)
+  const gdp = regionGdpList.value.map((r) => r.gdp)
+  const yoy = regionGdpList.value.map((r) => r.yoy)
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -449,27 +603,143 @@ const regionGdpOption = computed(() => {
   }
 })
 
-const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
-const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
+/* =========================================================
+   3. 三次产业分析（接口驱动）
+   ========================================================= */
+
+type PieItem = {
+  name: string
+  value: number
+  rate: number
+}
+
+const capacityData = ref<PieItem[]>([])
+const capacityLoading = ref(false)
+
+const fetchCapacityData = async () => {
+  capacityLoading.value = true
+  try {
+    const res: any = await getIndustrialAnalysis(dateCapacity.value)
+    console.log('[industrialanalysis] souseDate=', dateCapacity.value, 'res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      capacityData.value = [
+        {
+          name: '第一产业',
+          value: toNum(row.onePrimaryIndustry),
+          rate: toNum(row.onePrimaryProportion)
+        },
+        {
+          name: '第二产业',
+          value: toNum(row.twoPrimaryIndustry),
+          rate: toNum(row.twoPrimaryProportion)
+        },
+        {
+          name: '第三产业',
+          value: toNum(row.threePrimaryIndustry),
+          rate: toNum(row.threePrimaryProportion)
+        }
+      ]
+    } else {
+      capacityData.value = []
+    }
+  } catch (e) {
+    console.error('三次产业分析查询失败', e)
+    capacityData.value = []
+  } finally {
+    capacityLoading.value = false
+  }
+}
+
+/* =========================================================
+   4. 固定资产投资增速（接口驱动）
+   ========================================================= */
 
 const investTabs = ['地区', '行业', '园区']
-const activeInvestTab = ref<string>(investTabs[0])
-const activeElectricTab = ref<string>(electricTabs[0])
+type InvestTab = (typeof investTabs)[number]
 
-const investDistrictX = [
-  '海城市',
-  '台安县',
-  '岫岩县',
-  '铁东区',
-  '铁西区',
-  '立山区',
-  '千山区',
-  '高新区',
-  '经开区'
-]
-const investDistrictY = [25.8, 42.3, 11.6, 20, 25.8, 14.4, 39.8, 71, 148]
+const activeInvestTab = ref<InvestTab>('地区')
+
+type InvestRow = {
+  area: string
+  value: number
+}
+
+const investDistrictList = ref<InvestRow[]>([])
+const investIndustryList = ref<InvestRow[]>([])
+const investParkList = ref<InvestRow[]>([])
+const investLoading = ref(false)
+
+const currentInvestDateOptions = computed<string[]>(() => {
+  if (activeInvestTab.value === '园区') return parkDateOptions
+  return investDateOptions
+})
+
+const currentInvestDate = computed<string>({
+  get: () =>
+    activeInvestTab.value === '园区' ? dateInvestPark.value : dateInvestFixed.value,
+  set: (v: string) => {
+    if (activeInvestTab.value === '园区') dateInvestPark.value = v
+    else dateInvestFixed.value = v
+  }
+})
+
+const fetchInvestData = async () => {
+  investLoading.value = true
+  try {
+    if (activeInvestTab.value === '地区') {
+      const res: any = await getEconomicIndicatorsDName(dateInvestFixed.value)
+      console.log('[economicindicatorsdname] souseDate=', dateInvestFixed.value, 'res=', res)
+
+      const list = pickList(res)
+      investDistrictList.value = list.map((it: any) => ({
+        area: String(it?.departmentName ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    } else if (activeInvestTab.value === '行业') {
+      const res: any = await getFixedInvestments(dateInvestFixed.value)
+      console.log('[fixedinvestments] souseDate=', dateInvestFixed.value, 'res=', res)
+
+      const list = pickList(res)
+      investIndustryList.value = list.map((it: any) => ({
+        area: String(it?.industry ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    } else {
+      const res: any = await getParkProperty(dateInvestPark.value)
+      console.log('[parkproperty] souseDate=', dateInvestPark.value, 'res=', res)
+
+      const list = pickList(res)
+      investParkList.value = list.map((it: any) => ({
+        area: String(it?.parkName ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    }
+  } catch (e) {
+    console.error('固定资产投资增速查询失败', e)
+  } finally {
+    investLoading.value = false
+  }
+}
+
+const handleInvestTabClick = async (tab: InvestTab) => {
+  if (activeInvestTab.value === tab) return
+  activeInvestTab.value = tab
+  await fetchInvestData()
+}
+
+const currentInvestList = computed<InvestRow[]>(() => {
+  if (activeInvestTab.value === '地区') return investDistrictList.value
+  if (activeInvestTab.value === '行业') return investIndustryList.value
+  return investParkList.value
+})
 
 const investOption = computed(() => {
+  const names = currentInvestList.value.map((r) => r.area)
+  const values = currentInvestList.value.map((r) => r.value)
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
@@ -482,7 +752,7 @@ const investOption = computed(() => {
     grid: { left: 60, right: 24, top: 64, bottom: 80 },
     xAxis: {
       type: 'category',
-      data: investDistrictX,
+      data: names,
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
@@ -500,7 +770,7 @@ const investOption = computed(() => {
       {
         type: 'bar',
         barWidth: 24,
-        data: investDistrictY,
+        data: values,
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
@@ -521,52 +791,271 @@ const investOption = computed(() => {
   }
 })
 
-const investDistrictX2 = [
-  '钢铁行业',
-  '菱镁行业',
-  '建材行业',
-  '装备制造',
-  '化工行业',
-  '消费品',
-  '电子信息',
-  '铁矿行业',
-  '工业辅助'
-]
+/* =========================================================
+   5. 规模以上工业增项（接口驱动）
+   ========================================================= */
 
+type PileRow = {
+  name: string
+  value: number
+}
+
+const activePileTab = ref<string>(electricTabs[0])
+const pileData = ref<PileRow[]>([])
+const pileLoading = ref(false)
+
+const currentPileDateOptions = computed<string[]>(() => {
+  if (activePileTab.value === '行业') return pileIndustryDateOptions
+  if (activePileTab.value === '园区') return pileParkDateOptions
+  return pileDistrictDateOptions
+})
+
+const currentPileDate = computed<string>({
+  get: () => {
+    if (activePileTab.value === '行业') return datePileIndustry.value
+    if (activePileTab.value === '园区') return datePilePark.value
+    return datePileDistrict.value
+  },
+  set: (v: string) => {
+    if (activePileTab.value === '行业') datePileIndustry.value = v
+    else if (activePileTab.value === '园区') datePilePark.value = v
+    else datePileDistrict.value = v
+  }
+})
+
+const fetchPileData = async () => {
+  pileLoading.value = true
+  try {
+    if (activePileTab.value === '地区') {
+      const res: any = await getEconomicIndicatorsDName(datePileDistrict.value)
+      console.log('[pile-economicindicatorsdname] souseDate=', datePileDistrict.value, 'res=', res)
+
+      const list = pickList(res)
+      pileData.value = list.map((it: any) => ({
+        name: String(it?.departmentName ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    } else if (activePileTab.value === '行业') {
+      const res: any = await getEconomicIndicatorsIndustry(datePileIndustry.value)
+      console.log(
+        '[pile-economicindicatorsindustry] souseDate=',
+        datePileIndustry.value,
+        'res=',
+        res
+      )
+
+      const list = pickList(res)
+      pileData.value = list.map((it: any) => ({
+        name: String(it?.industry ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    } else {
+      const res: any = await getEconomicIndicatorsPark(datePilePark.value)
+      console.log(
+        '[pile-economicindicatorspark] souseDate=',
+        datePilePark.value,
+        'res=',
+        res
+      )
+
+      const list = pickList(res)
+      pileData.value = list.map((it: any) => ({
+        name: String(it?.parkName ?? ''),
+        value: toNum(it?.yearOnYearGrowth)
+      }))
+    }
+  } catch (e) {
+    console.error('规模以上工业增项查询失败', e)
+    pileData.value = []
+  } finally {
+    pileLoading.value = false
+  }
+}
+
+const handlePileTabClick = async (tab: string) => {
+  if (activePileTab.value === tab) return
+  activePileTab.value = tab
+  await fetchPileData()
+}
+
+/* =========================================================
+   6. 工业“四改”投资完成情况（接口驱动）
+   ========================================================= */
+
+type FourChangeMetrics = {
+  amount: string
+  yearOnYearGrowth: string
+  accountingGrowth: string
+  periodLastYear: string
+}
+
+const FOUR_CHANGES_DATE = '2024.01-03'
+
+const fourChangesData = ref<FourChangeMetrics>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  accountingGrowth: '0',
+  periodLastYear: '0'
+})
+
+const fetchFourChanges = async () => {
+  try {
+    const res: any = await getFourChanges(FOUR_CHANGES_DATE)
+    console.log('[fourchanges] souseDate=', FOUR_CHANGES_DATE, 'res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      fourChangesData.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        accountingGrowth: String(row.accountingGrowth ?? '0'),
+        periodLastYear: String(row.periodLastYear ?? '0')
+      }
+    }
+  } catch (e) {
+    console.error('工业“四改”投资完成情况查询失败', e)
+  }
+}
+
+const fourReformMetrics = computed(() => [
+  { label: '累计完成投资', value: fourChangesData.value.amount, unit: '亿元' },
+  { label: '较去年同期增长', value: fourChangesData.value.yearOnYearGrowth, unit: '%' },
+  { label: '占工业投资比重', value: fourChangesData.value.accountingGrowth, unit: '%' },
+  { label: '较去年同期提升', value: fourChangesData.value.periodLastYear, unit: '%' }
+])
+
+/* =========================================================
+   7. 规模以上工业效益（接口驱动）
+   - 接口：/economicoperation/bigscreen/economicbenefit?souseDate=xxx
+   - dataList: 每个行业一条 { industry, taking, averageNumber, amount, profit }
+   - summary.totals: { income, workers, tax, profit } → 4 个指标卡片
+   - summary.timeOptions / souseDate: 时间下拉
+   ========================================================= */
+
+type BenefitRow = {
+  industry: string
+  taking: number
+  averageNumber: number
+  amount: number
+  profit: number
+}
+
+type BenefitTotals = {
+  income: string
+  workers: string
+  tax: string
+  profit: string
+}
+
+const benefitList = ref<BenefitRow[]>([])
+const benefitTotals = ref<BenefitTotals>({
+  income: '0',
+  workers: '0',
+  tax: '0',
+  profit: '0'
+})
+const benefitLoading = ref(false)
+
+const fetchBenefitData = async () => {
+  benefitLoading.value = true
+  try {
+    const res: any = await getEconomicBenefit(dateBenefit.value)
+    console.log('[economicbenefit] souseDate=', dateBenefit.value, 'res=', res)
+
+    const list = pickList(res)
+    benefitList.value = list.map((it: any) => ({
+      industry: String(it?.industry ?? ''),
+      taking: toNum(it?.taking),
+      averageNumber: toNum(it?.averageNumber),
+      amount: toNum(it?.amount),
+      profit: toNum(it?.profit)
+    }))
+
+    // summary.totals + timeOptions
+    const summary = pickSummary(res)
+    const totals = summary?.totals ?? {}
+    benefitTotals.value = {
+      income: String(totals?.income ?? '0'),
+      workers: String(totals?.workers ?? '0'),
+      tax: String(totals?.tax ?? '0'),
+      profit: String(totals?.profit ?? '0')
+    }
+
+    // ⭐ 用接口返回的 timeOptions 覆盖本地时间下拉
+    const timeOptions = summary?.timeOptions
+    if (Array.isArray(timeOptions) && timeOptions.length) {
+      const opts = timeOptions.map((t: any) => String(t))
+      benefitDateOptions.value = opts
+      const souseDate = String(summary?.souseDate ?? '')
+      if (souseDate && opts.includes(souseDate)) {
+        dateBenefit.value = souseDate
+      } else if (!opts.includes(dateBenefit.value)) {
+        dateBenefit.value = opts[0]
+      }
+    }
+  } catch (e) {
+    console.error('规模以上工业效益查询失败', e)
+    benefitList.value = []
+  } finally {
+    benefitLoading.value = false
+  }
+}
+
+// 顶部 4 个指标卡片：营业收入 / 税金总额 / 平均用工人数 / 利润总额
+const fourReformMetrics2 = computed(() => [
+  { label: '营业收入', value: benefitTotals.value.income, unit: '亿元' },
+  { label: '税金总额', value: benefitTotals.value.tax, unit: '亿元' },
+  { label: '平均用工人数', value: benefitTotals.value.workers, unit: '人' },
+  { label: '利润总额', value: benefitTotals.value.profit, unit: '亿元' }
+])
+
+// 图表：9 个行业 × 4 个指标（多系列柱状图）
 const investOption2 = computed(() => {
+  const names = benefitList.value.map((r) => r.industry)
+
   return {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
+      axisPointer: { type: 'shadow' },
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
     },
-    grid: { left: 60, right: 24, top: 64, bottom: 300 },
+    legend: {
+      top: 8,
+      left: 'center',
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 20 }
+    },
+    grid: { left: 60, right: 24, top: 90, bottom: 300 },
     xAxis: {
       type: 'category',
-      data: investDistrictX2,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
+      data: names,
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 26, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
-      axisTick: { show: true }
+      axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      name: '单位：亿元',
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
-      axisTick: { show: true }
+      axisTick: { show: false }
     },
     series: [
       {
+        name: '营业收入',
         type: 'bar',
-        barWidth: 50,
-        data: investDistrictY,
+        barWidth: 10,
+        data: benefitList.value.map((r) => r.taking),
         itemStyle: {
-          borderRadius: [6, 6, 0, 0],
+          borderRadius: [4, 4, 0, 0],
           color: {
             type: 'linear',
             x: 0,
@@ -578,32 +1067,154 @@ const investOption2 = computed(() => {
               { offset: 1, color: '#1966ff' }
             ]
           }
-        },
-        markLine: { silent: true, data: [{ yAxis: 0 }], lineStyle: { color: '#ff4444', width: 2 } }
+        }
+      },
+      {
+        name: '税金总额',
+        type: 'bar',
+        barWidth: 10,
+        data: benefitList.value.map((r) => r.amount),
+        itemStyle: {
+          borderRadius: [4, 4, 0, 0],
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: '#36e8bc' },
+              { offset: 1, color: 'rgba(22,160,120,0.4)' }
+            ]
+          }
+        }
+      },
+      {
+        name: '利润总额',
+        type: 'bar',
+        barWidth: 10,
+        data: benefitList.value.map((r) => r.profit),
+        itemStyle: {
+          borderRadius: [4, 4, 0, 0],
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: '#ffd058' },
+              { offset: 1, color: 'rgba(255,150,20,0.4)' }
+            ]
+          }
+        }
       }
     ]
   }
 })
 
-const fourReformMetrics = computed(() => [
-  { label: '累计完成投资', value: '7.07', unit: '亿元' },
-  { label: '较去年同期增长', value: '2.9', unit: '%' },
-  { label: '占工业投资比重', value: '48.5', unit: '%' },
-  { label: '较去年同期提升', value: '1.2', unit: '%' }
-])
+/* =========================================================
+   8. 钢价走势（接口驱动）
+   ========================================================= */
 
-const fourReformMetrics2 = computed(() => [
-  { label: '营业收入', value: '3014', unit: '亿元' },
-  { label: '税金总额', value: '83', unit: '亿元' },
-  { label: '平均用工人数', value: '149580', unit: '人' },
-  { label: '利润总额', value: '161', unit: '亿元' }
-])
+const steelDateOptions = [
+  '2023.02',
+  '2023.03',
+  '2023.03.21',
+  '2023.03.22',
+  '2023.03.27',
+  '2023.04.20',
+  '2023.05.05',
+  '2023.05.18',
+  '2023.05.26',
+  '2023.06.02',
+  '2023.06.09',
+  '2023.06.16',
+  '2023.06.21',
+  '2023.06.29',
+  '2023.07.07',
+  '2023.07.14',
+  '2023.07.21',
+  '2023.07.28',
+  '2023.08',
+  '2023.08.04',
+  '2023.08.11',
+  '2023.08.18',
+  '2023.08.25',
+  '2023.09.01',
+  '2023.09.08',
+  '2023.09.15',
+  '2023.09.21',
+  '2023.09.26',
+  '2023.10.09',
+  '2023.10.17',
+  '2023.11.29',
+  '2024.03.13',
+  '2024.05',
+  '2024.07',
+  '2024.12',
+  '2025.06'
+]
+
+const dateSteel = ref('2025.06')
+const steelLoading = ref(false)
+
+type SteelRow = {
+  id: number
+  category: string
+  spec: string
+  price: number
+  lastWeekPrice: number
+  change: number
+}
+
+const steelTableData = ref<SteelRow[]>([])
+
+const fetchSteelData = async () => {
+  steelLoading.value = true
+  try {
+    const res: any = await getSteelPrice(dateSteel.value)
+    console.log('[steelprice] souseDate=', dateSteel.value, 'res=', res)
+
+    const list = pickList(res)
+    steelTableData.value = list.map((it: any, idx: number) => {
+      const price = Number(it?.price ?? 0)
+      const change = Number(it?.amountIncrease ?? 0)
+      return {
+        id: idx + 1,
+        category: String(it?.type ?? ''),
+        spec: String(it?.specification ?? ''),
+        price,
+        lastWeekPrice: price - change,
+        change
+      }
+    })
+  } catch (e) {
+    console.error('钢价走势查询失败', e)
+    steelTableData.value = []
+  } finally {
+    steelLoading.value = false
+  }
+}
+
+/* =========================================================
+   其余 Tab / 静态指标
+   ========================================================= */
+
+const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
+const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
 
 /* =========================================================
    初始化
    ========================================================= */
 
 onMounted(() => {
+  fetchGdpData()
+  fetchCapacityData()
+  fetchInvestData()
+  fetchPileData()
+  fetchFourChanges()
+  fetchBenefitData()
   fetchSteelData()
 })
 </script>
@@ -861,7 +1472,6 @@ onMounted(() => {
 .steel-body {
   width: 100%;
 }
-
 .steel-header-row {
   display: flex;
   width: 100%;
@@ -875,7 +1485,6 @@ onMounted(() => {
   padding: 12px 4px;
   text-shadow: 0 0 8px #2178dd;
 }
-
 .steel-row-wrap {
   display: flex;
   align-items: center;
@@ -895,7 +1504,6 @@ onMounted(() => {
 .arrow-right::before {
   content: '◆';
 }
-
 .steel-data-row {
   flex: 1;
   display: flex;
@@ -913,8 +1521,6 @@ onMounted(() => {
   color: #39f25c;
   text-shadow: 0 0 8px #23d848;
 }
-
-/* ⭐ 新增：钢价走势 空状态 */
 .steel-empty {
   display: flex;
   align-items: center;

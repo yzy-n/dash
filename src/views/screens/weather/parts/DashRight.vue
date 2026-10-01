@@ -1,11 +1,15 @@
 <template>
   <div class="right-wrap">
     <div class="grid-2x2">
-      <!-- 环保专项资金 -->
+      <!-- 环保专项资金（接口驱动） -->
       <section class="panel panel--fund">
         <div class="panel-head">
           <div class="panel-title">环保专项资金</div>
-          <div class="panel-subtitle">2022年全年</div>
+          <select v-model="dateFund" class="fund-date" @change="fetchFund">
+            <option v-for="item in fundDateOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div class="fund-body">
           <div class="fund-split">
@@ -25,7 +29,7 @@
         </div>
       </section>
 
-      <!-- 生态行政处罚情况 -->
+      <!-- 生态行政处罚情况（接口驱动） -->
       <section class="panel panel--punish">
         <div class="panel-head">
           <div class="panel-title">生态行政处罚情况</div>
@@ -39,24 +43,32 @@
             <span>罚款金额</span>
           </div>
           <div class="punish-table-body">
-            <div class="punish-row" v-for="item in punishList" :key="item.company">
+            <div
+              class="punish-row"
+              v-for="(item, idx) in punishList"
+              :key="`${item.company}-${idx}`"
+            >
               <span class="c-company">{{ item.company }}</span>
               <span class="c-person">{{ item.person }}</span>
-              <span class="c-desc">{{ item.desc }}</span>
+              <span class="c-desc" :title="item.breakTheLaw">{{ item.breakTheLaw }}</span>
               <span class="c-money">{{ item.money }}</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 12369环保举报 -->
+      <!-- 12369环保举报（接口驱动） -->
       <section class="panel panel--report">
         <div class="panel-head">
           <div class="panel-title">12369环保举报</div>
           <div class="panel-subtitle">2023年2月至今</div>
         </div>
         <div class="report-list">
-          <div class="report-item" v-for="item in reportList" :key="item.index">
+          <div
+            class="report-item"
+            v-for="(item, idx) in reportList"
+            :key="`${item.target}-${idx}`"
+          >
             <div class="r-row">
               <span class="r-label">举报类型：</span>
               <span>{{ item.type }}</span>
@@ -68,28 +80,43 @@
             <div class="r-row">
               <span class="r-label">污染描述：</span>
               <span class="r-desc">{{ item.desc }}</span>
-              <span class="tag-handled">已处理</span>
+              <span class="tag-handled">{{ item.result }}</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 企业超标排放情况 -->
+      <!-- 企业超标排放情况（接口驱动） -->
       <section class="panel panel--over">
         <div class="panel-head">
           <div class="panel-title">企业超标排放情况</div>
           <div class="panel-subtitle">2022年6月至今</div>
         </div>
         <div class="over-grid">
-          <div class="over-card" v-for="item in overList" :key="item.name">
-            <div class="over-line"><span>企业名称：</span>{{ item.name }}</div>
-            <div class="over-line"><span>监控点位名称：</span>{{ item.point }}</div>
-            <div class="over-line"><span>检测时间：</span>{{ item.time }}</div>
+          <div
+            class="over-card"
+            v-for="(item, idx) in overList"
+            :key="`${item.name}-${idx}`"
+          >
+            <div class="over-line">
+              <span>企业名称：</span>{{ item.name }}
+            </div>
+            <div class="over-line">
+              <span>监控点位名称：</span>{{ item.point }}
+            </div>
+            <div class="over-line">
+              <span>检测时间：</span>{{ item.time }}
+            </div>
             <div class="over-line">
               <span>监控状态：</span>
-              <span class="tag-status">{{ item.status }}</span>
+              <span
+                class="tag-status"
+                :class="item.status === '达标' ? 'is-ok' : 'is-bad'"
+              >{{ item.status }}</span>
             </div>
-            <div class="over-line"><span>超标污染物：</span>{{ item.pollutant }}</div>
+            <div class="over-line">
+              <span>超标污染物：</span>{{ item.pollutant }}
+            </div>
           </div>
         </div>
       </section>
@@ -98,8 +125,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import {
+  getCreditRepair,
+  getEnvProMoney,
+  getReport,
+  getPolluteInfoExt
+} from '@/api/weather'
 
 type FundGraphNode = {
   id: string
@@ -179,7 +212,67 @@ const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: Fun
   }
 }
 
-const fundIncomeOption = computed(() => {
+/* =========================================================
+   通用：多层解包
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+/* =========================================================
+   环保专项资金（接口驱动）
+   ========================================================= */
+const fundDateOptions = ref<string[]>(['2022年全年', '2023年度'])
+const dateFund = ref('2023年度')
+
+const fundRawList = ref<any[]>([])
+
+const fmtMoney = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n.toFixed(2) : '0.00'
+}
+
+const fundPalette = ['#ffbc40', '#7cf2ff', '#79ffa8', '#8b5cff', '#39d5ff', '#ff7cd1']
+
+const buildFundFromApi = (item: any) => {
+  if (!item) return null
+
+  const details: any[] = Array.isArray(item?.detailList) ? [...item.detailList] : []
+  if (!details.length) return null
+
+  details.sort((a, b) => (Number(a?.sort) || 0) - (Number(b?.sort) || 0))
+
+  const nodes: FundGraphNode[] = [
+    {
+      id: 't',
+      label: String(item?.total?.name ?? '合计'),
+      valueText: `${fmtMoney(item?.total?.value)} 万元`,
+      size: 140,
+      color: '#36e8ff'
+    },
+    ...details.map((d: any, i: number) => ({
+      id: `d${i}`,
+      label: String(d?.name ?? ''),
+      valueText: `${fmtMoney(d?.value)} 万元`,
+      size: 96,
+      color: fundPalette[i % fundPalette.length]
+    }))
+  ]
+
+  const links: FundGraphLink[] = details.map((_: any, i: number) => ({
+    source: 't',
+    target: `d${i}`
+  }))
+
+  return buildFundGraphOption('t', nodes, links)
+}
+
+const buildStaticIncome = () => {
   const nodes: FundGraphNode[] = [
     { id: 't', label: '收入合计', valueText: '7364.07 万元', size: 140, color: '#36e8ff' },
     { id: 'b', label: '财政拨款收入', valueText: '6584.13 万元', size: 96, color: '#ffbc40' },
@@ -196,9 +289,9 @@ const fundIncomeOption = computed(() => {
     { source: 't', target: 'b5' }
   ]
   return buildFundGraphOption('t', nodes, links)
-})
+}
 
-const fundExpenseOption = computed(() => {
+const buildStaticExpense = () => {
   const nodes: FundGraphNode[] = [
     { id: 't', label: '支出合计', valueText: '7364.07 万元', size: 140, color: '#36e8ff' },
     { id: 'a', label: '节能环保', valueText: '5723.36 万元', size: 96, color: '#7cf2ff' },
@@ -211,60 +304,167 @@ const fundExpenseOption = computed(() => {
     { source: 't', target: 'e' }
   ]
   return buildFundGraphOption('t', nodes, links)
+}
+
+const fetchFund = async () => {
+  try {
+    const res: any = await getCreditRepair(dateFund.value)
+    console.log('[creditrepair] souseDate=', dateFund.value, 'res=', res)
+    fundRawList.value = pickList(res)
+  } catch (e) {
+    console.error('环保专项资金查询失败', e)
+    fundRawList.value = []
+  }
+}
+
+const fundIncomeOption = computed(() => {
+  const item = fundRawList.value.find((x: any) => String(x?.type ?? '') === '收入')
+  return buildFundFromApi(item) ?? buildStaticIncome()
 })
 
-const punishList = [
+const fundExpenseOption = computed(() => {
+  const item = fundRawList.value.find((x: any) => String(x?.type ?? '') === '支出')
+  return buildFundFromApi(item) ?? buildStaticExpense()
+})
+
+/* =========================================================
+   生态行政处罚情况（接口驱动）
+   ========================================================= */
+type PunishRow = {
+  company: string
+  person: string
+  breakTheLaw: string
+  money: string
+}
+
+const punishList = ref<PunishRow[]>([])
+
+const defaultPunish: PunishRow[] = [
   {
     company: '鞍山盛盟煤气化有限公司',
     person: '宁友吉',
-    desc: '焦炉烟囱排放口排放的二氧化硫排放浓度均值为733.0mg/m3，超过《炼焦化学工业污染物排放...',
+    breakTheLaw:
+      '焦炉烟囱排放口排放的二氧化硫排放浓度均值为733.0mg/m3，超过《炼焦化学工业污染物排放标准》...',
     money: '20万元'
   },
   {
     company: '鞍钢金属结构有限公司',
     person: '项士平',
-    desc: '我局于2022年6月2日对鞍钢金属结构有限公司脱硫灰贮存场进行现场检查，发现你公司脱硫灰...',
+    breakTheLaw:
+      '我局于2022年6月2日对鞍钢金属结构有限公司脱硫灰贮存场进行现场检查，发现你公司脱硫灰...',
     money: '20万元'
-  },
-  {
-    company: '鞍山市达道湾污水处理有限责任公司',
-    person: '马强',
-    desc: '企业水质在线监测设备不符合最新规范要求；未安装水污染物在线监控设备（自动采样仪）；...',
-    money: '10万元'
-  },
-  {
-    company: '鞍山宏大针纺织品有限公司',
-    person: '黄蓉瑶',
-    desc: '你单位于2021年3月已编制突发环境事件应急预案，但未按规定将突发环境事件应急预案报环...',
-    money: '1万元'
   }
 ]
 
-const reportList = [
+const fmtFine = (v: any) => {
+  const n = Number(v)
+  if (!Number.isFinite(n) || n === 0) {
+    return String(v ?? '')
+  }
+  const wan = n / 10000
+  const text = Number.isInteger(wan) ? String(wan) : wan.toFixed(2)
+  return `${text}万元`
+}
+
+const fetchPunish = async () => {
+  try {
+    const res: any = await getEnvProMoney()
+    console.log('[envpromoney] res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      punishList.value = defaultPunish
+      return
+    }
+
+    punishList.value = list.map((it: any) => ({
+      company: String(it?.companyName ?? ''),
+      person: String(it?.juridicalPerson ?? ''),
+      // 接口字段名为 breaktheLaw（小写 t），本地字段名为 breakTheLaw
+      breakTheLaw: String(it?.breaktheLaw ?? ''),
+      money: fmtFine(it?.money)
+    }))
+  } catch (e) {
+    console.error('生态行政处罚情况查询失败', e)
+    punishList.value = defaultPunish
+  }
+}
+
+/* =========================================================
+   12369环保举报（接口驱动）
+   ========================================================= */
+type ReportRow = {
+  type: string
+  target: string
+  method: string
+  desc: string
+  result: string
+  createTime: string
+}
+
+const reportList = ref<ReportRow[]>([])
+
+const defaultReport: ReportRow[] = [
   {
-    index: 1,
     type: '大气污染',
     target: '海城市王石镇',
     method: '微信投诉',
-    desc: '在居民区印染服装，味道刺鼻，影响健康，影响生活！'
-  },
-  {
-    index: 2,
-    type: '噪声污染',
-    target: '海城市奔富服装厂',
-    method: '微信投诉',
-    desc: '云龙修配厂东边的服装厂 除了晚上其他时间弄的楼上嗡嗡响在家复习都不得安宁，我想要的解决方式就是不再有噪音。'
-  },
-  {
-    index: 3,
-    type: '噪声污染',
-    target: '海城市凯达热力有限公司',
-    method: '微信投诉',
-    desc: '噪音污染，声音很大无法入睡。严重污染，严重干扰居民睡眠。已经很久了。'
+    desc: '在居民区印染服装，味道刺鼻，影响健康，影响生活！',
+    result: '已处理',
+    createTime: ''
   }
 ]
 
-const overList = [
+const fetchReport = async () => {
+  try {
+    const res: any = await getReport()
+    console.log('[report] res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      reportList.value = defaultReport
+      return
+    }
+
+    reportList.value = list.map((it: any) => ({
+      type: String(it?.reportType ?? ''),
+      target: String(it?.reportObject ?? ''),
+      method: String(it?.reportWay ?? ''),
+      desc: String(it?.desc ?? ''),
+      result: String(it?.result ?? '已处理'),
+      createTime: String(it?.createTime ?? '')
+    }))
+  } catch (e) {
+    console.error('12369环保举报查询失败', e)
+    reportList.value = defaultReport
+  }
+}
+
+/* =========================================================
+   企业超标排放情况（接口驱动）
+   - 接口：/weatherenvironment/bigscreen/polluteinfoext?pollutantname=氮氧化物
+   - 返回：{ data: { dataList: [{ entname, monname, datetime,
+             pollutantname, avgsc, avgzc, stdvalue, isok,
+             overnum, status, dataType }] } }
+   - 展示：
+       企业名称     = entname
+       监控点位名称 = monname
+       检测时间     = datetime
+       监控状态     = isok（达标/超标）
+       超标污染物   = pollutantname
+   ========================================================= */
+type OverRow = {
+  name: string
+  point: string
+  time: string
+  status: string
+  pollutant: string
+}
+
+const overList = ref<OverRow[]>([])
+
+/** 兜底数据（接口失败/空时展示） */
+const defaultOver: OverRow[] = [
   {
     name: '海城市美菱氧化镁厂',
     point: '1拖12轻烧窑3号',
@@ -294,6 +494,37 @@ const overList = [
     pollutant: '氮氧化物'
   }
 ]
+
+const fetchOver = async () => {
+  try {
+    const res: any = await getPolluteInfoExt('氮氧化物')
+    console.log('[polluteinfoext] pollutantname=氮氧化物 res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      overList.value = defaultOver
+      return
+    }
+
+    overList.value = list.slice(0, 4).map((it: any) => ({
+      name: String(it?.entname ?? ''),
+      point: String(it?.monname ?? ''),
+      time: String(it?.datetime ?? ''),
+      status: String(it?.isok ?? ''),
+      pollutant: String(it?.pollutantname ?? '')
+    }))
+  } catch (e) {
+    console.error('企业超标排放情况查询失败', e)
+    overList.value = defaultOver
+  }
+}
+
+onMounted(() => {
+  fetchFund()
+  fetchPunish()
+  fetchReport()
+  fetchOver()
+})
 </script>
 
 <style scoped>
@@ -404,6 +635,26 @@ const overList = [
   z-index: 1;
 }
 
+/* 时间下拉 */
+.fund-date {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(78, 184, 255, 0.22);
+  background: rgba(5, 26, 66, 0.45);
+  color: rgba(209, 234, 255, 0.86);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  outline: none;
+}
+
 /* 环保专项资金 */
 .fund-body {
   margin-top: 10px;
@@ -455,7 +706,7 @@ const overList = [
   min-height: 0;
 }
 
-/* 行政处罚表格 */
+/* ================= 行政处罚表格 ================= */
 .punish-table-wrap {
   height: 100%;
   display: flex;
@@ -483,6 +734,21 @@ const overList = [
   font-size: 22px;
   gap: 6px;
   margin-top: 20px;
+  align-items: start;
+}
+.c-company {
+  color: rgba(240, 251, 255, 0.96);
+  word-break: break-all;
+}
+.c-person {
+  color: rgba(214, 238, 255, 0.86);
+  word-break: break-all;
+}
+.c-desc {
+  color: rgba(214, 238, 255, 0.86);
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
 }
 .c-money {
   color: #ffdd44;
@@ -517,6 +783,7 @@ const overList = [
 }
 .r-desc {
   flex: 1;
+  word-break: break-word;
 }
 .tag-handled {
   margin-left: auto;
@@ -525,6 +792,7 @@ const overList = [
   padding: 2px 10px;
   border-radius: 4px;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 /* 企业超标排放 */
@@ -548,7 +816,12 @@ const overList = [
 .over-line span {
   color: #82b8e8;
 }
-.tag-status {
+/* 监控状态颜色：达标绿色，超标红色 */
+.tag-status.is-ok {
+  color: #48e08c;
+  font-weight: bold;
+}
+.tag-status.is-bad {
   color: #ff4444;
   font-weight: bold;
 }

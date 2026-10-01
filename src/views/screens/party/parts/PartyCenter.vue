@@ -10,14 +10,14 @@
     <div class="cols">
       <div class="side side--left">
         <section class="list list--left-a">
-          <div class="list-title">{{ data.leftBlocks?.[0]?.title || '' }}</div>
+          <div class="list-title">{{ localData.leftBlocks?.[0]?.title || '' }}</div>
           <div class="list-rows">
             <div
-              v-for="(row, index) in data.leftBlocks?.[0]?.rows || []"
+              v-for="(row, index) in localData.leftBlocks?.[0]?.rows || []"
               :key="`la-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fill': getFill(row.value, data.leftBlocks?.[0]?.rows)
+                '--fill': getFill(row.value, localData.leftBlocks?.[0]?.rows)
               }"
             >
               <span class="list-label">{{ row.label }}</span>
@@ -27,10 +27,10 @@
         </section>
 
         <section class="list list--left-b">
-          <div class="list-title">{{ data.leftBlocks?.[1]?.title || '' }}</div>
+          <div class="list-title">{{ localData.leftBlocks?.[1]?.title || '' }}</div>
           <div class="list-rows">
             <div
-              v-for="(row, index) in data.leftBlocks?.[1]?.rows || []"
+              v-for="(row, index) in localData.leftBlocks?.[1]?.rows || []"
               :key="`lb-${row.label}-${index}`"
               class="list-row"
             >
@@ -43,14 +43,14 @@
 
       <div class="side side--right">
         <section class="list list--right-a">
-          <div class="list-title">{{ data.rightBlocks?.[0]?.title || '' }}</div>
+          <div class="list-title">{{ localData.rightBlocks?.[0]?.title || '' }}</div>
           <div class="list-rows">
             <div
-              v-for="(row, index) in data.rightBlocks?.[0]?.rows || []"
+              v-for="(row, index) in localData.rightBlocks?.[0]?.rows || []"
               :key="`ra-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fill': getFill(row.value, data.rightBlocks?.[0]?.rows)
+                '--fill': getFill(row.value, localData.rightBlocks?.[0]?.rows)
               }"
             >
               <span class="list-label">{{ row.label }}</span>
@@ -60,14 +60,14 @@
         </section>
 
         <section class="list list--right-b">
-          <div class="list-title">{{ data.rightBlocks?.[1]?.title || '' }}</div>
+          <div class="list-title">{{ localData.rightBlocks?.[1]?.title || '' }}</div>
           <div class="list-rows">
             <div
-              v-for="(row, index) in data.rightBlocks?.[1]?.rows || []"
+              v-for="(row, index) in localData.rightBlocks?.[1]?.rows || []"
               :key="`rb-${row.label}-${index}`"
               class="list-row"
               :style="{
-                '--fillx': getFillX(row.value, data.rightBlocks?.[1]?.rows)
+                '--fillx': getFillX(row.value, localData.rightBlocks?.[1]?.rows)
               }"
             >
               <span class="list-label">{{ row.label }}</span>
@@ -83,11 +83,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { PartyCenterData, PartyMetric } from '../data'
-import { getMemberTopStats } from '@/api/party'
+import { getMemberTopStats, getMemberAnalyse } from '@/api/party'
 
 const props = defineProps<{
   data: PartyCenterData
 }>()
+
+/**
+ * 用局部 ref 承接 props.data，接口返回后可整体替换，
+ * 避免直接修改 props（Vue 会警告）。
+ */
+const localData = ref<PartyCenterData>(props.data)
 
 const pickNumber = (value: unknown) => {
   if (value === null || value === undefined) return undefined
@@ -124,15 +130,7 @@ const getFillX = (value: unknown, rows: unknown) => {
 /* =========================================================
    顶部 5 项统计（接口驱动）
    - 接口：/partybuilding/bigscreen/membertopstats
-   - 返回单条记录：
-       memberTotal    党员总数
-       memberPrepare  预备党员
-       memberDevelop  发展党员
-       memberDegree   大专及以上
-       memberOrgan    基层党组织总数
-   - 拼成 topStats: { label, value }[]
    ========================================================= */
-
 const pickList = (res: any): any[] => {
   const body = res?.data ?? res
   if (Array.isArray(body?.datalist)) return body.datalist
@@ -167,12 +165,77 @@ const fetchTopStats = async () => {
   }
 }
 
+/* =========================================================
+   中间四列：党员分析（接口驱动）
+   - 接口：/partybuilding/bigscreen/memberanalyse
+   - 返回：dataList 12 个区 × { partyCount, prepareCount, developCount, baseOrganCount }
+            summary 4 项 { type: '1'..'4', label }
+   - 对应：
+       left-a  → type=1  partyCount      党员人数（含区名）
+       left-b  → type=2  prepareCount    预备党员人数（仅数值条）
+       right-a → type=3  developCount    发展党员人数（含区名）
+       right-b → type=4  baseOrganCount  基层党员组织数量（仅数值条）
+   ========================================================= */
+const fetchMemberAnalyse = async () => {
+  try {
+    const res: any = await getMemberAnalyse()
+    console.log('[memberanalyse] res=', res)
+
+    const body = res?.data ?? res
+    const list = pickList(res)
+    const summary = Array.isArray(body?.summary) ? body.summary : []
+
+    // 从 summary 里拿 4 个标题，兜底用固定文案
+    const labelMap: Record<string, string> = {}
+    summary.forEach((s: any) => {
+      labelMap[String(s.type)] = String(s.label ?? '')
+    })
+
+    const num = (v: unknown) => Number(v ?? 0) || 0
+
+    /** 构造某一列的 rows */
+    const rowsBy = (key: string, unit: string) =>
+      list.map((it: any) => ({
+        label: String(it?.areaName ?? ''),
+        value: `${num(it?.[key])}${unit}`
+      }))
+
+    localData.value = {
+      ...props.data,
+      leftBlocks: [
+        {
+          title: labelMap['1'] ?? '党员人数',
+          rows: rowsBy('partyCount', '名')
+        },
+        {
+          title: labelMap['2'] ?? '预备党员人数',
+          rows: rowsBy('prepareCount', '名')
+        }
+      ],
+      rightBlocks: [
+        {
+          title: labelMap['3'] ?? '发展党员人数',
+          rows: rowsBy('developCount', '名')
+        },
+        {
+          title: labelMap['4'] ?? '基层党员组织数量',
+          rows: rowsBy('baseOrganCount', '个')
+        }
+      ]
+    } as PartyCenterData
+  } catch (e) {
+    console.error('中间四列查询失败', e)
+  }
+}
+
 onMounted(() => {
   fetchTopStats()
+  fetchMemberAnalyse()
 })
 </script>
 
 <style scoped>
+/* 原有样式保持不变，无需改动 */
 .center-wrap {
   position: relative;
   width: 100%;

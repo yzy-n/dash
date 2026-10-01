@@ -43,3 +43,7 @@ export function getServiceCentre() {
 export function getTwoNewOrgan() {
   return requestData('/partybuilding/bigscreen/twoneworgan', { method: 'GET' })
 }
+// 中间四列：党员分析（12 个区 × 4 类指标）
+export function getMemberAnalyse() {
+  return requestData('/partybuilding/bigscreen/memberanalyse', { method: 'GET' })
+}

@@ -3,36 +3,44 @@ import { computed } from 'vue'
 import * as echarts from 'echarts'
 import EChart from '@/components/echarts/EChart.vue'
 
-interface LineDataItem {
-  name: string
-  value: number
+/** 接口返回的原始结构 */
+interface ApiDataItem {
+  quarter: string
+  speed: string | number
 }
 
 const props = defineProps<{
-  data?: LineDataItem[]
+  data?: ApiDataItem[]
 }>()
 
-// 模拟图片里季度增速数据
-const defaultData: LineDataItem[] = [
-  { name: '2020年1季度', value: -20 },
-  { name: '2020年2季度', value: -13 },
-  { name: '2020年3季度', value: -8 },
-  { name: '2020年4季度', value: -7 },
-  { name: '2021年1季度', value: 20 },
-  { name: '2021年2季度', value: 11.7 },
-  { name: '2021年3季度', value: 18.5 },
-  { name: '2021年4季度', value: 11 },
-  { name: '2022年1季度', value: 9 },
-  { name: '2022年2季度', value: -1 },
-  { name: '2022年3季度', value: 4 },
-  { name: '2022年4季度', value: 1 }
+// 默认（接口无数据时兜底）—— 按接口结构写成 quarter / speed
+const defaultData: ApiDataItem[] = [
+  { quarter: '2020年1季度', speed: -20 },
+  { quarter: '2020年2季度', speed: -13 },
+  { quarter: '2020年3季度', speed: -8 },
+  { quarter: '2020年4季度', speed: -7 },
+  { quarter: '2021年1季度', speed: 20 },
+  { quarter: '2021年2季度', speed: 11.7 },
+  { quarter: '2021年3季度', speed: 18.5 },
+  { quarter: '2021年4季度', speed: 11 },
+  { quarter: '2022年1季度', speed: 9 },
+  { quarter: '2022年2季度', speed: -1 },
+  { quarter: '2022年3季度', speed: 4 },
+  { quarter: '2022年4季度', speed: 1 }
 ]
 
-const chartData = computed(() => props.data ?? defaultData)
+// 只取有值的项，speed 统一转 number
+const chartData = computed<ApiDataItem[]>(() => {
+  const list = (props.data && props.data.length ? props.data : defaultData) ?? []
+  return list.map((it) => ({
+    quarter: String(it?.quarter ?? ''),
+    speed: Number(it?.speed) || 0
+  }))
+})
 
 const option = computed(() => {
-  const xAxisData = chartData.value.map((item) => item.name)
-  const seriesData = chartData.value.map((item) => item.value)
+  const xAxisData = chartData.value.map((item) => item.quarter)
+  const seriesData = chartData.value.map((item) => item.speed)
 
   const opt = {
     backgroundColor: 'transparent',

@@ -26,6 +26,28 @@ const buildUrl = (path: string, params?: RequestOptions['params']) => {
   return url.toString()
 }
 
+/* =========================================================
+   Token 读取（按你项目实际存储位置修改）
+   ========================================================= */
+const TOKEN_KEY = 'token'                 // ⚠️ 改这里
+const TOKEN_HEADER = 'Authorization'      // ⚠️ 改这里（'token' / 'Admin-Token' / ...）
+
+const getToken = (): string | null => {
+  try {
+    return (
+      localStorage.getItem(TOKEN_KEY) ||
+      sessionStorage.getItem(TOKEN_KEY) ||
+      null
+    )
+  } catch {
+    return null
+  }
+}
+
+const withBearer = (name: string, token: string) => {
+  return name.toLowerCase() === 'authorization' ? `Bearer ${token}` : token
+}
+
 export class ApiError extends Error {
   code?: number
   status?: number
@@ -42,10 +64,13 @@ export const request = async <T>(path: string, options: RequestOptions = {}): Pr
   const { params, data, headers, method, ...rest } = options
   const url = buildUrl(path, params)
 
+  const token = getToken()
+
   const res = await fetch(url, {
     method: method ?? (data ? 'POST' : 'GET'),
     headers: {
       ...(data ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { [TOKEN_HEADER]: withBearer(TOKEN_HEADER, token) } : {}),
       ...(headers ?? {})
     },
     body: data ? JSON.stringify(data) : undefined,
@@ -58,6 +83,16 @@ export const request = async <T>(path: string, options: RequestOptions = {}): Pr
   if (!res.ok) {
     const message =
       typeof payload === 'string' ? payload : (payload?.message ?? payload?.msg ?? res.statusText)
+
+    if (res.status === 401 || res.status === 403) {
+      try {
+        localStorage.removeItem(TOKEN_KEY)
+        sessionStorage.removeItem(TOKEN_KEY)
+      } catch {}
+      // 需要自动跳登录就放开下面这行
+      // window.location.href = '/login'
+    }
+
     throw new ApiError(String(message || res.statusText), { status: res.status })
   }
 

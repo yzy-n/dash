@@ -52,12 +52,12 @@
         <div class="action-table">
           <div class="action-tabs">
             <button
-              v-for="tab in actionTabs"
+              v-for="(tab, idx) in actionTabs"
               :key="tab"
               type="button"
               class="action-tab"
-              :class="{ 'action-tab--active': tab === activeActionTab }"
-              @click="activeActionTab = tab"
+              :class="{ 'action-tab--active': idx === activeActionTab }"
+              @click="activeActionTab = idx"
             >
               {{ tab }}
             </button>
@@ -123,68 +123,210 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
+import {
+  getSpecialActions,
+  getBuildEffect,
+  getForestFireStack
+} from '@/api/disaster'
 
+/* =========================================================
+   静态节点
+   ========================================================= */
 const actionNodesLeft = ['城镇燃气', '电动自行车', '大型商业综合体']
 const actionNodesRight = ['建筑施工', '危险化学品', '非煤矿山']
 
-const actionTabs = ['自助网', '报警器', '设备']
-const activeActionTab = ref<(typeof actionTabs)[number]>(actionTabs[0])
+const legendItems = [
+  { name: '高', color: '#ffb84a', key: 'high' },
+  { name: '中高', color: '#ffe24a', key: 'mediumHigh' },
+  { name: '中', color: '#40f3b8', key: 'medium' },
+  { name: '中低', color: '#33d5ff', key: 'mediumLow' },
+  { name: '低', color: '#7c5cff', key: 'low' }
+]
+
+/* =========================================================
+   通用解包 + 工具
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+const clean = (v: any) => String(v ?? '').replace(/[\r\n]/g, '').trim()
+
+const toNum = (v: any) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+/* =========================================================
+   专项整治行动（接口驱动）
+   ========================================================= */
+type RawRow = {
+  actionName: string
+  num: string
+  unit: string
+  pro: string
+  pmType: string
+  sort: number
+}
+
+const rawList = ref<RawRow[]>([])
+
+const fetchActions = async () => {
+  try {
+    const res: any = await getSpecialActions(1)
+    console.log('[specialactions] type=1 res=', res)
+
+    const list = pickList(res)
+    rawList.value = list.map((it: any) => ({
+      actionName: clean(it?.actionName),
+      num: clean(it?.num),
+      unit: clean(it?.unit),
+      pro: clean(it?.pro),
+      pmType: clean(it?.pmType),
+      sort: Number(it?.sort ?? 0) || 0
+    }))
+  } catch (e) {
+    console.error('专项整治行动查询失败', e)
+    rawList.value = []
+  }
+}
+
+const grouped = computed(() => {
+  const map = new Map<number, RawRow[]>()
+  for (const it of rawList.value) {
+    if (!map.has(it.sort)) map.set(it.sort, [])
+    map.get(it.sort)!.push(it)
+  }
+  return map
+})
+
+const extractDeviceName = (name: string) => {
+  return clean(name).replace(/(应安装数量|安装数量|安装率)$/, '')
+}
+
+const tabMeta = computed(() => {
+  const s1 = grouped.value.get(1) ?? []
+  const s4 = grouped.value.get(4) ?? []
+
+  return s1.map((it: RawRow, idx: number) => ({
+    name: extractDeviceName(it.actionName) || `设备${idx + 1}`,
+    statPmType: it.pmType,
+    rankPmType: s4[idx]?.pmType ?? ''
+  }))
+})
+
+const actionTabs = computed(() => tabMeta.value.map((t) => t.name))
+const activeActionTab = ref(0)
 
 const installStats = computed(() => {
-  const map = {
-    自助网: [
-      { label: '应安装数量', value: '50.72', unit: '万户' },
-      { label: '安装数量', value: '45.02', unit: '万户' },
-      { label: '安装率', value: '88.77', unit: '%' }
-    ],
-    报警器: [
-      { label: '应安装数量', value: '14.30', unit: '万户' },
-      { label: '安装数量', value: '12.86', unit: '万户' },
-      { label: '安装率', value: '89.93', unit: '%' }
-    ],
-    设备: [
-      { label: '应安装数量', value: '8.60', unit: '万户' },
-      { label: '安装数量', value: '7.92', unit: '万户' },
-      { label: '安装率', value: '92.09', unit: '%' }
+  const tab = tabMeta.value[activeActionTab.value]
+  if (!tab) {
+    return [
+      { label: '应安装数量', value: '0', unit: '' },
+      { label: '安装数量', value: '0', unit: '' },
+      { label: '安装率', value: '0', unit: '%' }
     ]
-  } as const
-  return map[activeActionTab.value]
+  }
+
+  const find = (sortKey: number) =>
+    grouped.value.get(sortKey)?.find((it) => it.pmType === tab.statPmType)
+
+  const s1 = find(1)
+  const s2 = find(2)
+  const s3 = find(3)
+
+  return [
+    { label: '应安装数量', value: s1?.num || '0', unit: s1?.unit || '' },
+    { label: '安装数量', value: s2?.num || '0', unit: s2?.unit || '' },
+    { label: '安装率', value: s3?.num || '0', unit: s3?.unit || '%' }
+  ]
 })
 
 const actionRankRows = computed(() => {
-  const map = {
-    自助网: [
-      { name: '海城市', rank: '第十名', rate: '79.53%' },
-      { name: '台安县', rank: '第一名', rate: '100.00%' },
-      { name: '铁东区', rank: '第二名', rate: '100.00%' },
-      { name: '铁西区', rank: '第三名', rate: '100.00%' },
-      { name: '立山区', rank: '第四名', rate: '100.00%' }
-    ],
-    报警器: [
-      { name: '铁西区', rank: '第一名', rate: '100.00%' },
-      { name: '铁东区', rank: '第二名', rate: '99.32%' },
-      { name: '立山区', rank: '第三名', rate: '98.60%' },
-      { name: '台安县', rank: '第四名', rate: '96.40%' },
-      { name: '海城市', rank: '第九名', rate: '82.15%' }
-    ],
-    设备: [
-      { name: '立山区', rank: '第一名', rate: '100.00%' },
-      { name: '铁西区', rank: '第二名', rate: '99.10%' },
-      { name: '铁东区', rank: '第三名', rate: '98.25%' },
-      { name: '台安县', rank: '第五名', rate: '93.70%' },
-      { name: '海城市', rank: '第八名', rate: '86.45%' }
-    ]
-  } as const
-  return map[activeActionTab.value]
+  const tab = tabMeta.value[activeActionTab.value]
+  if (!tab) return []
+
+  const rows: { name: string; rank: string; rate: string }[] = []
+  const sortKeys = Array.from(grouped.value.keys())
+    .filter((k) => k >= 4)
+    .sort((a, b) => a - b)
+
+  for (const k of sortKeys) {
+    const items = grouped.value.get(k) ?? []
+    const found = items.find((it) => it.pmType === tab.rankPmType)
+    if (!found) continue
+    rows.push({
+      name: found.actionName,
+      rank: `${found.num}${found.unit}`,
+      rate: found.pro || '-'
+    })
+  }
+
+  return rows
 })
 
-const resultMetrics = [
+/* =========================================================
+   灾后建设成效（接口驱动）
+   ========================================================= */
+type BuildEffectRow = {
+  peopleNum: number
+  rebuildSub: number
+  lifeSub: number
+}
+
+const buildEffect = ref<BuildEffectRow>({
+  peopleNum: 0,
+  rebuildSub: 0,
+  lifeSub: 0
+})
+
+const defaultBuildEffect: BuildEffectRow = {
+  peopleNum: 6839,
+  rebuildSub: 393,
+  lifeSub: 62.16
+}
+
+const fetchBuildEffect = async () => {
+  try {
+    const res: any = await getBuildEffect()
+    console.log('[buildeffect] res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      buildEffect.value = { ...defaultBuildEffect }
+      return
+    }
+
+    const row = list[0] || {}
+    buildEffect.value = {
+      peopleNum: toNum(row?.peopleNum),
+      rebuildSub: toNum(row?.rebuildSub),
+      lifeSub: toNum(row?.lifeSub)
+    }
+  } catch (e) {
+    console.error('灾后建设成效查询失败', e)
+    buildEffect.value = { ...defaultBuildEffect }
+  }
+}
+
+const fmtNum = (n: number, keepDecimal: boolean) => {
+  if (!Number.isFinite(n)) return '0'
+  if (keepDecimal) return n.toFixed(2)
+  return String(n)
+}
+
+const resultMetrics = computed(() => [
   {
     kind: 'people',
     label: '临时救助人次',
-    value: '6839',
+    value: fmtNum(buildEffect.value.peopleNum, false),
     unit: '人',
     iconPath:
       'M32 34c7.2 0 13-5.8 13-13S39.2 8 32 8 19 13.8 19 21s5.8 13 13 13zm0 6c-10.5 0-19 6.7-19 15v1h38v-1c0-8.3-8.5-15-19-15z'
@@ -192,37 +334,76 @@ const resultMetrics = [
   {
     kind: 'money',
     label: '发放临时救助金',
-    value: '393',
+    value: fmtNum(buildEffect.value.rebuildSub, false),
     unit: '万元',
     iconPath: 'M14 18h36v28H14V18zm4 6v16h28V24H18zm7 4h14v4H25v-4zM22 50h20v4H22v-4z'
   },
   {
     kind: 'fund',
     label: '国补专项救助金',
-    value: '62.16',
+    value: fmtNum(buildEffect.value.lifeSub, true),
     unit: '万元',
     iconPath:
       'M32 10l20 10v12c0 12.2-8.5 22.8-20 26-11.5-3.2-20-13.8-20-26V20l20-10zm0 10a8 8 0 100 16 8 8 0 000-16zm-10 30h20v4H22v-4z'
   }
+])
+
+/* =========================================================
+   森林防火能力（接口驱动）
+   - 接口：/disaster/bigscreen/forestfirestack
+   - 返回：{ data: { dataList: [{ county, high, mediumHigh,
+             medium, mediumLow, low }] } }
+   ========================================================= */
+type ForestRow = {
+  county: string
+  high: number
+  mediumHigh: number
+  medium: number
+  mediumLow: number
+  low: number
+}
+
+const forestList = ref<ForestRow[]>([])
+
+/** 兜底数据（接口失败/空时展示原静态数据） */
+const defaultForest: ForestRow[] = [
+  { county: '海城市', high: 12, mediumHigh: 10, medium: 2, mediumLow: 4, low: 1 },
+  { county: '台安县', high: 7, mediumHigh: 0, medium: 0, mediumLow: 2, low: 2 },
+  { county: '岫岩县', high: 0, mediumHigh: 10, medium: 10, mediumLow: 6, low: 0 },
+  { county: '铁东区', high: 0, mediumHigh: 0, medium: 12, mediumLow: 0, low: 8 },
+  { county: '铁西区', high: 0, mediumHigh: 0, medium: 0, mediumLow: 0, low: 0 },
+  { county: '立山区', high: 0, mediumHigh: 0, medium: 0, mediumLow: 2, low: 2 }
 ]
 
-const legendItems = [
-  { name: '高', color: '#ffb84a' },
-  { name: '中高', color: '#ffe24a' },
-  { name: '中', color: '#40f3b8' },
-  { name: '中低', color: '#33d5ff' },
-  { name: '低', color: '#7c5cff' }
-]
+const fetchForest = async () => {
+  try {
+    const res: any = await getForestFireStack()
+    console.log('[forestfirestack] res=', res)
+
+    const list = pickList(res)
+    if (!list.length) {
+      forestList.value = defaultForest
+      return
+    }
+
+    forestList.value = list.map((it: any) => ({
+      county: String(it?.county ?? '').trim(),
+      high: toNum(it?.high),
+      mediumHigh: toNum(it?.mediumHigh),
+      medium: toNum(it?.medium),
+      mediumLow: toNum(it?.mediumLow),
+      low: toNum(it?.low)
+    }))
+  } catch (e) {
+    console.error('森林防火能力查询失败', e)
+    forestList.value = defaultForest
+  }
+}
 
 const forestOption = computed(() => {
-  const districts = ['海城市', '台安县', '岫岩县', '铁东区', '铁西区', '立山区']
-  const seriesData = {
-    高: [12, 10, 2, 4, 1, 0],
-    中高: [7, 0, 0, 2, 2, 0],
-    中: [0, 10, 10, 6, 0, 1],
-    中低: [0, 0, 12, 0, 8, 5],
-    低: [0, 0, 0, 0, 0, 2]
-  }
+  const source = forestList.value.length ? forestList.value : defaultForest
+
+  const districts = source.map((it) => it.county)
 
   const makeGradient = (color: string) => ({
     type: 'linear',
@@ -244,13 +425,20 @@ const forestOption = computed(() => {
     低: '#7c5cff'
   }
 
+  // 根据数据自动计算 x 轴上限：取所有区县各等级之和的最大值，向上取整到 5 的倍数
+  const totals = source.map(
+    (it) => it.high + it.mediumHigh + it.medium + it.mediumLow + it.low
+  )
+  const maxTotal = Math.max(1, ...totals)
+  const xMax = Math.ceil(maxTotal / 5) * 5
+
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
     grid: { left: 140, right: 40, top: 34, bottom: 28 },
     xAxis: {
       type: 'value',
-      max: 30,
+      max: xMax,
       splitNumber: 6,
       axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 14 },
       axisTick: { show: false },
@@ -264,22 +452,32 @@ const forestOption = computed(() => {
       axisTick: { show: false },
       axisLine: { show: false }
     },
-    series: legendItems.map((legend) => ({
-      name: legend.name,
-      type: 'bar',
-      stack: 'total',
-      barWidth: 22,
-      data: (seriesData as any)[legend.name] ?? [],
-      itemStyle: {
-        borderRadius: legend.name === '低' ? [0, 12, 12, 0] : 0,
-        color: makeGradient(colors[legend.name])
+    series: legendItems.map((legend) => {
+      const key = legend.key as keyof Omit<ForestRow, 'county'>
+      return {
+        name: legend.name,
+        type: 'bar',
+        stack: 'total',
+        barWidth: 22,
+        data: source.map((it) => it[key]),
+        itemStyle: {
+          borderRadius: legend.name === '低' ? [0, 12, 12, 0] : 0,
+          color: makeGradient(colors[legend.name])
+        }
       }
-    }))
+    })
   }
+})
+
+onMounted(() => {
+  fetchActions()
+  fetchBuildEffect()
+  fetchForest()
 })
 </script>
 
 <style scoped>
+/* 样式与上一版完全一致，未做任何改动 */
 .right-wrap {
   width: 100%;
   height: 100%;
@@ -733,9 +931,6 @@ const forestOption = computed(() => {
   overflow: hidden;
   border-radius: 18px;
   padding: 82px 28px 26px;
-  /* background:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/leftBg.png'); */
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;

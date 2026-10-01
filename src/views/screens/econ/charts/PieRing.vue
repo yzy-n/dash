@@ -5,7 +5,9 @@ import EChart from '@/components/echarts/EChart.vue'
 interface PieDataItem {
   name: string
   value: number
+  rate?: number
 }
+
 const props = defineProps<{
   data?: PieDataItem[]
 }>()
@@ -29,7 +31,7 @@ const option = computed(() => {
     series: [
       {
         type: 'pie',
-        radius: ['45%', '70%'], // 环形内外半径，做成空心环
+        radius: ['45%', '70%'],
         center: ['50%', '50%'],
         avoidLabelOverlap: false,
         itemStyle: {
@@ -38,7 +40,12 @@ const option = computed(() => {
         label: {
           show: true,
           position: 'outside',
-          formatter: '{b}\n增加值:{c}亿元\n占比:{d}%',
+          formatter: (params: any) => {
+            const it = params.data || {}
+            const rate =
+              it.rate !== undefined && it.rate !== null ? it.rate : params.percent
+            return `${it.name}\n增加值:${it.value}亿元\n占比:${rate}%`
+          },
           color: '#fff',
           fontSize: 30
         },
@@ -49,11 +56,7 @@ const option = computed(() => {
           }
         },
         data: chartData.value,
-        color: [
-          '#33b8ff', // 第三产业蓝色
-          '#e65c4f', // 第二产业红色
-          '#ffd058' // 第一产业黄色
-        ]
+        color: ['#33b8ff', '#e65c4f', '#ffd058']
       }
     ]
   }

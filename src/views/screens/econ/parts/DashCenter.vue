@@ -7,56 +7,87 @@
       <!-- 地图 -->
       <div ref="mapRef" class="anshan-map"></div>
 
-      <!-- CPI 中心圆环 -->
+      <!-- CPI 中心圆环：消费价格指数（接口驱动） -->
       <div class="cpi-item">
-        <div class="time">2022.01~12</div>
+        <div class="time">{{ cpiData.quarter }}</div>
         <div class="label">消费价格指数</div>
-        <div class="value">101.4</div>
+        <div class="value">{{ cpiData.amount }}</div>
       </div>
 
-      <!-- 右侧主指标卡片 -->
+      <!-- 右侧主指标卡片：全市进出口总额（接口驱动） -->
       <div class="main-card">
-        <div class="main-card-time">2022.01~12</div>
+        <div class="main-card-time">{{ volumeForeignTrade.quarter }}</div>
         <div class="main-card-label">全市进出口总额</div>
-        <div class="main-card-num">390.3 <span class="unit">亿元</span></div>
-        <div class="main-card-rate">14.8%↑</div>
+        <div class="main-card-num">
+          {{ volumeForeignTrade.amount }} <span class="unit">亿元</span>
+        </div>
+        <div class="main-card-rate">{{ volumeForeignTrade.yearOnYearGrowth }}%↑</div>
       </div>
 
-      <!-- 左侧小气泡 -->
+      <!-- 预算收入（接口驱动） -->
       <div class="bubble b1">
-        <div class="time">2023.01~02</div>
+        <div class="time">{{ fiscalRevenue.quarter }}</div>
         <div class="label">预算收入</div>
-        <div class="num">36.39 <span class="unit">亿元</span></div>
-        <div class="rate">8.1%↑</div>
+        <div class="num">
+          {{ fiscalRevenue.amount }} <span class="unit">亿元</span>
+        </div>
+        <div
+          class="rate"
+          :class="{ red: Number(fiscalRevenue.yearOnYearGrowth) < 0 }"
+        >
+          {{ fiscalRevenue.yearOnYearGrowth }}%{{
+            Number(fiscalRevenue.yearOnYearGrowth) < 0 ? '↓' : '↑'
+          }}
+        </div>
       </div>
 
+      <!-- 税收收入（接口驱动） -->
       <div class="bubble b2">
-        <div class="time">2023.01~02</div>
+        <div class="time">{{ taxRevenue.quarter }}</div>
         <div class="label">税收收入</div>
-        <div class="num">24.93 <span class="unit">亿元</span></div>
-        <div class="rate">3.7%↑</div>
+        <div class="num">
+          {{ taxRevenue.amount }} <span class="unit">亿元</span>
+        </div>
+        <div
+          class="rate"
+          :class="{ red: Number(taxRevenue.yearOnYearGrowth) < 0 }"
+        >
+          {{ taxRevenue.yearOnYearGrowth }}%{{ Number(taxRevenue.yearOnYearGrowth) < 0 ? '↓' : '↑' }}
+        </div>
       </div>
 
+      <!-- GDP（接口驱动） -->
       <div class="bubble b3">
-        <div class="time">2022.01~12</div>
+        <div class="time">{{ gdpData.quarter }}</div>
         <div class="label">GDP</div>
-        <div class="num">1,863.2 <span class="unit">亿元</span></div>
-        <div class="rate red">0.3%↑</div>
+        <div class="num">
+          {{ gdpData.amount }} <span class="unit">亿元</span>
+        </div>
+        <div
+          class="rate"
+          :class="{ red: Number(gdpData.yearOnYearGrowth) < 0 }"
+        >
+          {{ gdpData.yearOnYearGrowth }}%{{ Number(gdpData.yearOnYearGrowth) < 0 ? '↓' : '↑' }}
+        </div>
       </div>
 
-      <!-- 右侧小气泡 -->
+      <!-- 右侧小气泡：城市 / 农村居民人均收入（接口驱动） -->
       <div class="bubble b4">
-        <div class="time">2022.01~12</div>
+        <div class="time">{{ urbanIncome.quarter }}</div>
         <div class="label">城市居民人均收入情况</div>
-        <div class="num">4.18 <span class="unit">万元</span></div>
-        <div class="rate red">1.4%↑</div>
+        <div class="num">
+          {{ urbanIncome.amount }} <span class="unit">元</span>
+        </div>
+        <div class="rate red">{{ urbanIncome.yearOnYearGrowth }}%↑</div>
       </div>
 
       <div class="bubble b5">
-        <div class="time">2022.01~12</div>
+        <div class="time">{{ ruralIncome.quarter }}</div>
         <div class="label">农村居民人均收入情况</div>
-        <div class="num">2.18 <span class="unit">万元</span></div>
-        <div class="rate red">1.8%↑</div>
+        <div class="num">
+          {{ ruralIncome.amount }} <span class="unit">元</span>
+        </div>
+        <div class="rate red">{{ ruralIncome.yearOnYearGrowth }}%↑</div>
       </div>
 
       <!-- 底部光晕 -->
@@ -69,10 +100,258 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
 import 'echarts-gl'
+import {
+  getVolumeForeignTrade,
+  getResidentIncome,
+  getHouseholdConsumption,
+  getGdp,
+  getFiscalTaxRevenue,
+  getFiscalRevenue
+} from '@/api/econ'
 
 const mapRef = ref<HTMLElement | null>(null)
 let chartInstance: echarts.ECharts | null = null
 const techTexture = ref<HTMLCanvasElement | null>(null)
+
+/* =========================================================
+   通用：兼容多种解包层级
+   ========================================================= */
+const pickList = (res: any): any[] => {
+  const body = res?.data ?? res
+  if (Array.isArray(body?.datalist)) return body.datalist
+  if (Array.isArray(body?.dataList)) return body.dataList
+  if (Array.isArray(body?.data?.datalist)) return body.data.datalist
+  if (Array.isArray(body?.data?.dataList)) return body.data.dataList
+  return []
+}
+
+/* =========================================================
+   1. 消费价格指数（CPI）—— 接口驱动
+   ========================================================= */
+
+const HOUSEHOLD_CONSUMPTION_DATE = '2026.04-2026.04'
+
+type CpiData = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const cpiData = ref<CpiData>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: HOUSEHOLD_CONSUMPTION_DATE
+})
+
+const fetchHouseholdConsumption = async () => {
+  try {
+    const res: any = await getHouseholdConsumption(HOUSEHOLD_CONSUMPTION_DATE)
+    console.log('[householdconsumption] souseDate=', HOUSEHOLD_CONSUMPTION_DATE, 'res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      cpiData.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        quarter: String(row.quarter ?? HOUSEHOLD_CONSUMPTION_DATE)
+      }
+    }
+  } catch (e) {
+    console.error('消费价格指数查询失败', e)
+  }
+}
+
+/* =========================================================
+   2. 全市进出口总额 —— 接口驱动
+   ========================================================= */
+
+const VOLUME_FOREIGN_TRADE_DATE = '2023年1月-9月'
+
+type VolumeForeignTrade = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const volumeForeignTrade = ref<VolumeForeignTrade>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: VOLUME_FOREIGN_TRADE_DATE
+})
+
+const fetchVolumeForeignTrade = async () => {
+  try {
+    const res: any = await getVolumeForeignTrade(VOLUME_FOREIGN_TRADE_DATE)
+    console.log('[volumeforeigntrade] souseDate=', VOLUME_FOREIGN_TRADE_DATE, 'res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      volumeForeignTrade.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        quarter: String(row.quarter ?? VOLUME_FOREIGN_TRADE_DATE)
+      }
+    }
+  } catch (e) {
+    console.error('全市进出口总额查询失败', e)
+  }
+}
+
+/* =========================================================
+   3. 城乡居民人均收入情况 —— 接口驱动
+   ========================================================= */
+
+const RESIDENT_INCOME_DATE = '2026.01-2026.03'
+
+type ResidentIncome = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const urbanIncome = ref<ResidentIncome>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: RESIDENT_INCOME_DATE
+})
+
+const ruralIncome = ref<ResidentIncome>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: RESIDENT_INCOME_DATE
+})
+
+const fetchResidentIncome = async () => {
+  try {
+    const res: any = await getResidentIncome(RESIDENT_INCOME_DATE)
+    console.log('[residentincome] souseDate=', RESIDENT_INCOME_DATE, 'res=', res)
+
+    const list = pickList(res)
+
+    const toItem = (row: any): ResidentIncome => ({
+      amount: String(row?.amount ?? '0'),
+      yearOnYearGrowth: String(row?.yearOnYearGrowth ?? '0'),
+      quarter: String(row?.quarter ?? RESIDENT_INCOME_DATE)
+    })
+
+    const urbanRow = list.find((it: any) => String(it?.type) === '1')
+    const ruralRow = list.find((it: any) => String(it?.type) === '2')
+
+    if (urbanRow) urbanIncome.value = toItem(urbanRow)
+    if (ruralRow) ruralIncome.value = toItem(ruralRow)
+  } catch (e) {
+    console.error('居民人均收入查询失败', e)
+  }
+}
+
+/* =========================================================
+   4. GDP —— 接口驱动
+   ========================================================= */
+
+type GdpData = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const gdpData = ref<GdpData>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: ''
+})
+
+const fetchGdp = async () => {
+  try {
+    const res: any = await getGdp()
+    console.log('[gdp] res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      gdpData.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        quarter: String(row.quarter ?? '')
+      }
+    }
+  } catch (e) {
+    console.error('GDP 查询失败', e)
+  }
+}
+
+/* =========================================================
+   5. 税收收入 —— 接口驱动（无参）
+   ========================================================= */
+
+type TaxRevenue = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const taxRevenue = ref<TaxRevenue>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: ''
+})
+
+const fetchTaxRevenue = async () => {
+  try {
+    const res: any = await getFiscalTaxRevenue()
+    console.log('[fiscaltaxrevenue] res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      taxRevenue.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        quarter: String(row.quarter ?? '')
+      }
+    }
+  } catch (e) {
+    console.error('税收收入查询失败', e)
+  }
+}
+
+/* =========================================================
+   6. 预算收入 —— 接口驱动（无参）
+   - 接口：/economicoperation/bigscreen/fiscalrevenue
+   - 返回 { amount, yearOnYearGrowth, quarter }
+   ========================================================= */
+
+type FiscalRevenue = {
+  amount: string
+  yearOnYearGrowth: string
+  quarter: string
+}
+
+const fiscalRevenue = ref<FiscalRevenue>({
+  amount: '0',
+  yearOnYearGrowth: '0',
+  quarter: ''
+})
+
+const fetchFiscalRevenue = async () => {
+  try {
+    const res: any = await getFiscalRevenue()
+    console.log('[fiscalrevenue] res=', res)
+
+    const list = pickList(res)
+    const row = list[0]
+    if (row) {
+      fiscalRevenue.value = {
+        amount: String(row.amount ?? '0'),
+        yearOnYearGrowth: String(row.yearOnYearGrowth ?? '0'),
+        quarter: String(row.quarter ?? '')
+      }
+    }
+  } catch (e) {
+    console.error('预算收入查询失败', e)
+  }
+}
 
 /** 生成科技感纹理（网格 + 星点） */
 const createTechTexture = () => {
@@ -134,17 +413,23 @@ const createTechTexture = () => {
 onMounted(async () => {
   if (!mapRef.value) return
 
+  // 先请求所有接口数据
+  fetchHouseholdConsumption()
+  fetchVolumeForeignTrade()
+  fetchResidentIncome()
+  fetchGdp()
+  fetchTaxRevenue()
+  fetchFiscalRevenue()
+
   techTexture.value = createTechTexture()
 
   const url = `${import.meta.env.BASE_URL}geo/anshan.geojson`
   const anshanGeoJson = await fetch(url).then((res) => res.json())
 
-  // 注意：这里注册名改成 anshan，和 geo3D 保持一致
   echarts.registerMap('anshan', anshanGeoJson)
 
   chartInstance = echarts.init(mapRef.value)
 
-  // 主色
   const topColor = 'rgba(20, 140, 220, 0.65)'
   const topColorEmphasis = 'rgba(80, 200, 255, 0.85)'
   const detailTexture = techTexture.value as any
@@ -193,8 +478,8 @@ onMounted(async () => {
       },
       viewControl: {
         projection: 'perspective',
-        alpha: 70, // ← 倾斜角度，改这里
-        beta: -18, // ← 水平旋转
+        alpha: 70,
+        beta: -18,
         distance: 175,
         minDistance: 80,
         maxDistance: 170,
@@ -261,7 +546,6 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 
-/* 背景空间网格，贴近你这张图的科技感 */
 .space-grid {
   position: absolute;
   inset: 0;
@@ -273,7 +557,6 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 
-/* 地图居中偏下，更大更靠前 */
 .anshan-map {
   position: absolute;
   left: 50%;
@@ -285,7 +568,6 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-/* CPI 中心圆环 */
 .cpi-item {
   position: absolute;
   top: 18%;
@@ -321,7 +603,6 @@ onBeforeUnmount(() => {
   color: #ffff66;
 }
 
-/* 右侧主指标卡片，参考图里右侧那个大蓝圈 */
 .main-card {
   position: absolute;
   top: 50%;
@@ -368,7 +649,6 @@ onBeforeUnmount(() => {
   color: #4cff70;
 }
 
-/* 小气泡 */
 .bubble {
   position: absolute;
   width: 280px;
@@ -416,7 +696,6 @@ onBeforeUnmount(() => {
   color: #ff5252;
 }
 
-/* 左侧小气泡 */
 .b1 {
   top: 28%;
   left: 16%;
@@ -435,7 +714,6 @@ onBeforeUnmount(() => {
   animation-delay: 1.6s;
 }
 
-/* 右侧小气泡 */
 .b4 {
   top: 34%;
   right: 12%;
@@ -459,7 +737,6 @@ onBeforeUnmount(() => {
   z-index: 2;
 }
 
-/* 轻微漂浮，不要大幅旋转 */
 @keyframes float {
   0% {
     transform: translateY(0);
