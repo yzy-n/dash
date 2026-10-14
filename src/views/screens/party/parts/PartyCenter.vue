@@ -322,6 +322,7 @@ onMounted(() => {
 }
 
 .list-title {
+  /* 其他属性保持不变 */
   position: absolute;
   left: 0;
   right: 0;
@@ -333,10 +334,20 @@ onMounted(() => {
   font-weight: 800;
   color: rgba(255, 238, 206, 0.98);
   letter-spacing: 2px;
-  background: linear-gradient(90deg, rgba(197, 15, 15, 0.82), rgba(197, 15, 15, 0.22));
+
+  /* 修改后的背景色：暗红棕色，带有渐变和透明度，更贴近原图 */
+  background: linear-gradient(
+    90deg,
+    rgba(120, 30, 20, 0.65) 0%,
+    rgba(90, 20, 10, 0.2) 50%,
+    rgba(120, 30, 20, 0.65) 100%
+  );
+
+  /* 优化阴影，让边缘过渡更柔和，带有一种微弱的暗金光晕 */
   box-shadow:
-    inset 0 0 0 1px rgba(255, 230, 172, 0.08),
-    0 0 16px rgba(255, 92, 32, 0.12);
+    inset 0 0 0 1px rgba(255, 220, 160, 0.12),
+    /* 边框略调亮，勾勒形状 */ inset 0 -10px 20px rgba(0, 0, 0, 0.3),
+    /* 底部加一点暗色内阴影，增加立体感 */ 0 0 20px rgba(200, 80, 30, 0.15); /* 外发光改为更柔和的暗橙色 */
 }
 
 .list-rows {

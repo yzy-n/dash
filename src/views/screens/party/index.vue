@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 
-import partyUrl from '@/assets/img/party.jpg'
+import partyUrl from '@/assets/img/party.png'
 import { partyScreenMock } from './data'
 import PartyCenter from './parts/PartyCenter.vue'
 import PartyLeft from './parts/PartyLeft.vue'

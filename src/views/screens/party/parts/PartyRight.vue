@@ -1072,16 +1072,18 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgba(255, 200, 130, 0.22);
+  /* 修改点：降低红色饱和度，换为暗红棕色 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
-    linear-gradient(90deg, rgba(170, 12, 12, 0.72), rgba(120, 8, 8, 0.42));
+    linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
   box-shadow: inset 0 0 0 1px rgba(255, 220, 160, 0.06);
 }
 
 .panel--dev .table-row:nth-of-type(even) {
+  /* 修改点：偶数行也调整为偏暗的红棕色 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.18) 0 18%, transparent 18% 100%),
-    linear-gradient(90deg, rgba(150, 10, 10, 0.68), rgba(100, 6, 6, 0.38));
+    linear-gradient(90deg, rgba(100, 25, 15, 0.6), rgba(70, 15, 10, 0.3));
 }
 
 .panel--dev .table-row .c1 {
@@ -1241,9 +1243,10 @@ onMounted(() => {
   justify-content: space-between;
   gap: 22px;
   border: 2px solid rgba(255, 200, 130, 0.55);
+  /* 修改点：合计框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
-    linear-gradient(90deg, rgba(170, 12, 12, 0.72), rgba(120, 8, 8, 0.42));
+    linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
   box-shadow:
     inset 0 0 0 1px rgba(255, 220, 160, 0.06),
     0 0 18px rgba(255, 140, 70, 0.06);
@@ -1316,9 +1319,10 @@ onMounted(() => {
   align-items: center;
   gap: 14px;
   border: 2px solid rgba(255, 200, 130, 0.55);
+  /* 修改点：合计框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
-    linear-gradient(90deg, rgba(170, 12, 12, 0.72), rgba(120, 8, 8, 0.42));
+    linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
   box-shadow:
     inset 0 0 0 1px rgba(255, 220, 160, 0.06),
     0 0 18px rgba(255, 140, 70, 0.06);
@@ -1437,11 +1441,8 @@ onMounted(() => {
 }
 
 .tab--active {
-  background: radial-gradient(
-    circle at 50% 30%,
-    rgba(255, 220, 140, 0.52),
-    rgba(160, 10, 10, 0.32)
-  );
+  /* 修改点：激活态标签页底色也改为暗红棕 */
+  background: radial-gradient(circle at 50% 30%, rgba(255, 220, 140, 0.52), rgba(120, 30, 20, 0.4));
   box-shadow: 0 0 16px rgba(255, 210, 120, 0.12);
 }
 
@@ -1658,9 +1659,10 @@ onMounted(() => {
   justify-content: flex-end;
   gap: 12px;
   border: 2px solid rgba(255, 200, 130, 0.62);
+  /* 修改点：群团组织数据框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
-    linear-gradient(90deg, rgba(150, 10, 10, 0.32), rgba(100, 6, 6, 0.2));
+    linear-gradient(90deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
   box-shadow:
     inset 0 0 0 1px rgba(255, 220, 160, 0.06),
     0 0 18px rgba(255, 140, 70, 0.06);
@@ -1902,9 +1904,10 @@ onMounted(() => {
   padding: 22px 14px 18px;
   box-sizing: border-box;
   border: 1px solid rgba(255, 200, 130, 0.22);
+  /* 修改点：两新组织卡片背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.2) 0 18%, transparent 18% 100%),
-    linear-gradient(180deg, rgba(150, 10, 10, 0.28), rgba(90, 6, 6, 0.18));
+    linear-gradient(180deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
   box-shadow:
     inset 0 0 0 1px rgba(255, 220, 160, 0.06),
     0 0 18px rgba(255, 140, 70, 0.05);
