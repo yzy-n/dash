@@ -119,7 +119,7 @@ watch(
 }
 
 .kpi-label {
-  font-size: 36px;
+  font-size: 40px;
   text-align: center;
   color: rgba(214, 238, 255, 0.75);
 }
@@ -187,7 +187,7 @@ watch(
 }
 
 .side-name {
-  font-size: 28px;
+  font-size: 40px;
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   font-weight: 900;
   color: #e0f2ff;
@@ -201,7 +201,7 @@ watch(
 .side-metrics {
   display: flex;
   justify-content: space-between;
-  font-size: 24px;
+  font-size: 40px;
   color: rgba(214, 238, 255, 0.75);
   gap: 60px; /* 两个条目之间间距 */
   align-items: center;
