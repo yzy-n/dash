@@ -255,7 +255,7 @@ const props = defineProps<{
   min-height: 0;
   display: grid;
   gap: 12px;
-  font-size: 34px;
+  font-size: 38px;
   color: rgba(214, 238, 255, 0.84);
   margin-top: 100px;
 }

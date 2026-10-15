@@ -14,7 +14,7 @@ const props = defineProps<{
 const chartOption = computed(() => {
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: { show: true },
     series: [
       // 外层主圆环（带外发光）
       {
@@ -35,7 +35,7 @@ const chartOption = computed(() => {
           alignTo: 'labelLine',
           formatter: (params) => `${params.name}: ${params.value}`,
           color: '#ffffff',
-          fontSize: 20
+          fontSize: 35
         },
         labelLine: {
           show: true,
@@ -65,8 +65,8 @@ const chartOption = computed(() => {
           shadowBlur: 12,
           shadowColor: '#ffdd22'
         },
-        label: { show: false },
-        labelLine: { show: false },
+        label: { show: true },
+        labelLine: { show: true },
         data: props.data.map((item) => ({ value: item.value }))
       }
     ],

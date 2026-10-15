@@ -23,7 +23,7 @@ const renderChart = () => {
       trigger: 'axis',
       backgroundColor: 'rgba(6, 18, 48, 0.9)',
       borderColor: 'rgba(89, 194, 255, 0.12)',
-      textStyle: { color: '#fff' },
+      textStyle: { color: '#fff', fontSize: 40 },
       formatter: '{b}<br/>数量 : {c}'
     },
     grid: {
@@ -39,7 +39,8 @@ const renderChart = () => {
       axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)' } },
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.7)',
-        rotate: 15
+        rotate: 15,
+        fontSize: 30
       }
     },
     yAxis: {
@@ -47,9 +48,9 @@ const renderChart = () => {
       name: `单位：${props.unit || '万个'}`,
       nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)' },
       max: yAxisMax,
-      axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)' } },
-      splitLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.1)' } },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)' }
+      axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)', fontSize: 30 } },
+      splitLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.1)', fontSize: 30 } },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 30 }
     },
     series: [
       {
