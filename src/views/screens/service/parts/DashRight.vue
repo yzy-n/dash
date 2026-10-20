@@ -757,7 +757,7 @@ onMounted(() => {
 }
 
 .panel-title {
-  font-size: 34px;
+  font-size: 60px;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;

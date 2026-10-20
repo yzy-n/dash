@@ -175,7 +175,7 @@ const props = defineProps<{
   height: 42px;
   display: inline-flex;
   align-items: center;
-  font-size: 40px;
+  font-size: 60px;
   line-height: 2px;
   margin-top: -10px;
   margin-left: 30px;

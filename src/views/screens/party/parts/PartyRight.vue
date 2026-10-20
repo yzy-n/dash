@@ -1015,7 +1015,7 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 38px;
+  font-size: 60px;
   letter-spacing: 2px;
 }
 
@@ -1030,7 +1030,7 @@ onMounted(() => {
   min-width: 250px;
   height: 60px;
   line-height: 60px;
-  font-size: 30px;
+  font-size: 40px;
   border-radius: 30px;
   cursor: pointer;
 }
@@ -1059,7 +1059,7 @@ onMounted(() => {
   padding: 0 18px;
   background: transparent;
   border-bottom: 1px solid rgba(255, 200, 130, 0.2);
-  font-size: 32px;
+  font-size: 40px;
   color: rgba(255, 238, 206, 0.9);
 }
 
@@ -1087,13 +1087,13 @@ onMounted(() => {
 }
 
 .panel--dev .table-row .c1 {
-  font-size: 32px;
+  font-size: 40px;
   color: rgba(255, 238, 206, 0.92);
 }
 
 .panel--dev .table-row .c2,
 .panel--dev .table-row .c3 {
-  font-size: 32px;
+  font-size: 40px;
 }
 
 .panel--dev .table-empty {
@@ -1122,7 +1122,7 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 38px;
+  font-size: 60px;
   margin-left: -50px;
 }
 
@@ -1194,7 +1194,7 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 38px;
+  font-size: 60px;
   margin-left: -50px;
 }
 
@@ -1226,9 +1226,10 @@ onMounted(() => {
 }
 
 .panel--service .panel-title {
-  font-size: 38px;
+  font-size: 60px;
   position: relative;
   top: -30px;
+  left: -30px;
 }
 .panel--service .panel-total {
   position: absolute;
@@ -1276,7 +1277,7 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 38px;
+  font-size: 60px;
   margin-left: -60px;
 }
 .panel--vol .panel-tabs {
@@ -1387,7 +1388,7 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 38px;
+  font-size: 60px;
   margin-left: -50px;
 }
 
@@ -1403,7 +1404,7 @@ onMounted(() => {
   line-height: 52px;
   padding: 0 18px;
   display: inline-block;
-  font-size: 36px;
+  font-size: 60px;
   font-weight: 800;
   color: rgba(255, 238, 206, 0.98);
   letter-spacing: 2px;
@@ -1725,13 +1726,13 @@ onMounted(() => {
 }
 
 .service-label {
-  font-size: 26px;
+  font-size: 40px;
   color: rgba(255, 238, 206, 0.92);
 }
 
 .service-value {
   text-align: right;
-  font-size: 30px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(255, 238, 206, 0.98);
 }

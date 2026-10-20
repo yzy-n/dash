@@ -45,10 +45,7 @@ const currentStations = computed(() =>
   selectedDirection.value === 'down' ? downStations.value : upStations.value
 )
 
-const mapStations = computed(() => {
-  if (hasBothDirection.value) return currentStations.value
-  return data.value.stations
-})
+const mapStations = computed(() => data.value.stations.filter((item) => item.direction !== 'down'))
 
 const firstLastStationText = computed(() => {
   const list = currentStations.value

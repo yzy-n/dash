@@ -142,14 +142,14 @@ const ORG_LIST_HEIGHT =
   (ORG_VISIBLE_COUNT - 1) * ORG_ITEM_GAP
 
 const layout = {
-  orgTitle: { left: 172, top: 190 },
+  orgTitle: { left: 152, top: 175 },
   orgTotal: { left: 1018, top: 200 },
-  cityTab: { left: 308, top: 286, width: 296, height: 46 },
-  districtTab: { left: 692, top: 286, width: 296, height: 46 },
+  cityTab: { left: 308, top: 286, width: 296, height: 66 },
+  districtTab: { left: 692, top: 286, width: 296, height: 66 },
   orgList: { left: 126, top: 386, width: 1028, height: ORG_LIST_HEIGHT },
-  starsTitle: { left: 34, top: 1156 },
-  starsCityTab: { left: 96, top: 1266, width: 190, height: 44 },
-  starsDistrictTab: { left: 382, top: 1266, width: 190, height: 44 },
+  starsTitle: { left: 14, top: 1140 },
+  starsCityTab: { left: 96, top: 1266, width: 190, height: 66 },
+  starsDistrictTab: { left: 382, top: 1266, width: 190, height: 66 },
   starsTotal: { left: 266, top: 1350 },
   starRows: { left: 26, top: 1450, width: 1048, height: 58, stepY: 92 }
 } as const
@@ -381,7 +381,7 @@ onMounted(() => {
   letter-spacing: 2px;
   color: #ffefc8;
   text-shadow: 0 0 8px rgba(255, 196, 112, 0.16);
-  font-size: 40px;
+  font-size: 60px;
 }
 
 .stars-title {
@@ -393,7 +393,7 @@ onMounted(() => {
   text-shadow: 0 0 8px rgba(255, 196, 112, 0.16);
   margin-top: 10px;
   margin-left: 130px;
-  font-size: 40px;
+  font-size: 60px;
 }
 
 .org-total {
@@ -427,7 +427,7 @@ onMounted(() => {
   border: none;
   border-radius: 22px;
   color: #fff1cb;
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 700;
   background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
   box-shadow:
@@ -497,7 +497,7 @@ onMounted(() => {
   height: 84px;
   line-height: 84px;
   text-align: center;
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 700;
   color: #ffeec8;
   border-radius: 32px;
@@ -534,7 +534,7 @@ onMounted(() => {
   position: absolute;
   display: flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 34px;
   margin-left: 110px;
   margin-top: 100px;
 }
@@ -583,7 +583,7 @@ onMounted(() => {
 .star-label {
   flex: 1;
   color: #ffe4aa;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 700;
   letter-spacing: 1px;
   white-space: nowrap;
@@ -594,7 +594,7 @@ onMounted(() => {
 .star-value {
   width: 220px;
   color: #ffd374;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 700;
   text-align: right;
   white-space: nowrap;
@@ -603,7 +603,7 @@ onMounted(() => {
 .star-rate {
   width: 180px;
   color: #ffd374;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 700;
   text-align: right;
   white-space: nowrap;

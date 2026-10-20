@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import { getCityTrafficBusRealtime } from '@/api/citytraffic'
 import stationUpIconUrl from '@/assets/img/bus-stop.svg'
-import stationDownIconUrl from '@/assets/img/bus-stop-down.svg'
-import busIconUrl from '@/assets/img/bus-realtime.svg'
 
 const props = withDefaults(
   defineProps<{
@@ -19,16 +16,13 @@ const mapRef = ref<HTMLDivElement | null>(null)
 
 let map: AMap.Map | null = null
 let geoLayer: AMap.Polygon[] = []
-let busLayer: any[] = []
 let stationLayer: any[] = []
 let AMapGlobal: typeof AMap | null = null
 let loadPromise: Promise<typeof AMap | null> | null = null
 const loadError = ref('')
-let busTimer: number | undefined
 
 const anshanGeoBase = import.meta.env.BASE_URL.startsWith('.') ? '/' : import.meta.env.BASE_URL
 const ANSHAN_GEO_URL = `${anshanGeoBase}geo/anshan.geojson`
-const BUS_REFRESH_MS = 5000
 
 const resolveFeaturePath = (feature: any) => {
   const geometry = feature?.geometry
@@ -77,7 +71,7 @@ const loadAMapApi = async () => {
   return loadPromise
 }
 
-const resolveBusLngLat = (item: any) => {
+const resolveLngLat = (item: any) => {
   const lng =
     item?.lng ??
     item?.lon ??
@@ -100,12 +94,6 @@ const resolveBusLngLat = (item: any) => {
   return [lngNum, latNum] as [number, number]
 }
 
-const clearBusLayer = () => {
-  if (!map || !busLayer.length) return
-  map.remove(busLayer)
-  busLayer = []
-}
-
 const clearStationLayer = () => {
   if (!map || !stationLayer.length) return
   map.remove(stationLayer)
@@ -117,11 +105,11 @@ const renderStations = () => {
   const source = props.stations || []
   const upPoints = source
     .filter((item) => item?.direction === 'up' || !item?.direction)
-    .map((item) => resolveBusLngLat(item))
+    .map((item) => resolveLngLat(item))
     .filter(Boolean) as [number, number][]
   const downPoints = source
     .filter((item) => item?.direction === 'down')
-    .map((item) => resolveBusLngLat(item))
+    .map((item) => resolveLngLat(item))
     .filter(Boolean) as [number, number][]
 
   const overlays: any[] = []
@@ -156,12 +144,6 @@ const renderStations = () => {
     imageSize: new (AMapGlobal as any).Size(34, 34)
   })
 
-  const downIcon = new (AMapGlobal as any).Icon({
-    image: stationDownIconUrl,
-    size: new (AMapGlobal as any).Size(34, 34),
-    imageSize: new (AMapGlobal as any).Size(34, 34)
-  })
-
   overlays.push(
     ...(upPoints.map(
       (lngLat) =>
@@ -174,67 +156,11 @@ const renderStations = () => {
     ) as any[])
   )
 
-  overlays.push(
-    ...(downPoints.map(
-      (lngLat) =>
-        new (AMapGlobal as any).Marker({
-          position: lngLat,
-          icon: downIcon,
-          offset: new (AMapGlobal as any).Pixel(-17, -34),
-          zIndex: 299
-        })
-    ) as any[])
-  )
-
   clearStationLayer()
   stationLayer = overlays
   if (stationLayer.length) {
     map.add(stationLayer)
     map.setFitView(stationLayer, false, [140, 140, 140, 140], 14)
-  }
-}
-
-const renderBusRealtime = async () => {
-  if (!map || !AMapGlobal) return
-  try {
-    const res: any = await getCityTrafficBusRealtime({ pageNo: 1, pageSize: 50 })
-    const payload = res?.data ?? res
-    const list = Array.isArray(payload?.summary?.list)
-      ? payload.summary.list
-      : Array.isArray(payload?.dataList)
-        ? payload.dataList
-        : Array.isArray(payload?.list)
-          ? payload.list
-          : Array.isArray(payload?.rows)
-            ? payload.rows
-            : Array.isArray(payload)
-              ? payload
-              : []
-
-    const icon = new (AMapGlobal as any).Icon({
-      image: busIconUrl,
-      size: new (AMapGlobal as any).Size(28, 28),
-      imageSize: new (AMapGlobal as any).Size(28, 28)
-    })
-
-    const overlays = list
-      .map((item: any) => {
-        const lngLat = resolveBusLngLat(item)
-        if (!lngLat) return null
-        return new (AMapGlobal as any).Marker({
-          position: lngLat,
-          icon,
-          offset: new (AMapGlobal as any).Pixel(-14, -28),
-          zIndex: 220
-        })
-      })
-      .filter(Boolean) as any[]
-
-    clearBusLayer()
-    busLayer = overlays
-    if (busLayer.length) map.add(busLayer)
-  } catch (error) {
-    console.error('render bus realtime failed:', error)
   }
 }
 
@@ -325,15 +251,9 @@ const initMap = async () => {
 onMounted(async () => {
   await initMap()
   renderStations()
-  await renderBusRealtime()
-  busTimer = window.setInterval(() => {
-    renderBusRealtime()
-  }, BUS_REFRESH_MS)
 })
 
 onBeforeUnmount(() => {
-  if (busTimer) window.clearInterval(busTimer)
-  clearBusLayer()
   clearStationLayer()
   if (map) {
     map.destroy()

@@ -282,14 +282,14 @@ onMounted(() => {
 }
 
 .top-label {
-  font-size: 20px;
+  font-size: 40px;
   color: rgba(255, 232, 198, 0.92);
   letter-spacing: 1px;
   white-space: nowrap;
 }
 
 .top-value {
-  font-size: 34px;
+  font-size: 40px;
   color: rgba(255, 232, 198, 0.98);
   font-weight: 700;
   white-space: nowrap;
@@ -330,7 +330,7 @@ onMounted(() => {
   height: 52px;
   line-height: 52px;
   text-align: center;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 800;
   color: rgba(255, 238, 206, 0.98);
   letter-spacing: 2px;
@@ -409,7 +409,7 @@ onMounted(() => {
   left: 26px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 26px;
+  font-size: 40px;
   color: rgba(255, 238, 206, 0.96);
   white-space: nowrap;
   overflow: hidden;
@@ -421,7 +421,7 @@ onMounted(() => {
   right: 26px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 26px;
+  font-size: 40px;
   color: rgba(255, 238, 206, 0.98);
   font-weight: 800;
   white-space: nowrap;

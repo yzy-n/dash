@@ -218,7 +218,7 @@ const currentParkingChart = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 42px;
+  font-size: 60px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
   font-weight: 700;
   letter-spacing: 2px;
@@ -389,7 +389,7 @@ const currentParkingChart = computed(() => {
   display: flex;
   gap: 60px;
   margin-bottom: 20px;
-  font-size: 36px;
+  font-size: 40px;
   /* 新增居中 */
   justify-content: center;
   width: 100%;

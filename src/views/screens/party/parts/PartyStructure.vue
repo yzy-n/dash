@@ -322,9 +322,9 @@ onMounted(() => {
 .title {
   margin: 0;
   position: absolute;
-  left: 450px;
-  top: 310px;
-  font-size: 44px;
+  left: 380px;
+  top: 280px;
+  font-size: 90px;
   font-weight: 700;
   color: #ffefc8;
 }
@@ -346,12 +346,12 @@ onMounted(() => {
 }
 
 .gender-label {
-  font-size: 40px;
+  font-size: 60px;
   color: #ffe4aa;
 }
 
 .gender-value {
-  font-size: 42px;
+  font-size: 62px;
   color: #fff1be;
 }
 
@@ -410,53 +410,53 @@ onMounted(() => {
 
 .dist-block--age .dist-item:nth-child(1) {
   left: 180px;
-  top: 370px;
+  top: 340px;
 }
 
 .dist-block--age .dist-item:nth-child(2) {
   left: 940px;
-  top: 370px;
+  top: 340px;
 }
 
 .dist-block--age .dist-item:nth-child(3) {
   left: 180px;
-  top: 690px;
+  top: 660px;
 }
 
 .dist-block--age .dist-item:nth-child(4) {
   left: 940px;
-  top: 690px;
+  top: 660px;
 }
 
 .dist-block--join .dist-item:nth-child(1) {
-  left: 200px;
-  top: 370px;
+  left: 160px;
+  top: 340px;
 }
 
 .dist-block--join .dist-item:nth-child(2) {
-  left: 960px;
-  top: 370px;
+  left: 920px;
+  top: 340px;
 }
 
 .dist-block--join .dist-item:nth-child(3) {
-  left: 200px;
-  top: 690px;
+  left: 160px;
+  top: 660px;
 }
 
 .dist-block--join .dist-item:nth-child(4) {
-  left: 960px;
-  top: 690px;
+  left: 920px;
+  top: 660px;
 }
 
 .dist-name {
-  font-size: 40px;
+  font-size: 60px;
   color: #ffe4ad;
   line-height: 1.2;
 }
 
 .dist-value {
   margin-top: 8px;
-  font-size: 40px;
+  font-size: 60px;
   color: #ffcf77;
 }
 
@@ -511,7 +511,7 @@ onMounted(() => {
 }
 
 .edu-pill {
-  width: 240px;
+  width: 340px;
   height: 42px;
   position: absolute;
   left: 50%;
@@ -521,14 +521,14 @@ onMounted(() => {
   line-height: 42px;
   border-radius: 22px;
   color: #ffe6aa;
-  font-size: 48px;
+  font-size: 68px;
 }
 
 .edu-value {
   position: absolute;
-  left: 27%;
+  left: 23%;
   top: 160px;
-  font-size: 40px;
+  font-size: 60px;
   color: #ffcf77;
 }
 
@@ -565,7 +565,7 @@ onMounted(() => {
 
 .ring-text {
   position: absolute;
-  font-size: 28px;
+  font-size: 60px;
   font-weight: 700;
   color: #fff0bd;
 }
@@ -639,19 +639,19 @@ onMounted(() => {
   border: 3px solid rgba(255, 210, 120, 0.42);
   background: radial-gradient(circle, rgba(255, 196, 91, 0.28), rgba(225, 73, 21, 0.72));
   color: #fff0c0;
-  font-size: 36px;
+  font-size: 50px;
   font-weight: 700;
 }
 
 .job-label {
   margin-top: 14px;
-  font-size: 28px;
+  font-size: 40px;
   color: #ffe2a6;
 }
 
 .job-count {
   margin-top: 8px;
-  font-size: 32px;
+  font-size: 40px;
   color: #ffcd72;
 }
 .title2 {

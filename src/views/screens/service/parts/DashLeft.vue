@@ -971,7 +971,7 @@ onMounted(() => {
   height: 54px;
   display: inline-flex;
   align-items: center;
-  font-size: 34px;
+  font-size: 60px;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
@@ -1085,18 +1085,18 @@ onMounted(() => {
 }
 
 .metric-label {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
 .metric-num {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
 .metric-unit {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }

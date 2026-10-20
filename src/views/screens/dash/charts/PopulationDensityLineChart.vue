@@ -16,20 +16,20 @@ const option = computed(() => {
     legend: {
       top: 0,
       right: 8,
-      textStyle: { color: 'rgba(214,238,255,0.75)', fontSize: 36 },
+      textStyle: { color: 'rgba(214,238,255,0.75)', fontSize: 40 },
       itemWidth: 10,
       itemHeight: 6
     },
-    grid: { left: 106, right: 18, top: 26, bottom: 46 },
+    grid: { left: 116, right: 18, top: 26, bottom: 46 },
     xAxis: {
       type: 'category',
       data: props.x,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 36 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 40 }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 36 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 40 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: props.series.map((s) => ({
