@@ -797,15 +797,15 @@ const volOption = computed(() => {
       axisPointer: { type: 'shadow' },
       borderWidth: 0,
       backgroundColor: 'rgba(0,0,0,0.65)',
-      textStyle: { color: '#fff', fontSize: 18 }
+      textStyle: { color: '#fff', fontSize: 40 }
     },
-    grid: { left: 86, right: 26, top: 36, bottom: 66, containLabel: false },
+    grid: { left: 106, right: 26, top: 36, bottom: 66, containLabel: false },
     xAxis: {
       type: 'category',
       data: data.map((d: any) => d.name),
       axisLabel: {
         color: 'rgba(255, 238, 206, 0.86)',
-        fontSize: 16,
+        fontSize: 30,
         interval: 0,
         margin: 16
       },
@@ -817,7 +817,7 @@ const volOption = computed(() => {
       max: maxAxis,
       interval: step,
       splitNumber: 5,
-      axisLabel: { color: 'rgba(255, 238, 206, 0.78)', fontSize: 16 },
+      axisLabel: { color: 'rgba(255, 238, 206, 0.78)', fontSize: 30 },
       axisTick: { show: false },
       axisLine: { show: false },
       splitLine: { show: true, lineStyle: { color: 'rgba(255, 210, 140, 0.18)' } }

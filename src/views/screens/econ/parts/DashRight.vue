@@ -832,7 +832,7 @@ const serviceBarOption = computed(() => {
     },
     grid: {
       left: '3%',
-      right: '6%',
+      right: '9%',
       top: '6%',
       bottom: '4%',
       containLabel: true
@@ -843,13 +843,13 @@ const serviceBarOption = computed(() => {
       nameTextStyle: { color: '#82d8e8' },
       splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
       axisLine: { show: false },
-      axisLabel: { color: '#82d8e8', fontSize: 22 }
+      axisLabel: { color: '#82d8e8', fontSize: 36 }
     },
     yAxis: {
       type: 'category',
       data: names,
       axisLine: { lineStyle: { color: '#287892' } },
-      axisLabel: { color: '#82d8e8', fontSize: 22 }
+      axisLabel: { color: '#82d8e8', fontSize: 36 }
     },
     series: [
       {
@@ -1026,7 +1026,7 @@ onMounted(() => {
   pointer-events: none;
 }
 .panel-title {
-  font-size: 34px;
+  font-size: 60px;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;
@@ -1176,13 +1176,13 @@ onMounted(() => {
   justify-content: center;
 }
 .panel-date {
-  height: 36px;
+  height: 50px;
   padding: 0 18px;
   border-radius: 999px;
   border: 1px solid rgba(78, 184, 255, 0.22);
   background: rgba(5, 26, 66, 0.45);
   color: rgba(209, 234, 255, 0.86);
-  font-size: 16px;
+  font-size: 40px;
   font-weight: 800;
   letter-spacing: 1px;
   display: inline-flex;

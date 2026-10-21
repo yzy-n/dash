@@ -75,7 +75,7 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: '#fff',
-        fontSize: 22,
+        fontSize: 36,
         rotate: 35
       },
       axisLine: {
@@ -87,19 +87,19 @@ const option = computed(() => {
       {
         type: 'value',
         name: '单位：万平方米',
-        nameTextStyle: { color: '#82d8e8', fontSize: 22 },
+        nameTextStyle: { color: '#82d8e8', fontSize: 36 },
         splitLine: {
           lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
         },
-        axisLabel: { color: '#82d8e8', fontSize: 30 },
+        axisLabel: { color: '#82d8e8', fontSize: 36 },
         axisLine: { show: false }
       },
       {
         type: 'value',
         name: '单位：%',
-        nameTextStyle: { color: '#82d8e8', fontSize: 16 },
+        nameTextStyle: { color: '#82d8e8', fontSize: 36 },
         splitLine: { show: false },
-        axisLabel: { color: '#82d8e8', fontSize: 20 },
+        axisLabel: { color: '#82d8e8', fontSize: 36 },
         axisLine: { show: false }
       }
     ],

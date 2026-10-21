@@ -345,7 +345,7 @@ const popDecreaseRows = ref([])
   height: 54px;
   display: inline-flex;
   align-items: center;
-  font-size: 34px;
+  font-size: 60px;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;

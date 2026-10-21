@@ -79,10 +79,10 @@ const option = computed<EChartsOption>(() => {
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 40 }
     },
     grid: {
-      left: '10%',
+      left: '12%',
       right: '8%',
       top: '14%',
       bottom: '12%'
@@ -91,7 +91,7 @@ const option = computed<EChartsOption>(() => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
       splitLine: { show: false }
     },
     yAxis: [
@@ -101,7 +101,7 @@ const option = computed<EChartsOption>(() => {
         nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)' },
         max: 21000,
         axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
         splitLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.3)' } }
       },
       {
@@ -111,7 +111,7 @@ const option = computed<EChartsOption>(() => {
         max: 6,
         position: 'right',
         axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 12 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
         splitLine: { show: false }
       }
     ],

@@ -1267,7 +1267,7 @@ onMounted(() => {
   height: 54px;
   display: inline-flex;
   align-items: center;
-  font-size: 34px;
+  font-size: 60px;
   transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
@@ -1282,23 +1282,18 @@ onMounted(() => {
     0 0 24px #0f58d1;
 }
 .panel-date {
-  height: 36px;
+   height: 50px;
   padding: 0 18px;
   border-radius: 999px;
   border: 1px solid rgba(78, 184, 255, 0.22);
   background: rgba(5, 26, 66, 0.45);
   color: rgba(209, 234, 255, 0.86);
-  font-size: 16px;
+  font-size: 40px;
   font-weight: 800;
   letter-spacing: 1px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  appearance: none;
-  outline: none;
-  cursor: pointer;
-  font: inherit;
-  text-align: center;
 }
 .panel-tabs {
   position: absolute;

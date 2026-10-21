@@ -59,7 +59,7 @@ const option = computed(() => {
     },
     legend: {
       data: props.seriesNames,
-      textStyle: { color: '#ffffff' },
+      textStyle: { color: '#ffffff', fontSize: 40 },
       top: 8
     },
     grid: {
@@ -72,7 +72,7 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-      axisLabel: { color: '#fff', fontSize: 30 },
+      axisLabel: { color: '#fff', fontSize: 36 },
       splitLine: { show: false }
     },
     yAxis: [
@@ -82,7 +82,7 @@ const option = computed(() => {
         min: 120,
         max: 125,
         axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-        axisLabel: { color: '#fff', fontSize: 30 },
+        axisLabel: { color: '#fff', fontSize: 36 },
         splitLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.15)' } }
       },
       {
@@ -92,7 +92,7 @@ const option = computed(() => {
         max: 350,
         position: 'right',
         axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-        axisLabel: { color: '#fff', fontSize: 30 },
+        axisLabel: { color: '#fff', fontSize: 36 },
         splitLine: { show: false }
       }
     ],
