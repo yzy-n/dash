@@ -438,9 +438,9 @@ onMounted(() => {
 .list--left-b .list-value {
   left: 50%;
   right: auto;
-  top: 2px;
+  top: -6px;
   transform: translateX(-50%);
-  font-size: 28px;
+  font-size: 40px;
 }
 
 .list--left-b .list-row::before {
@@ -470,17 +470,17 @@ onMounted(() => {
 
 .list--left-a .list-label {
   left: 28px;
-  top: 16px;
+  top: -6px;
   transform: none;
-  font-size: 26px;
+  font-size: 40px;
   font-weight: 800;
 }
 
 .list--left-a .list-value {
   right: 28px;
-  top: 16px;
+  top: -6px;
   transform: none;
-  font-size: 26px;
+  font-size: 40px;
   font-weight: 800;
 }
 
@@ -513,17 +513,17 @@ onMounted(() => {
 }
 .list--right-a .list-label {
   left: 28px;
-  top: 16px;
+  top: -6px;
   transform: none;
-  font-size: 26px;
+  font-size: 40px;
   font-weight: 800;
 }
 
 .list--right-a .list-value {
   right: 28px;
-  top: 16px;
+  top: -6px;
   transform: none;
-  font-size: 26px;
+  font-size: 40px;
   font-weight: 800;
 }
 
@@ -559,9 +559,9 @@ onMounted(() => {
 .list--right-b .list-value {
   left: 50%;
   right: auto;
-  top: 2px;
+  top: -6px;
   transform: translateX(-50%);
-  font-size: 28px;
+  font-size: 40px;
 }
 
 .list--right-b .list-row::before {

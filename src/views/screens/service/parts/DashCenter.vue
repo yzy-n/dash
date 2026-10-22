@@ -354,7 +354,7 @@ onMounted(() => {
 .metrics {
   position: relative;
   display: block;
-  --metric-card-h: 200px;
+  --metric-card-h: 240px;
   --metric-gap: 18px;
   min-height: 0;
   z-index: 2;
@@ -440,7 +440,7 @@ onMounted(() => {
   padding: 14px 16px;
   box-sizing: border-box;
   display: grid;
-  gap: 12px;
+  gap: 6px;
   position: relative;
   overflow: hidden;
 }
@@ -454,7 +454,7 @@ onMounted(() => {
 }
 
 .metric-label {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.86);
   letter-spacing: 2px;
@@ -484,19 +484,19 @@ onMounted(() => {
 
 .metric-row {
   display: grid;
-  grid-template-columns: 72px 1fr 124px;
+  grid-template-columns: 90px 1fr 124px;
   align-items: center;
   gap: 10px;
 }
 
 .metric-city {
-  font-size: 36px;
+  font-size: 45px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
 
 .metric-val {
-  font-size: 36px;
+  font-size: 45px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
