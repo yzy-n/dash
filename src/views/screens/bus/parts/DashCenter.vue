@@ -89,9 +89,11 @@ const firstLastTimeText = computed(() => '-')
         <div class="station-panel">
           <div class="station-head">
             <span class="station-head-name">{{ routeName }}</span>
-            <span style="font-size: 22px; margin-left: 12px">正在运行</span>
-            <span class="station-head-num">{{ data.activeBusRunningCount }}</span>
-            <span style="font-size: 22px">辆公交车</span>
+            <div class="station-head-info">
+              <span style="font-size: 22px">正在运行</span>
+              <span class="station-head-num">{{ data.activeBusRunningCount }}</span>
+              <span style="font-size: 22px">辆公交车</span>
+            </div>
           </div>
 
           <div v-if="hasBothDirection" class="station-tabs">
@@ -259,7 +261,7 @@ const firstLastTimeText = computed(() => '-')
   height: 72px;
   display: grid;
   grid-template-columns:
-    120px
+    180px
     1fr
     1fr;
   align-items: center;
@@ -267,6 +269,7 @@ const firstLastTimeText = computed(() => '-')
   padding: 0 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
+  font-size: 40px;
 }
 
 .route-item.active {
@@ -320,12 +323,14 @@ const firstLastTimeText = computed(() => '-')
 }
 
 .station-head {
-  height: 58px;
+  min-height: 58px;
+  padding: 10px 18px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 18px;
-  font-size: 28px;
+  flex-wrap: wrap; /* 允许换行，防止挤爆 */
+  gap: 8px 12px; /* 上下8px，左右12px */
+  font-size: 40px; /* 用户设置的40px */
   font-weight: 800;
   color: rgba(240, 252, 255, 0.95);
   letter-spacing: 1px;
@@ -334,7 +339,9 @@ const firstLastTimeText = computed(() => '-')
   border-radius: 14px;
   box-shadow: inset 0 0 18px rgba(34, 121, 255, 0.12);
 }
-
+.station-head > span {
+  white-space: nowrap;
+}
 .station-head-name {
   flex: 0 0 auto;
 }
@@ -392,12 +399,12 @@ const firstLastTimeText = computed(() => '-')
   display: grid;
   gap: 10px;
   color: rgba(214, 238, 255, 0.82);
-  font-size: 22px;
+  font-size: 34px;
 }
 
 .meta-row {
   display: grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 160px 1fr;
   gap: 10px;
   align-items: center;
 }
