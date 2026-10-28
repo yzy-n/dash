@@ -99,7 +99,7 @@ const chartOption = computed(() => {
           style: {
             text: '暂无数据',
             fill: 'rgba(214, 238, 255, 0.72)',
-            fontSize: 24,
+            fontSize: 40,
             fontWeight: 600
           }
         },
@@ -131,7 +131,7 @@ const chartOption = computed(() => {
           show: true,
           position: 'right',
           color: '#ffffff',
-          fontSize: 24,
+          fontSize: 40,
           formatter: `{b} {c} ${props.unit}`
         },
         labelLine: {

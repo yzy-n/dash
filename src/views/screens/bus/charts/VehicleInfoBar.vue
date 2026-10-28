@@ -95,14 +95,14 @@ const chartOption = computed(() => {
           style: {
             text: '暂无数据',
             fill: 'rgba(214, 238, 255, 0.72)',
-            fontSize: 18,
+            fontSize: 34,
             fontWeight: 600
           }
         },
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,0,0,0.75)',
-      textStyle: { color: '#fff', fontSize: 14 },
+      textStyle: { color: '#fff', fontSize: 34 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
         params.forEach((p) => {
@@ -116,7 +116,7 @@ const chartOption = computed(() => {
     legend: {
       top: 10,
       right: '8%',
-      textStyle: { color: '#ffffff', fontSize: 14 },
+      textStyle: { color: '#ffffff', fontSize: 40 },
       data: barSource.value.map((item) => item.name)
     },
     grid: {
@@ -130,18 +130,18 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 24 },
+      axisLabel: { color: '#fff', fontSize: 40 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
     yAxis: {
       name: '单位：辆',
-      nameTextStyle: { color: '#fff', fontSize: 24 },
+      nameTextStyle: { color: '#fff', fontSize: 40 },
       type: 'value',
       max: yAxisMax,
       interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 24 },
+      axisLabel: { color: '#fff', fontSize: 40 },
       splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
       axisTick: { show: false }
     },

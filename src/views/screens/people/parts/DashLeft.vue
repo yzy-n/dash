@@ -476,7 +476,7 @@ const popDecreaseRows = ref([])
   pointer-events: none;
 }
 .pop-side-total-label {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 900;
   letter-spacing: 1px;
   color: rgba(214, 238, 255, 0.9);
@@ -489,13 +489,13 @@ const popDecreaseRows = ref([])
   z-index: 1;
 }
 .pop-side-total-value .num {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.18);
 }
 .pop-side-total-value .unit {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.65);
 }
@@ -545,7 +545,7 @@ const popDecreaseRows = ref([])
   pointer-events: none;
 }
 .pop-side-row-label {
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
   z-index: 1;
@@ -557,12 +557,12 @@ const popDecreaseRows = ref([])
   z-index: 1;
 }
 .pop-side-row-value .num {
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
 }
 .pop-side-row-value .unit {
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.6);
 }

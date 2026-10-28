@@ -573,8 +573,8 @@ onBeforeUnmount(() => {
   top: 18%;
   left: 50%;
   transform: translateX(-50%);
-  width: 260px;
-  height: 260px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(20, 124, 230, 0.28), transparent 70%);
@@ -588,12 +588,12 @@ onBeforeUnmount(() => {
 }
 
 .cpi-item .time {
-  font-size: 24px;
+  font-size: 32px;
   color: #94d8ff;
 }
 
 .cpi-item .label {
-  font-size: 26px;
+  font-size: 32px;
   margin: 6px 0;
 }
 
@@ -608,8 +608,8 @@ onBeforeUnmount(() => {
   top: 50%;
   right: 18%;
   transform: translateY(-50%);
-  width: 280px;
-  height: 280px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(22, 130, 230, 0.32), rgba(8, 30, 70, 0.04));
@@ -623,12 +623,12 @@ onBeforeUnmount(() => {
 }
 
 .main-card-time {
-  font-size: 24px;
+  font-size: 32px;
   color: #94d8ff;
 }
 
 .main-card-label {
-  font-size: 26px;
+  font-size: 32px;
   text-align: center;
   margin-top: 8px;
 }
@@ -641,18 +641,18 @@ onBeforeUnmount(() => {
 }
 
 .main-card-num .unit {
-  font-size: 20px;
+  font-size: 32px;
 }
 
 .main-card-rate {
-  font-size: 24px;
+  font-size: 32px;
   color: #4cff70;
 }
 
 .bubble {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(22, 130, 230, 0.24), rgba(8, 30, 70, 0.04));
@@ -667,12 +667,12 @@ onBeforeUnmount(() => {
 }
 
 .bubble .time {
-  font-size: 28px;
+  font-size: 32px;
   color: #94d8ff;
 }
 
 .bubble .label {
-  font-size: 28px;
+  font-size: 32px;
   text-align: center;
 }
 
@@ -684,11 +684,11 @@ onBeforeUnmount(() => {
 }
 
 .bubble .unit {
-  font-size: 20px;
+  font-size: 32px;
 }
 
 .bubble .rate {
-  font-size: 24px;
+  font-size: 32px;
   color: #4cff70;
 }
 
@@ -715,7 +715,7 @@ onBeforeUnmount(() => {
 }
 
 .b4 {
-  top: 34%;
+  top: 24%;
   right: 12%;
   animation-delay: 2.4s;
 }

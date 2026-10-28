@@ -1022,28 +1022,28 @@ const investOption2 = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 36 }
     },
     legend: {
       top: 8,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 20 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 30 }
     },
-    grid: { left: 60, right: 24, top: 90, bottom: 300 },
+    grid: { left: 90, right: 24, top: 50, bottom: 400 },
     xAxis: {
       type: 'category',
       data: names,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 26, rotate: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 36, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：亿元',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 36 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 36 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -1435,7 +1435,7 @@ onMounted(() => {
   background: rgba(10, 30, 65, 0.35);
 }
 .four-reform-label {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 800;
   color: rgba(214, 238, 255, 0.75);
 }
@@ -1445,13 +1445,13 @@ onMounted(() => {
   gap: 6px;
 }
 .four-reform-value .num {
-  font-size: 24px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 10px rgba(54, 232, 255, 0.16);
 }
 .four-reform-value .unit {
-  font-size: 28px;
+  font-size: 40px;
   color: rgba(214, 238, 255, 0.6);
 }
 .pile-body {

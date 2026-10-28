@@ -126,7 +126,7 @@ const chartOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,0,0,0.75)',
-      textStyle: { color: '#fff', fontSize: 24 },
+      textStyle: { color: '#fff', fontSize: 40 },
       formatter(params: any[]) {
         let res = params[0].axisValue + '<br/>'
         params.forEach((p) => {
@@ -141,7 +141,7 @@ const chartOption = computed(() => {
     legend: {
       top: 10,
       left: 'center',
-      textStyle: { color: '#fff', fontSize: 24 },
+      textStyle: { color: '#fff', fontSize: 40 },
       data: [...barSource.value.map((i) => i.name), ...lineSource.value.map((i) => i.name)]
     },
     grid: {
@@ -155,7 +155,7 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 24 },
+      axisLabel: { color: '#fff', fontSize: 40 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
@@ -163,27 +163,27 @@ const chartOption = computed(() => {
       // 左侧 货运万吨
       {
         name: `单位：${props.numUnit || '万吨'}`,
-        nameTextStyle: { color: '#fff', fontSize: 24 },
+        nameTextStyle: { color: '#fff', fontSize: 40 },
         type: 'value',
         min: 0,
         max: leftAxisMax,
         interval: Math.max(1, leftAxisMax / 5),
         axisLine: { lineStyle: { color: '#405888' } },
-        axisLabel: { color: '#fff', fontSize: 24 },
+        axisLabel: { color: '#fff', fontSize: 40 },
         splitLine: { lineStyle: { color: 'rgba(82,110,165,0.3)' } },
         axisTick: { show: false }
       },
       // 右侧 同比百分比
       {
         name: '单位：%',
-        nameTextStyle: { color: '#fff', fontSize: 24 },
+        nameTextStyle: { color: '#fff', fontSize: 40 },
         type: 'value',
         min: -rightAxisMax,
         max: rightAxisMax,
         interval: Math.max(1, rightAxisMax / 5),
         position: 'right',
         axisLine: { lineStyle: { color: '#405888' } },
-        axisLabel: { color: '#fff', fontSize: 24 },
+        axisLabel: { color: '#fff', fontSize: 40 },
         splitLine: { show: false },
         axisTick: { show: false }
       }

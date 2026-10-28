@@ -325,7 +325,8 @@ const genderOption = computed(() => {
               position: 'right',
               formatter: `${d.male}万  ${maleRate}%`,
               color: 'rgba(240, 251, 255, 0.9)',
-              fontWeight: 800
+              fontWeight: 800,
+              fontSize: 36
             }
           },
           {
@@ -336,7 +337,8 @@ const genderOption = computed(() => {
               position: 'right',
               formatter: `${d.female}万  ${femaleRate}%`,
               color: 'rgba(240, 251, 255, 0.9)',
-              fontWeight: 800
+              fontWeight: 800,
+              fontSize: 36
             }
           }
         ],

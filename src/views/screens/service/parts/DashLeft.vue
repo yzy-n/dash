@@ -74,48 +74,6 @@
       </div>
     </section>
 
-    <section class="panel panel--resume">
-      <div class="panel-head">
-        <div class="panel-title">企业复工复产情况</div>
-        <select v-model="dateResume" class="panel-date">
-          <option v-for="item in resumeDateOptions" :key="item" :value="item">{{ item }}</option>
-        </select>
-      </div>
-      <div class="resume-filter">
-        <select v-model="resumeIndustry" class="resume-select">
-          <option v-for="item in resumeIndustryOptions" :key="item" :value="item">
-            {{ item }}
-          </option>
-        </select>
-      </div>
-      <div class="resume-body">
-        <div class="resume-card">
-          <div class="resume-row">
-            <span class="resume-name">复工率</span>
-            <span class="resume-rate">{{ resumeWorkRate }}%</span>
-          </div>
-          <div class="resume-bar">
-            <div class="resume-bar-fill" :style="{ width: `${resumeWorkRate}%` }"></div>
-          </div>
-          <div class="resume-desc">
-            复工率=企业日用电量超过基准用电量20%的用户数/有企业用电企业总数（基准值：2021年4月的日平均电量）
-          </div>
-        </div>
-        <div class="resume-card">
-          <div class="resume-row">
-            <span class="resume-name">复产率</span>
-            <span class="resume-rate">{{ resumeProdRate }}%</span>
-          </div>
-          <div class="resume-bar resume-bar--yellow">
-            <div class="resume-bar-fill" :style="{ width: `${resumeProdRate}%` }"></div>
-          </div>
-          <div class="resume-desc">
-            复产率=企业日用电量超过基准用电量70%的用户数/有企业用电企业总数（基准值：2021年4月的日平均电量）
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="panel panel--pile">
       <div class="panel-head">
         <div class="panel-title">充电桩建设情况</div>
@@ -304,7 +262,6 @@ import ProjectPie3D from '../charts/ProjectPie3D.vue'
 import {
   getPowervolume,
   getPowertype,
-  getReturnwork,
   getChargeboard,
   getReportboard,
   getInstalledcapacity
@@ -341,22 +298,6 @@ const capacityDateOptions = [
   '2024'
 ]
 const dateCapacity = ref(capacityDateOptions[0])
-
-// 企业复工复产情况
-const resumeDateOptions = [
-  '2023-03',
-  '2023-04',
-  '2023-05',
-  '2023-06',
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
-]
-const dateResume = ref(resumeDateOptions[1])
 
 // 充电桩建设情况（接口返回 timeOptions 会覆盖）
 const pileDateOptions = ref<string[]>(['2022年统计数据'])
@@ -572,19 +513,6 @@ const capacityRingOption = computed(() => {
     })
   }
 })
-
-// ============================================================
-// 企业复工复产情况
-// ============================================================
-const resumeIndustryOptions = ['工业', '服务业', '商贸业']
-const resumeIndustry = ref<(typeof resumeIndustryOptions)[number]>('工业')
-
-const resumeWorkRate = computed(() =>
-  resumeIndustry.value === '工业' ? 76.03 : resumeIndustry.value === '服务业' ? 68.4 : 62.8
-)
-const resumeProdRate = computed(() =>
-  resumeIndustry.value === '工业' ? 54.9 : resumeIndustry.value === '服务业' ? 48.3 : 52.1
-)
 
 // ============================================================
 // 充电桩建设情况
@@ -955,6 +883,11 @@ onMounted(() => {
   pointer-events: none;
 }
 
+/* 充电桩面板放大：占据原“企业复工复产情况”所在的整列（跨两行） */
+.panel--pile {
+  grid-row: span 2;
+}
+
 .panel-head {
   position: absolute;
   left: 26px;
@@ -1118,103 +1051,21 @@ onMounted(() => {
   min-height: 0;
 }
 
-.resume-filter {
-  position: absolute;
-  top: 78px;
-  right: 26px;
-  width: 360px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid rgba(84, 188, 255, 0.22);
-  background: rgba(6, 18, 48, 0.34);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  box-sizing: border-box;
-  z-index: 20;
-}
-
-.resume-select {
-  width: 100%;
-  height: 100%;
-  appearance: none;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: rgba(240, 251, 255, 0.92);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
-}
-
-.resume-body {
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  gap: 16px;
-  grid-template-rows: 1fr 1fr;
-}
-
-.resume-card {
-  border-radius: 14px;
-  border: 1px solid rgba(89, 194, 255, 0.12);
-  background: rgba(6, 18, 48, 0.42);
-  padding: 16px 18px;
-  box-sizing: border-box;
-  display: grid;
-  gap: 12px;
-}
-
-.resume-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.resume-name {
-  font-size: 28px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.9);
-}
-.resume-rate {
-  font-size: 28px;
-  font-weight: 900;
-  color: rgba(240, 251, 255, 0.94);
-  text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
-}
-
-.resume-bar {
-  height: 24px;
-  border-radius: 999px;
-  background: rgba(89, 194, 255, 0.12);
-  overflow: hidden;
-}
-.resume-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(64, 243, 184, 0.18), rgba(64, 243, 184, 0.95));
-}
-.resume-bar--yellow .resume-bar-fill {
-  background: linear-gradient(90deg, rgba(255, 226, 74, 0.2), rgba(255, 226, 74, 0.95));
-}
-.resume-desc {
-  font-size: 34px;
-  line-height: 1.5;
-  color: rgba(214, 238, 255, 0.68);
-}
-
+/* ========== 充电桩面板（上下各占一半） ========== */
 .pile-body {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-rows: 140px 1fr;
+  grid-template-rows: 1fr 1fr; /* 上下各占一半 */
   gap: 14px;
 }
+
 .pile-top {
   display: grid;
-  grid-template-columns: 520px 1fr;
+  grid-template-columns: minmax(0, 4.5fr) minmax(0, 5.5fr); /* 调整比例，给右侧更多空间 */
   gap: 14px;
   min-height: 0;
+  height: 100%;
 }
 
 .pile-top-left,
@@ -1229,6 +1080,8 @@ onMounted(() => {
   box-sizing: border-box;
   min-height: 0;
   overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr 1fr; /* 左右块内部两行均分高度 */
 }
 
 .pile-top-left::before,
@@ -1261,11 +1114,10 @@ onMounted(() => {
 
 .pile-top-left {
   padding: 6px 16px;
-  display: grid;
 }
 
 .pile-top-left-row {
-  height: 58px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1280,30 +1132,32 @@ onMounted(() => {
 }
 
 .pile-top-left-label {
-  font-size: 18px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.86);
   letter-spacing: 2px;
+  white-space: nowrap;
 }
 .pile-top-left-value {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .pile-top-right {
   padding: 6px 16px;
-  display: grid;
 }
 
+/* 将右侧行改为纵向布局，给 40px 字体腾出充足空间 */
 .pile-top-right-row {
-  height: 58px;
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  align-items: center;
-  gap: 14px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
   position: relative;
-  padding: 0 6px;
+  padding: 0 16px 0 24px;
   box-sizing: border-box;
 }
 
@@ -1315,62 +1169,61 @@ onMounted(() => {
 .pile-top-right-row::before {
   content: '';
   width: 4px;
-  height: 18px;
+  height: 24px; /* 指示条稍微加长 */
   border-radius: 999px;
   background: rgba(54, 232, 255, 0.35);
   box-shadow: 0 0 12px rgba(54, 232, 255, 0.16);
   position: absolute;
-  left: 0;
+  left: 6px; /* 缩进 */
   top: 50%;
   transform: translateY(-50%);
 }
 
 .pile-top-right-name {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
 }
 .pile-top-right-sub {
-  font-size: 18px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
   letter-spacing: 1px;
 }
 .pile-top-right-main {
-  font-size: 18px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.82);
   letter-spacing: 2px;
 }
 .pile-top-right-metrics {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  align-items: baseline;
+  gap: 24px;
+  flex-wrap: wrap; /* 避免极端情况下的超出边界 */
 }
 .pile-top-right-val,
 .pile-top-right-yoy {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
+  white-space: nowrap;
 }
 .pile-top-right-yoy-label {
-  font-size: 16px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
+  white-space: nowrap;
 }
 
-.pile-top-left .pile-num {
-  font-size: 28px;
-}
-.pile-top-right .pile-num {
-  font-size: 22px;
-}
-
+/* 统一数字大小并防止换行 */
 .pile-num {
-  font-size: 24px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.18);
+  white-space: nowrap;
 }
 .pile-num--cyan {
   color: rgba(51, 213, 255, 0.95);
@@ -1381,17 +1234,21 @@ onMounted(() => {
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
 }
 .pile-unit {
-  font-size: 16px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
+  white-space: nowrap;
 }
 .pile-split {
-  font-size: 16px;
+  font-size: 32px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.42);
+  white-space: nowrap;
 }
+
 .pile-chart {
   min-height: 0;
+  height: 100%;
 }
 
 /* ========== 重点项目面板 ========== */
@@ -1588,8 +1445,7 @@ onMounted(() => {
 }
 
 /* 统一 select 展开后的选项背景 */
-.panel-date option,
-.resume-select option {
+.panel-date option {
   background-color: #0a1f4a;
   color: rgba(214, 238, 255, 0.92);
   font-size: 16px;
@@ -1597,8 +1453,7 @@ onMounted(() => {
   letter-spacing: 1px;
 }
 
-.panel-date option:checked,
-.resume-select option:checked {
+.panel-date option:checked {
   background: linear-gradient(0deg, #1a4d8c 0%, #1a4d8c 100%);
   color: #fff;
 }
