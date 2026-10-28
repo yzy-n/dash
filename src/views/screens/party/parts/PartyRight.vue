@@ -465,7 +465,7 @@ const getPie3DOption = (rows: any[]) => {
       textStyle: {
         rich: {
           n: {
-            width: 50,
+            width: 140, // 【修复点 1】从 50 改为 140，加宽名称列，防止文字重叠
             align: 'left',
             color: 'rgba(255, 238, 206, 0.92)',
             fontSize: 22,
@@ -473,7 +473,7 @@ const getPie3DOption = (rows: any[]) => {
             padding: [0, 12, 0, 0]
           },
           v: {
-            width: 120,
+            width: 130, // 【修复点 2】从 120 改为 130，给大数值留足空间
             align: 'right',
             color: 'rgba(255, 238, 206, 0.98)',
             fontSize: 22,
@@ -498,11 +498,11 @@ const getPie3DOption = (rows: any[]) => {
       boxWidth: 200,
       boxDepth: 200,
       boxHeight: 40,
-      left: -180,
+      left: -220, // 【修复点 3】从 -180 改为 -60，让饼图整体向右平移，远离图例
       viewControl: {
         alpha: 42,
         beta: 30,
-        distance: 210,
+        distance: 240, // 【修复点 4】从 210 改为 240，拉远视角让饼图稍微变小
         rotateSensitivity: 0,
         zoomSensitivity: 0,
         panSensitivity: 0
@@ -850,14 +850,6 @@ const volOption = computed(() => {
 
 /* =========================================================
    5. 两新组织（接口驱动）
-   - 接口返回 { key, label, value }，key 依次为 one ~ six
-       one   非公有制企业党组织
-       two   非公有制企业党员
-       three 非公有制企业党组织覆盖率
-       four  社会组织
-       five  社会组织党员
-       six   社会组织党组织覆盖率
-   - 按 key 存 Map，不依赖数组顺序
    ========================================================= */
 
 type TwoNewStats = {
@@ -1072,7 +1064,6 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgba(255, 200, 130, 0.22);
-  /* 修改点：降低红色饱和度，换为暗红棕色 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
@@ -1080,7 +1071,6 @@ onMounted(() => {
 }
 
 .panel--dev .table-row:nth-of-type(even) {
-  /* 修改点：偶数行也调整为偏暗的红棕色 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.18) 0 18%, transparent 18% 100%),
     linear-gradient(90deg, rgba(100, 25, 15, 0.6), rgba(70, 15, 10, 0.3));
@@ -1244,7 +1234,6 @@ onMounted(() => {
   justify-content: space-between;
   gap: 22px;
   border: 2px solid rgba(255, 200, 130, 0.55);
-  /* 修改点：合计框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
@@ -1320,7 +1309,6 @@ onMounted(() => {
   align-items: center;
   gap: 14px;
   border: 2px solid rgba(255, 200, 130, 0.55);
-  /* 修改点：合计框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
@@ -1442,7 +1430,6 @@ onMounted(() => {
 }
 
 .tab--active {
-  /* 修改点：激活态标签页底色也改为暗红棕 */
   background: radial-gradient(circle at 50% 30%, rgba(255, 220, 140, 0.52), rgba(120, 30, 20, 0.4));
   box-shadow: 0 0 16px rgba(255, 210, 120, 0.12);
 }
@@ -1660,7 +1647,6 @@ onMounted(() => {
   justify-content: flex-end;
   gap: 12px;
   border: 2px solid rgba(255, 200, 130, 0.62);
-  /* 修改点：群团组织数据框背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
@@ -1763,7 +1749,6 @@ onMounted(() => {
   transform-origin: left;
 }
 
-/* ⭐ 新增：党员服务中心 空状态 */
 .service-empty {
   display: flex;
   align-items: center;
@@ -1905,7 +1890,6 @@ onMounted(() => {
   padding: 22px 14px 18px;
   box-sizing: border-box;
   border: 1px solid rgba(255, 200, 130, 0.22);
-  /* 修改点：两新组织卡片背景变暗红棕 */
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.2) 0 18%, transparent 18% 100%),
     linear-gradient(180deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
