@@ -168,75 +168,6 @@
         <EChart class="vol-chart" :option="volOption" />
       </div>
     </section>
-
-    <!-- ==================== 两新组织（接口驱动） ==================== -->
-    <section class="panel panel--two">
-      <div class="panel-head">
-        <div class="panel-title">两新组织</div>
-      </div>
-
-      <div class="two-block">
-        <div class="two-head">
-          <span class="two-arrow two-arrow--l"></span>
-          <div class="two-title">非公有制企业</div>
-          <span class="two-arrow two-arrow--r"></span>
-        </div>
-        <div class="two-grid">
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.nonPublicOrgan) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicOrgan) || '个' }}</span>
-            </div>
-            <div class="two-label">非公有制企业<br />党组织</div>
-          </div>
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.nonPublicMember) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicMember) || '名' }}</span>
-            </div>
-            <div class="two-label">非公有制企业<br />党员</div>
-          </div>
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.nonPublicRate) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.nonPublicRate) || '%' }}</span>
-            </div>
-            <div class="two-label">非公有制企业<br />党组织覆盖率</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="two-block">
-        <div class="two-head">
-          <span class="two-arrow two-arrow--l"></span>
-          <div class="two-title">社会组织</div>
-          <span class="two-arrow two-arrow--r"></span>
-        </div>
-        <div class="two-grid">
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.socialOrgan) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.socialOrgan) || '个' }}</span>
-            </div>
-            <div class="two-label">社会组织<br />党组织</div>
-          </div>
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.socialMember) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.socialMember) || '名' }}</span>
-            </div>
-            <div class="two-label">社会组织<br />党员</div>
-          </div>
-          <div class="two-item">
-            <div class="two-value">
-              <span class="two-num">{{ getNumText(twoNewStats.socialRate) }}</span>
-              <span class="two-unit">{{ getUnitText(twoNewStats.socialRate) || '%' }}</span>
-            </div>
-            <div class="two-label">社会组织<br />党组织覆盖率</div>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -251,8 +182,7 @@ import {
   getTalentPolicy,
   getOrganizaSituation,
   getIdealService,
-  getServiceCentre,
-  getTwoNewOrgan
+  getServiceCentre
 } from '@/api/party'
 
 const props = defineProps<{
@@ -299,20 +229,6 @@ const getFillX = (value: unknown, rows: unknown) => {
   if (!max) return '0'
   const scale = Math.max(0, Math.min(1, cur / max))
   return scale.toFixed(4)
-}
-
-const getNumText = (value: unknown) => {
-  const txt = String(value ?? '')
-  const match = txt.match(/-?\d+(?:\.\d+)?/)
-  return match ? match[0] : txt
-}
-
-const getUnitText = (value: unknown) => {
-  const txt = String(value ?? '')
-  const match = txt.match(/-?\d+(?:\.\d+)?/)
-  if (!match) return ''
-  const unit = txt.replace(match[0], '').trim()
-  return unit
 }
 
 const hexToRgb = (hex: string) => {
@@ -465,7 +381,7 @@ const getPie3DOption = (rows: any[]) => {
       textStyle: {
         rich: {
           n: {
-            width: 140, // 【修复点 1】从 50 改为 140，加宽名称列，防止文字重叠
+            width: 140,
             align: 'left',
             color: 'rgba(255, 238, 206, 0.92)',
             fontSize: 22,
@@ -473,7 +389,7 @@ const getPie3DOption = (rows: any[]) => {
             padding: [0, 12, 0, 0]
           },
           v: {
-            width: 130, // 【修复点 2】从 120 改为 130，给大数值留足空间
+            width: 130,
             align: 'right',
             color: 'rgba(255, 238, 206, 0.98)',
             fontSize: 22,
@@ -498,11 +414,11 @@ const getPie3DOption = (rows: any[]) => {
       boxWidth: 200,
       boxDepth: 200,
       boxHeight: 40,
-      left: -220, // 【修复点 3】从 -180 改为 -60，让饼图整体向右平移，远离图例
+      left: -220,
       viewControl: {
         alpha: 42,
         beta: 30,
-        distance: 240, // 【修复点 4】从 210 改为 240，拉远视角让饼图稍微变小
+        distance: 240,
         rotateSensitivity: 0,
         zoomSensitivity: 0,
         panSensitivity: 0
@@ -849,56 +765,7 @@ const volOption = computed(() => {
 })
 
 /* =========================================================
-   5. 两新组织（接口驱动）
-   ========================================================= */
-
-type TwoNewStats = {
-  nonPublicOrgan: string
-  nonPublicMember: string
-  nonPublicRate: string
-  socialOrgan: string
-  socialMember: string
-  socialRate: string
-}
-
-const twoNewMap = ref<Record<string, string>>({})
-const twoNewLoading = ref(false)
-
-const twoNewStats = computed<TwoNewStats>(() => {
-  const map = twoNewMap.value
-  return {
-    nonPublicOrgan: map.one ?? '',
-    nonPublicMember: map.two ?? '',
-    nonPublicRate: map.three ?? '',
-    socialOrgan: map.four ?? '',
-    socialMember: map.five ?? '',
-    socialRate: map.six ?? ''
-  }
-})
-
-const fetchTwoNewData = async () => {
-  twoNewLoading.value = true
-  try {
-    const res: any = await getTwoNewOrgan()
-    console.log('[twoneworgan] res=', res)
-
-    const list = pickList(res)
-    const map: Record<string, string> = {}
-    list.forEach((it: any) => {
-      const k = String(it?.key ?? '')
-      if (k) map[k] = String(it?.value ?? '')
-    })
-    twoNewMap.value = map
-  } catch (e) {
-    console.error('两新组织查询失败', e)
-    twoNewMap.value = {}
-  } finally {
-    twoNewLoading.value = false
-  }
-}
-
-/* =========================================================
-   6. 发展党员 Tab（学历=1、年龄=2）
+   5. 发展党员 Tab（学历=1、年龄=2）
    ========================================================= */
 
 type RecruitType = 1 | 2
@@ -972,7 +839,6 @@ onMounted(() => {
   fetchMassData(3)
   fetchServiceData()
   fetchVolData()
-  fetchTwoNewData()
 })
 </script>
 
@@ -1168,11 +1034,12 @@ onMounted(() => {
   white-space: nowrap;
 }
 
+/* ==================== 群团组织（拉长 + 放大） ==================== */
 .panel--mass {
   left: 2700px;
   top: 180px;
   width: 1000px;
-  height: 950px;
+  height: 1930px;
 }
 
 .panel--mass .panel-head {
@@ -1184,26 +1051,153 @@ onMounted(() => {
   height: 56px;
   line-height: 56px;
   padding: 0 26px;
-  font-size: 60px;
+  font-size: 64px;
   margin-left: -50px;
 }
 
 .panel--mass .panel-tabs {
-  left: 80px;
-  top: 140px;
+  left: 60px;
+  top: 150px;
   right: auto;
-  gap: 80px;
+  gap: 40px;
 }
 
 .panel--mass .tab {
-  min-width: 220px;
-  height: 52px;
-  line-height: 52px;
-  font-size: 34px;
-  border-radius: 26px;
+  min-width: 280px;
+  height: 66px;
+  line-height: 66px;
+  font-size: 44px;
+  border-radius: 33px;
   cursor: pointer;
 }
 
+.mass-list {
+  position: absolute;
+  left: -20px;
+  right: 26px;
+  top: 300px;
+  bottom: 40px;
+  display: grid;
+  align-content: space-evenly;
+  gap: 0;
+  padding-top: 0;
+  box-sizing: border-box;
+}
+
+.mass-row {
+  height: 400px;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  align-items: center;
+  column-gap: 40px;
+}
+
+.mass-left {
+  position: relative;
+  height: 400px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  row-gap: 28px;
+}
+
+.mass-badge {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 200, 130, 0.72);
+  background:
+    radial-gradient(circle at 40% 30%, rgba(255, 235, 170, 0.52), rgba(120, 10, 10, 0.22)),
+    radial-gradient(circle, rgba(255, 220, 140, 0.12), rgba(140, 10, 10, 0.35));
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 220, 160, 0.08),
+    0 0 24px rgba(255, 180, 80, 0.12);
+  position: relative;
+}
+
+.mass-badge::before {
+  content: '';
+  position: absolute;
+  inset: 38px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 220, 160, 0.35);
+  background: rgba(255, 220, 140, 0.14);
+}
+
+.mass-badge--a::after,
+.mass-badge--b::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border-radius: 7px;
+  background: rgba(255, 220, 140, 0.88);
+  box-shadow: 0 0 10px rgba(255, 210, 120, 0.28);
+}
+
+.mass-badge--b::after {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.mass-name {
+  width: 380px;
+  text-align: center;
+  font-size: 38px;
+  font-weight: 700;
+  color: rgba(255, 238, 206, 0.92);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mass-right {
+  height: 200px;
+  padding: 0 44px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  border: 3px solid rgba(255, 200, 130, 0.62);
+  background:
+    linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
+    linear-gradient(90deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 220, 160, 0.06),
+    0 0 18px rgba(255, 140, 70, 0.06);
+  border-radius: 12px;
+}
+
+.mass-num {
+  font-size: 104px;
+  font-weight: 900;
+  color: rgba(255, 220, 140, 0.98);
+  letter-spacing: 1px;
+}
+
+.mass-unit {
+  font-size: 56px;
+  font-weight: 800;
+  color: rgba(255, 220, 140, 0.9);
+  padding-top: 10px;
+}
+
+.mass-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  font-size: 36px;
+  color: rgba(255, 238, 206, 0.6);
+}
+
+/* ==================== 党员服务中心分布 ==================== */
 .panel--service {
   left: 180px;
   top: 1190px;
@@ -1256,6 +1250,8 @@ onMounted(() => {
   color: rgba(255, 220, 140, 0.98);
   white-space: nowrap;
 }
+
+/* ==================== 志愿服务 ==================== */
 .panel--vol {
   left: 1460px;
   top: 1160px;
@@ -1360,26 +1356,7 @@ onMounted(() => {
   height: 100%;
 }
 
-.panel--two {
-  left: 2680px;
-  top: 1160px;
-  width: 1000px;
-  height: 950px;
-}
-
-.panel--two .panel-head {
-  height: 150px;
-  padding: 14px 18px 0;
-}
-
-.panel--two .panel-title {
-  height: 56px;
-  line-height: 56px;
-  padding: 0 26px;
-  font-size: 60px;
-  margin-left: -50px;
-}
-
+/* ==================== 公共 ==================== */
 .panel-head {
   position: relative;
   height: 92px;
@@ -1553,132 +1530,6 @@ onMounted(() => {
   background: #8a5cff;
 }
 
-.mass-list {
-  position: absolute;
-  left: -56px;
-  right: 26px;
-  top: 310px;
-  bottom: 26px;
-  display: grid;
-  align-content: start;
-  gap: 66px;
-  padding-top: 18px;
-  box-sizing: border-box;
-}
-
-.mass-row {
-  height: 170px;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  align-items: center;
-  column-gap: 22px;
-}
-
-.mass-left {
-  position: relative;
-  height: 170px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  row-gap: 14px;
-}
-
-.mass-badge {
-  width: 92px;
-  height: 92px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 200, 130, 0.72);
-  background:
-    radial-gradient(circle at 40% 30%, rgba(255, 235, 170, 0.52), rgba(120, 10, 10, 0.22)),
-    radial-gradient(circle, rgba(255, 220, 140, 0.12), rgba(140, 10, 10, 0.35));
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 220, 160, 0.08),
-    0 0 24px rgba(255, 180, 80, 0.12);
-  position: relative;
-}
-
-.mass-badge::before {
-  content: '';
-  position: absolute;
-  inset: 22px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 220, 160, 0.35);
-  background: rgba(255, 220, 140, 0.14);
-}
-
-.mass-badge--a::after,
-.mass-badge--b::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  transform: translate(-50%, -50%);
-  border-radius: 4px;
-  background: rgba(255, 220, 140, 0.88);
-  box-shadow: 0 0 10px rgba(255, 210, 120, 0.28);
-}
-
-.mass-badge--b::after {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.mass-name {
-  width: 240px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: rgba(255, 238, 206, 0.92);
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mass-right {
-  height: 88px;
-  padding: 0 22px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  border: 2px solid rgba(255, 200, 130, 0.62);
-  background:
-    linear-gradient(135deg, rgba(255, 210, 120, 0.22) 0 18%, transparent 18% 100%),
-    linear-gradient(90deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 220, 160, 0.06),
-    0 0 18px rgba(255, 140, 70, 0.06);
-  border-radius: 8px;
-}
-
-.mass-num {
-  font-size: 54px;
-  font-weight: 900;
-  color: rgba(255, 220, 140, 0.98);
-  letter-spacing: 1px;
-}
-
-.mass-unit {
-  font-size: 30px;
-  font-weight: 800;
-  color: rgba(255, 220, 140, 0.9);
-  padding-top: 6px;
-}
-
-.mass-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 170px;
-  font-size: 28px;
-  color: rgba(255, 238, 206, 0.6);
-}
-
 .service-list {
   position: absolute;
   left: 26px;
@@ -1809,120 +1660,5 @@ onMounted(() => {
   background: linear-gradient(90deg, rgba(255, 210, 120, 0.85), rgba(255, 120, 0, 0.55));
   transform: scaleX(var(--fillx, 0));
   transform-origin: left;
-}
-
-.two-block {
-  position: relative;
-  margin: 0 26px;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.two-block + .two-block {
-  margin-top: 46px;
-}
-
-.two-head {
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-}
-
-.two-arrow {
-  width: 180px;
-  height: 18px;
-  position: relative;
-  opacity: 0.75;
-}
-
-.two-arrow::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  right: 16px;
-  height: 2px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, transparent, rgba(255, 220, 140, 0.75), transparent);
-}
-
-.two-arrow--l::after,
-.two-arrow--r::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 10px;
-  height: 10px;
-  border-top: 2px solid rgba(255, 220, 140, 0.72);
-  border-right: 2px solid rgba(255, 220, 140, 0.72);
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.two-arrow--l::after {
-  left: 6px;
-  transform: translateY(-50%) rotate(-135deg);
-}
-
-.two-arrow--r::after {
-  right: 6px;
-}
-
-.two-title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 900;
-  color: rgba(255, 238, 206, 0.94);
-  letter-spacing: 2px;
-}
-
-.two-grid {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 26px;
-}
-
-.two-item {
-  text-align: center;
-  height: 210px;
-  padding: 22px 14px 18px;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 200, 130, 0.22);
-  background:
-    linear-gradient(135deg, rgba(255, 210, 120, 0.2) 0 18%, transparent 18% 100%),
-    linear-gradient(180deg, rgba(120, 30, 20, 0.45), rgba(80, 20, 10, 0.25));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 220, 160, 0.06),
-    0 0 18px rgba(255, 140, 70, 0.05);
-  border-radius: 10px;
-}
-
-.two-value {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 8px;
-}
-
-.two-num {
-  font-size: 44px;
-  font-weight: 900;
-  color: rgba(255, 238, 206, 0.98);
-}
-
-.two-unit {
-  font-size: 22px;
-  font-weight: 800;
-  color: rgba(255, 238, 206, 0.82);
-}
-
-.two-label {
-  margin-top: 18px;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: rgba(255, 238, 206, 0.88);
 }
 </style>
