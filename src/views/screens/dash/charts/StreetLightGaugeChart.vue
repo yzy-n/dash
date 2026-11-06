@@ -21,8 +21,8 @@ const chartOption = computed(() => {
     series: [
       {
         type: 'pie',
-        // 空心环形内外半径
-        radius: ['22%', '82%'],
+        // 空心环形内外半径（原 ['22%', '82%']，整体缩小）
+        radius: ['18%', '40%'],
         center: ['50%', '50%'],
         // 玫瑰图核心配置：radius 扇区长度随数值变化
         roseType: 'radius',
@@ -40,13 +40,13 @@ const chartOption = computed(() => {
           show: true,
           position: 'outside',
           formatter: '{b}：{c}',
-          fontSize: 36,
+          fontSize: 28, // 36 → 28，配合圆环缩小
           color: '#fff'
         },
         labelLine: {
           show: true,
-          length: 15,
-          length2: 5,
+          length: 10, // 15 → 10
+          length2: 4, // 5  → 4
           lineStyle: {
             color: 'auto',
             width: 1

@@ -192,10 +192,12 @@ watch(
   font-weight: 900;
   color: #e0f2ff;
   letter-spacing: 4px;
+  /* 原：3 层 + 30px blur → 改：2 层 + 1/8px，文字本体保持清晰 */
   text-shadow:
-    0 0 4px #fff,
-    0 0 12px #90d8ff,
-    0 0 30px #00a6ff;
+    0 0 1px rgba(224, 242, 255, 0.95),
+    0 0 8px rgba(144, 216, 255, 0.55);
+  /* 关键：避免 GPU 合成缩放导致边缘发虚 */
+  text-rendering: geometricPrecision;
 }
 
 .side-metrics {
@@ -203,9 +205,10 @@ watch(
   justify-content: space-between;
   font-size: 40px;
   color: rgba(214, 238, 255, 0.75);
-  gap: 60px; /* 两个条目之间间距 */
+  gap: 60px;
   align-items: center;
 }
+
 .metric-item {
   display: inline-flex;
   align-items: center;
@@ -213,23 +216,24 @@ watch(
   font-weight: 900;
   letter-spacing: 3px;
 }
-/* 汉字 浅白+蓝光发光 */
+
+/* 汉字 浅白+蓝光发光（收紧光晕） */
 .text-label {
   color: #d6ecff;
   text-shadow:
-    0 0 4px #fff,
-    0 0 12px #80c8ff,
-    0 0 24px #0099ff;
-  margin-right: 16px; /* 文字和数字中间空隙 */
+    0 0 1px rgba(214, 236, 255, 0.95),
+    0 0 8px rgba(128, 200, 255, 0.5);
+  margin-right: 16px;
 }
-/* 数字 金色+暖黄光效 */
+
+/* 数字 金色+暖黄光效（收紧光晕） */
 .text-num {
   color: #ffdd99;
   text-shadow:
-    0 0 4px #fff8cc,
-    0 0 12px #ffcc66,
-    0 0 24px #ffaa22;
+    0 0 1px rgba(255, 248, 204, 0.95),
+    0 0 8px rgba(255, 204, 102, 0.55);
 }
+
 .map-box {
   min-height: 0;
   display: flex;

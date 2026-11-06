@@ -19,7 +19,7 @@ const chartOption = computed(() => {
       // 外层主圆环（带外发光）
       {
         type: 'pie',
-        radius: ['64%', '80%'],
+        radius: ['64%', '60%'],
         center: ['50%', '50%'],
         avoidLabelOverlap: false,
         silent: true,
