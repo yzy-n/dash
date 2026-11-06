@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/postbuild-file-preview.cjs",
+    "build": "vite build",
+    "build:file": "vite build --config vite.config.file.ts && node scripts/postbuild-file-preview.cjs dist-file",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "preview": "vite preview",
