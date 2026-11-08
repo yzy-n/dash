@@ -146,7 +146,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab === activeDisabledTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleDisabledTabClick(tab)"
           >
             {{ tab }}
@@ -173,7 +172,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab === activeAssistTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleAssistTabClick(tab)"
           >
             {{ tab }}
@@ -206,7 +204,6 @@ import pie3dChart from '@/views/screens/people/charts/3d.vue'
 import pensionChart from '@/views/screens/people/charts/pension.vue'
 import roseChart from '@/views/screens/people/charts/rose.vue'
 import marryChart from '@/views/screens/people/charts/marry.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 // ⭐ 引入接口
 import {
   getEduLevel,

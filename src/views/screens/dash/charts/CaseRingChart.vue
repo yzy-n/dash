@@ -14,20 +14,30 @@ const props = defineProps<{
 const chartOption = computed(() => {
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: true },
+    tooltip: {
+      // ① 饼图必须用 item
+      trigger: 'item',
+      formatter: '{b}<br/>{c}',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.5)',
+      borderWidth: 1,
+      padding: [12, 20],
+      confine: true // 防止贴近边缘时被容器裁掉
+    },
     series: [
       // 外层主圆环（带外发光）
       {
         type: 'pie',
-        radius: ['64%', '60%'],
+        radius: ['60%', '64%'], // ② 原来是 ['64%','60%']，内径>外径，环反了
         center: ['50%', '50%'],
         avoidLabelOverlap: false,
-        silent: true,
-        gap: 6, // 分段间隙留白
+        // ③ 删除 silent: true，否则鼠标事件被禁用，tooltip 不触发
+        gap: 6,
         itemStyle: {
-          borderRadius: 10, // 分段圆角
-          shadowBlur: 25, // 发光强度
-          shadowColor: 'auto' // 跟随色块颜色发光
+          borderRadius: 10,
+          shadowBlur: 25,
+          shadowColor: 'auto'
         },
         label: {
           show: true,
@@ -35,7 +45,7 @@ const chartOption = computed(() => {
           alignTo: 'labelLine',
           formatter: (params) => `${params.name}: ${params.value}`,
           color: '#ffffff',
-          fontSize: 35
+          fontSize: 28
         },
         labelLine: {
           show: true,
@@ -57,7 +67,6 @@ const chartOption = computed(() => {
         type: 'pie',
         radius: ['46%', '56%'],
         center: ['50%', '50%'],
-        silent: true,
         gap: 6,
         itemStyle: {
           borderRadius: 10,
@@ -65,13 +74,17 @@ const chartOption = computed(() => {
           shadowBlur: 12,
           shadowColor: '#ffdd22'
         },
-        label: { show: true },
-        labelLine: { show: true },
-        data: props.data.map((item) => ({ value: item.value }))
+        // ③ 内层环没有 name，加了 tooltip.show:false 避免 hover 弹出空白名称
+        tooltip: { show: false },
+        label: { show: false },
+        labelLine: { show: false },
+        data: props.data.map((item) => ({
+          name: item.name,
+          value: item.value
+        }))
       }
     ],
     graphic: [
-      // 中间文字「交通方式」
       {
         type: 'text',
         left: 'center',

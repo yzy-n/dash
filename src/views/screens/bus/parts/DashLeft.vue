@@ -242,8 +242,6 @@ const currentParkingChart = computed(() => {
   padding: 0 26px;
   border: none;
   outline: none;
-  background: url('@/assets/img/tabBg.png') no-repeat center;
-  background-size: 100% 100%;
   background-color: transparent;
   appearance: none;
   color: #ffffff;
@@ -252,21 +250,11 @@ const currentParkingChart = computed(() => {
   line-height: 64px;
   text-align: center;
   cursor: pointer;
-  opacity: 0.72;
-  filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   letter-spacing: 2px;
-  text-shadow:
-    0 0 6px #fff,
-    0 0 12px #7cf,
-    0 0 24px #0cf,
-    0 0 40px #00a8ff;
 }
 .tab--active {
   color: #eaf4ff;
-  opacity: 1;
-  filter: drop-shadow(0 0 10px rgba(54, 232, 255, 0.28));
 }
 
 /* 柱状图模拟区域（实际替换ECharts容器） */

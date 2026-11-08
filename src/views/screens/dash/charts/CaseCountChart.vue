@@ -10,17 +10,21 @@ const props = defineProps<{
 const option = computed(() => {
   return {
     backgroundColor: 'transparent',
-    tooltip: { trigger: 'axis' },
-    grid: { left: 120, right: 18, top: 48, bottom: 80 },
+    tooltip: {
+      trigger: 'axis',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
+    grid: { left: 120, right: 18, top: 68, bottom: 100 },
     xAxis: {
       type: 'category',
       data: props.x,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 32, rotate: 25 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 28, rotate: 25 }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 32 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: [

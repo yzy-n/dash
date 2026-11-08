@@ -2,7 +2,7 @@
   <div class="shell shell--scrollable">
     <div class="viewport" :style="{ width: `${designWidth}px`, height: `${designHeight}px` }">
       <div
-        class="screen"
+        class="screen screen--party"
         :style="{
           width: `${designWidth}px`,
           height: `${designHeight}px`,

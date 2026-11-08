@@ -4,6 +4,8 @@ import createAppRouter from './router'
 import './style.css'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import './styles/tabs.css'
+import './styles/selects.css'
 
 // 1. 先创建app实例，拿到app对象
 const app = createApp(App)

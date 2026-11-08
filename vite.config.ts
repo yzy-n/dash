@@ -25,16 +25,23 @@ export default defineConfig(({ mode }) => {
   return {
     base: basePath,
     plugins: [vue()],
-    server: proxyTarget
-      ? {
-          proxy: Object.fromEntries(
-            apiPrefixes.map((prefix) => [
-              prefix,
-              { target: proxyTarget, changeOrigin: true, timeout: 5000, proxyTimeout: 5000 }
-            ])
-          )
-        }
-      : undefined,
+    server: {
+      // 编辑器/工具会以原子写入方式生成 .<file>.<pid>.<uuid>.tmpdir 临时目录，
+      // Windows 下 watcher 监听这些文件会抛 EBUSY 并导致 dev server 退出。
+      watch: {
+        ignored: ['**/.*.tmpdir/**', '**/*.tmp']
+      },
+      ...(proxyTarget
+        ? {
+            proxy: Object.fromEntries(
+              apiPrefixes.map((prefix) => [
+                prefix,
+                { target: proxyTarget, changeOrigin: true, timeout: 5000, proxyTimeout: 5000 }
+              ])
+            )
+          }
+        : {})
+    },
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) }
     }

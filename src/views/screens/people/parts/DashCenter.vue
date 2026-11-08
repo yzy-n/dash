@@ -699,16 +699,17 @@ const moveOption = computed(() => {
   width: 100%;
 }
 .map-select-wrap .el-select__wrapper {
-  height: 36px;
-  min-height: 36px;
-  padding: 0 18px;
+  height: 50px;
+  min-height: 50px;
+  padding: 0 22px;
   border-radius: 999px;
   border: 1px solid rgba(78, 184, 255, 0.22);
   background: rgba(5, 26, 66, 0.45);
   color: rgba(209, 234, 255, 0.86);
-  font-size: 16px;
+  font-size: 34px;
   font-weight: 800;
   letter-spacing: 1px;
+  justify-content: center;
   box-shadow: none !important;
   cursor: pointer;
   transition: border-color 0.2s;
@@ -723,11 +724,12 @@ const moveOption = computed(() => {
 .map-select-wrap .el-select__placeholder,
 .map-select-wrap .el-select__selected-item {
   color: rgba(209, 234, 255, 0.86) !important;
-  font-size: 16px;
+  font-size: 34px;
   font-weight: 800;
   letter-spacing: 1px;
 }
 .map-select-wrap .el-select__caret {
+  display: none;
   color: rgba(209, 234, 255, 0.65);
 }
 
@@ -741,8 +743,10 @@ const moveOption = computed(() => {
   padding: 6px 4px;
 }
 .map-select-popper .el-select-dropdown__item {
+  height: 50px;
+  line-height: 50px;
   color: rgba(214, 238, 255, 0.9);
-  font-size: 15px;
+  font-size: 34px;
   font-weight: 700;
   border-radius: 6px;
   margin: 2px 4px;

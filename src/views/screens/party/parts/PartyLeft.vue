@@ -144,12 +144,12 @@ const ORG_LIST_HEIGHT =
 const layout = {
   orgTitle: { left: 152, top: 175 },
   orgTotal: { left: 1018, top: 200 },
-  cityTab: { left: 308, top: 286, width: 296, height: 66 },
-  districtTab: { left: 692, top: 286, width: 296, height: 66 },
+  cityTab: { left: 308, top: 306, width: 296, height: 66 },
+  districtTab: { left: 692, top: 306, width: 296, height: 66 },
   orgList: { left: 126, top: 386, width: 1028, height: ORG_LIST_HEIGHT },
   starsTitle: { left: 14, top: 1140 },
-  starsCityTab: { left: 96, top: 1266, width: 190, height: 66 },
-  starsDistrictTab: { left: 382, top: 1266, width: 190, height: 66 },
+  starsCityTab: { left: 26, top: 1266, width: 296, height: 66 },
+  starsDistrictTab: { left: 382, top: 1266, width: 296, height: 66 },
   starsTotal: { left: 266, top: 1350 },
   starRows: { left: 26, top: 1450, width: 1048, height: 58, stepY: 92 }
 } as const
@@ -424,20 +424,23 @@ onMounted(() => {
 .chip,
 .chip2 {
   position: absolute;
-  border: none;
-  border-radius: 22px;
-  color: #fff1cb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 200, 130, 0.55);
+  border-radius: 999px;
+  color: rgba(255, 238, 206, 0.9);
   font-size: 40px;
   font-weight: 700;
-  background: linear-gradient(180deg, rgba(255, 201, 93, 0.52), rgba(255, 145, 31, 0.18));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 241, 190, 0.42),
-    inset 0 0 0 1px rgba(255, 211, 122, 0.34),
-    0 0 10px rgba(255, 170, 52, 0.1);
+  background: rgba(120, 10, 10, 0.22);
+  box-shadow: none;
   cursor: pointer;
   transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
     box-shadow 0.2s ease,
-    filter 0.2s ease;
+    color 0.2s ease;
 }
 
 .chip2 {
@@ -447,11 +450,8 @@ onMounted(() => {
 
 .chip--active {
   color: #fff8dd;
-  filter: brightness(1.12);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 248, 218, 0.65),
-    inset 0 0 0 1px rgba(255, 226, 154, 0.6),
-    0 0 16px rgba(255, 186, 66, 0.38);
+  background: radial-gradient(circle at 50% 30%, rgba(255, 220, 140, 0.52), rgba(120, 30, 20, 0.4));
+  box-shadow: 0 0 16px rgba(255, 210, 120, 0.12);
 }
 
 /* ---------- 列表滚动容器（一屏 5 条） ---------- */

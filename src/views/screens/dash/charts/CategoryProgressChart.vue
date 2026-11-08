@@ -27,6 +27,11 @@ const option = computed(() => {
 
   return {
     backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
     grid: { left: 140, right: 80, top: 12, bottom: 10 },
     xAxis: {
       type: 'value',
@@ -41,7 +46,7 @@ const option = computed(() => {
       data: data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 32 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 28 }
     },
     series: [
       {
@@ -59,7 +64,7 @@ const option = computed(() => {
             return `${percent}%`
           },
           color: '#dff3ff',
-          fontSize: 32
+          fontSize: 28
         },
         itemStyle: {
           borderRadius: 8,

@@ -84,7 +84,7 @@ const buildSeries = () => {
       name: item.name,
       type: 'bar',
       stack: 'total',
-      barWidth: 28,
+      barWidth: 50,
       barBorderRadius: [0, 0, 0, 0],
       itemStyle: {
         color: item.gradient
@@ -164,7 +164,7 @@ const chartOption = computed(() => {
       }
     },
     legend: {
-      top: 42,
+      top: 62,
       left: 'center',
       textStyle: { color: '#ffffff', fontSize: 40 },
       selectedMode: false,
@@ -178,25 +178,25 @@ const chartOption = computed(() => {
       left: '6%',
       right: '4%',
       bottom: '12%',
-      top: '18%',
+      top: '25%',
       containLabel: true
     },
     xAxis: {
       type: 'category',
       data: xAxisList.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
     yAxis: {
       name: '单位：万人',
-      nameTextStyle: { color: '#fff', fontSize: 32 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       type: 'value',
       max: yAxisMax,
       interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: {
         lineStyle: { color: 'rgba(82, 110, 165, 0.3)' }
       },

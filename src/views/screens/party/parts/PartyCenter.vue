@@ -260,7 +260,7 @@ onMounted(() => {
   position: absolute;
   left: 60px;
   right: 60px;
-  top: 220px;
+  top: 280px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -299,7 +299,7 @@ onMounted(() => {
   position: absolute;
   left: 0;
   right: 0;
-  top: 320px;
+  top: 480px;
   bottom: 88px;
   display: flex;
   justify-content: space-between;

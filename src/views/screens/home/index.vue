@@ -21,13 +21,9 @@
           </div>
         </header>
         <section class="body body--home">
-          <!-- 居中容器：宽度=大屏1/3，高度=大屏1/2，整体占屏幕1/6，水平垂直居中 -->
           <div class="center-container">
             <section class="home-panel">
-              <div class="home-panel-head">
-                <div class="home-panel-title">模块入口</div>
-                <div class="home-panel-sub">选择一个大屏进入查看</div>
-              </div>
+              <div class="home-panel-head"></div>
               <div class="nav-grid">
                 <button
                   v-for="item in navItems"
@@ -39,8 +35,6 @@
                   <div class="nav-card-top">
                     <div class="nav-card-name">{{ item.title }}</div>
                   </div>
-                  <div class="nav-card-desc">{{ item.desc }}</div>
-                  <div class="nav-card-cta">进入</div>
                 </button>
               </div>
             </section>
@@ -358,7 +352,8 @@ const hmsText = computed(() => {
   gap: 8px;
 }
 .nav-card-name {
-  font-size: 34px;
+  font-size: 84px;
+  text-align: center;
   font-weight: 900;
   letter-spacing: 1px;
 }

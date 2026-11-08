@@ -23,17 +23,21 @@ const option = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { trigger: 'axis' },
-    grid: { left: 110, right: 18, top: 48, bottom: 84 },
+    tooltip: {
+      trigger: 'axis',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
+    grid: { left: 110, right: 18, top: 48, bottom: 100 },
     xAxis: {
       type: 'category',
       data: categories,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 32, rotate: 18 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 28, rotate: 18 }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 32 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: [

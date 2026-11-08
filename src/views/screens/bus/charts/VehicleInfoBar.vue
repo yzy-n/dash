@@ -43,7 +43,7 @@ const buildCylinderSeries = () => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
-      barWidth: 26,
+      barWidth: 50,
       barGap: '12%',
       itemStyle: {
         color: item.gradient,
@@ -102,7 +102,7 @@ const chartOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,0,0,0.75)',
-      textStyle: { color: '#fff', fontSize: 34 },
+      textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
         params.forEach((p) => {
@@ -130,18 +130,18 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
     yAxis: {
       name: '单位：辆',
-      nameTextStyle: { color: '#fff', fontSize: 40 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       type: 'value',
       max: yAxisMax,
       interval: yAxisMax / 5,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
       axisTick: { show: false }
     },

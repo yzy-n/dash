@@ -12,17 +12,7 @@ const props = defineProps<{
   data?: BarDataItem[]
 }>()
 
-const defaultData: BarDataItem[] = [
-  { name: '海城市', value: 10.1 },
-  { name: '台安县', value: 18 },
-  { name: '岫岩县', value: 6.1 },
-  { name: '铁东区', value: 3.8 },
-  { name: '铁西区', value: 22.8 },
-  { name: '立山区', value: 21.4 },
-  { name: '千山区', value: 16.7 },
-  { name: '高新区', value: 11.9 },
-  { name: '经开区', value: 10.1 }
-]
+const defaultData: BarDataItem[] = []
 
 const chartData = computed(() => props.data ?? defaultData)
 
@@ -61,7 +51,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff' },
+      textStyle: { color: '#fff', fontSize: 34 },
       formatter: '{b}<br/>{c} %'
     },
     grid: {
@@ -75,7 +65,7 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLabel: {
-        color: '#fff',
+        color: 'rgba(214, 238, 255, 0.6)',
         fontSize: 28,
         rotate: 40
       },
@@ -87,11 +77,11 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: '#fff', fontSize: 28 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
       },
-      axisLabel: { color: '#fff', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { show: false }
     },
     series: [

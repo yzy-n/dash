@@ -14,7 +14,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab.type === activeElectricTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handleElectricTabClick(tab.type)"
         >
           {{ tab.label }}
@@ -51,7 +50,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab.type === activeCapacityTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handleCapacityTabClick(tab.type)"
         >
           {{ tab.label }}
@@ -168,7 +166,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab.type === activeProjectTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handleProjectTabClick(tab.type)"
         >
           {{ tab.label }}
@@ -234,7 +231,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab.type === activeEnergyTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handleEnergyTabClick(tab.type)"
         >
           {{ tab.label }}
@@ -257,7 +253,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import ProjectPie3D from '../charts/ProjectPie3D.vue'
 import {
   getPowervolume,
@@ -1046,7 +1041,7 @@ onMounted(() => {
 
 .electric-chart,
 .capacity-chart {
-  margin-top: 120px;
+  margin-top: 40px;
   height: 80%;
   min-height: 0;
 }

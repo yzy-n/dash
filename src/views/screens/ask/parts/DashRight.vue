@@ -77,7 +77,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab.type === activeAssistTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleAssistTabClick(tab.type)"
           >
             {{ tab.label }}
@@ -107,7 +106,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import {
   getRepaymentPeople,
   getAcceptanceDeptParticipation,

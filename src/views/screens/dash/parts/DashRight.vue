@@ -258,6 +258,8 @@ const props = defineProps<{
   font-size: 38px;
   color: rgba(214, 238, 255, 0.84);
   margin-top: 100px;
+  overflow-y: scroll;
+  height: 100%;
 }
 
 .table-row {

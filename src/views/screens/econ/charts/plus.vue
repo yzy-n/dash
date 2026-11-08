@@ -32,7 +32,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#ffffff' },
+      textStyle: { color: '#ffffff', fontSize: 40 },
       formatter: '{b}<br/>增加值：{c}亿元'
     },
     grid: {
@@ -46,8 +46,8 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLabel: {
-        color: '#fff',
-        fontSize: 34,
+        color: 'rgba(214, 238, 255, 0.6)',
+        fontSize: 28,
         rotate: 35
       },
       axisLine: {
@@ -58,14 +58,14 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：亿元',
-      nameTextStyle: { color: '#fff', fontSize: 22 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
       },
       min: 0,
       max: 150,
       interval: 30,
-      axisLabel: { color: '#fff', fontSize: 34 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { show: false }
     },
     series: [

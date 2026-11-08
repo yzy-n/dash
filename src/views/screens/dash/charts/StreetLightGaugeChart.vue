@@ -17,7 +17,18 @@ const chartOption = computed(() => {
   const roseData = props.data
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+
+    tooltip: {
+      // 饼图必须用 item，不能用 axis
+      trigger: 'item',
+      formatter: '{b}<br/>{c}（{d}%）',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.5)',
+      borderWidth: 1,
+      padding: [12, 20],
+      confine: true
+    },
     series: [
       {
         type: 'pie',
@@ -26,7 +37,7 @@ const chartOption = computed(() => {
         center: ['50%', '50%'],
         // 玫瑰图核心配置：radius 扇区长度随数值变化
         roseType: 'radius',
-        silent: true,
+        // 删除 silent: true，否则鼠标事件被禁用，tooltip 无法触发
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 6, // 扇区圆角
@@ -40,13 +51,13 @@ const chartOption = computed(() => {
           show: true,
           position: 'outside',
           formatter: '{b}：{c}',
-          fontSize: 28, // 36 → 28，配合圆环缩小
+          fontSize: 28,
           color: '#fff'
         },
         labelLine: {
           show: true,
-          length: 10, // 15 → 10
-          length2: 4, // 5  → 4
+          length: 10,
+          length2: 4,
           lineStyle: {
             color: 'auto',
             width: 1

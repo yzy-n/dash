@@ -66,7 +66,7 @@ const buildSeries = () => {
       name: item.name,
       type: 'bar',
       yAxisIndex: 0,
-      barWidth: 22,
+      barWidth: 50,
       itemStyle: {
         color: item.color,
         shadowBlur: 8,
@@ -137,7 +137,7 @@ const chartOption = computed(() => {
       type: 'category',
       data: xAxisData.value,
       axisLine: { lineStyle: { color: '#405888' } },
-      axisLabel: { color: '#fff', fontSize: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { show: false },
       axisTick: { show: false }
     },
@@ -145,27 +145,27 @@ const chartOption = computed(() => {
       // 左轴：客运量 万人
       {
         name: `单位：${props.numUnit || '万人'}`,
-        nameTextStyle: { color: '#fff', fontSize: 40 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         type: 'value',
         min: 0,
         max: leftAxisMax,
         interval: leftAxisMax / 5,
         axisLine: { lineStyle: { color: '#405888' } },
-        axisLabel: { color: '#fff', fontSize: 40 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)f', fontSize: 28 },
         splitLine: { lineStyle: { color: 'rgba(82, 110, 165, 0.3)' } },
         axisTick: { show: false }
       },
       // 右轴：同比百分比 %
       {
         name: '单位：%',
-        nameTextStyle: { color: '#fff', fontSize: 40 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         type: 'value',
         min: -rightAxisMax,
         max: rightAxisMax,
         interval: Math.max(1, rightAxisMax / 5),
         position: 'right',
         axisLine: { lineStyle: { color: '#405888' } },
-        axisLabel: { color: '#fff', fontSize: 40 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { show: false },
         axisTick: { show: false }
       }

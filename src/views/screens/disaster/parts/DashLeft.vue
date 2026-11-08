@@ -9,7 +9,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': activeCommandTab === item.key }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="activeCommandTab = item.key"
         >
           {{ item.label }}
@@ -134,7 +133,6 @@
                 type="button"
                 class="tab"
                 :class="{ 'tab--active': activeMaterialTab === item.key }"
-                :style="{ backgroundImage: `url(${tabBgUrl})` }"
                 @click="switchMaterialTab(item.key)"
               >
                 {{ item.label }}
@@ -218,7 +216,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import {
   getEmergencyRescue,
   getRescueMaterials,

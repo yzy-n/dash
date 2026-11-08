@@ -28,13 +28,8 @@
       <div class="bubble b1">
         <div class="time">{{ fiscalRevenue.quarter }}</div>
         <div class="label">预算收入</div>
-        <div class="num">
-          {{ fiscalRevenue.amount }} <span class="unit">亿元</span>
-        </div>
-        <div
-          class="rate"
-          :class="{ red: Number(fiscalRevenue.yearOnYearGrowth) < 0 }"
-        >
+        <div class="num">{{ fiscalRevenue.amount }} <span class="unit">亿元</span></div>
+        <div class="rate" :class="{ red: Number(fiscalRevenue.yearOnYearGrowth) < 0 }">
           {{ fiscalRevenue.yearOnYearGrowth }}%{{
             Number(fiscalRevenue.yearOnYearGrowth) < 0 ? '↓' : '↑'
           }}
@@ -45,14 +40,11 @@
       <div class="bubble b2">
         <div class="time">{{ taxRevenue.quarter }}</div>
         <div class="label">税收收入</div>
-        <div class="num">
-          {{ taxRevenue.amount }} <span class="unit">亿元</span>
-        </div>
-        <div
-          class="rate"
-          :class="{ red: Number(taxRevenue.yearOnYearGrowth) < 0 }"
-        >
-          {{ taxRevenue.yearOnYearGrowth }}%{{ Number(taxRevenue.yearOnYearGrowth) < 0 ? '↓' : '↑' }}
+        <div class="num">{{ taxRevenue.amount }} <span class="unit">亿元</span></div>
+        <div class="rate" :class="{ red: Number(taxRevenue.yearOnYearGrowth) < 0 }">
+          {{ taxRevenue.yearOnYearGrowth }}%{{
+            Number(taxRevenue.yearOnYearGrowth) < 0 ? '↓' : '↑'
+          }}
         </div>
       </div>
 
@@ -60,13 +52,8 @@
       <div class="bubble b3">
         <div class="time">{{ gdpData.quarter }}</div>
         <div class="label">GDP</div>
-        <div class="num">
-          {{ gdpData.amount }} <span class="unit">亿元</span>
-        </div>
-        <div
-          class="rate"
-          :class="{ red: Number(gdpData.yearOnYearGrowth) < 0 }"
-        >
+        <div class="num">{{ gdpData.amount }} <span class="unit">亿元</span></div>
+        <div class="rate" :class="{ red: Number(gdpData.yearOnYearGrowth) < 0 }">
           {{ gdpData.yearOnYearGrowth }}%{{ Number(gdpData.yearOnYearGrowth) < 0 ? '↓' : '↑' }}
         </div>
       </div>
@@ -75,18 +62,14 @@
       <div class="bubble b4">
         <div class="time">{{ urbanIncome.quarter }}</div>
         <div class="label">城市居民人均收入情况</div>
-        <div class="num">
-          {{ urbanIncome.amount }} <span class="unit">元</span>
-        </div>
+        <div class="num">{{ urbanIncome.amount }} <span class="unit">元</span></div>
         <div class="rate red">{{ urbanIncome.yearOnYearGrowth }}%↑</div>
       </div>
 
       <div class="bubble b5">
         <div class="time">{{ ruralIncome.quarter }}</div>
         <div class="label">农村居民人均收入情况</div>
-        <div class="num">
-          {{ ruralIncome.amount }} <span class="unit">元</span>
-        </div>
+        <div class="num">{{ ruralIncome.amount }} <span class="unit">元</span></div>
         <div class="rate red">{{ ruralIncome.yearOnYearGrowth }}%↑</div>
       </div>
 
@@ -463,7 +446,7 @@ onMounted(async () => {
       label: {
         show: true,
         color: 'rgba(240, 252, 255, 0.92)',
-        fontSize: 14,
+        fontSize: 40,
         fontWeight: 'bold',
         textShadowBlur: 10,
         textShadowColor: 'rgba(0, 120, 200, 0.6)'
@@ -480,7 +463,7 @@ onMounted(async () => {
         projection: 'perspective',
         alpha: 70,
         beta: -18,
-        distance: 175,
+        distance: 140,
         minDistance: 80,
         maxDistance: 170,
         rotateSensitivity: 0,
@@ -562,19 +545,19 @@ onBeforeUnmount(() => {
   left: 50%;
   top: 55%;
   transform: translate(-50%, -50%);
-  width: 1100px;
-  height: 1000px;
+  width: 1800px;
+  height: 1650px;
   z-index: 5;
   pointer-events: none;
 }
 
 .cpi-item {
   position: absolute;
-  top: 18%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 350px;
-  height: 350px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(20, 124, 230, 0.28), transparent 70%);
@@ -588,12 +571,12 @@ onBeforeUnmount(() => {
 }
 
 .cpi-item .time {
-  font-size: 32px;
+  font-size: 40px;
   color: #94d8ff;
 }
 
 .cpi-item .label {
-  font-size: 32px;
+  font-size: 40px;
   margin: 6px 0;
 }
 
@@ -606,10 +589,10 @@ onBeforeUnmount(() => {
 .main-card {
   position: absolute;
   top: 50%;
-  right: 18%;
+  right: 8%;
   transform: translateY(-50%);
-  width: 350px;
-  height: 350px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(22, 130, 230, 0.32), rgba(8, 30, 70, 0.04));
@@ -623,36 +606,36 @@ onBeforeUnmount(() => {
 }
 
 .main-card-time {
-  font-size: 32px;
+  font-size: 40px;
   color: #94d8ff;
 }
 
 .main-card-label {
-  font-size: 32px;
+  font-size: 40px;
   text-align: center;
   margin-top: 8px;
 }
 
 .main-card-num {
-  font-size: 48px;
+  font-size: 40px;
   color: #ffff55;
   font-weight: bold;
   margin: 8px 0;
 }
 
 .main-card-num .unit {
-  font-size: 32px;
+  font-size: 40px;
 }
 
 .main-card-rate {
-  font-size: 32px;
+  font-size: 40px;
   color: #4cff70;
 }
 
 .bubble {
   position: absolute;
-  width: 350px;
-  height: 350px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
   border: 2px solid #42b8ff;
   background: radial-gradient(circle, rgba(22, 130, 230, 0.24), rgba(8, 30, 70, 0.04));
@@ -667,17 +650,17 @@ onBeforeUnmount(() => {
 }
 
 .bubble .time {
-  font-size: 32px;
+  font-size: 40px;
   color: #94d8ff;
 }
 
 .bubble .label {
-  font-size: 32px;
+  font-size: 40px;
   text-align: center;
 }
 
 .bubble .num {
-  font-size: 36px;
+  font-size: 40px;
   color: #ffff55;
   font-weight: bold;
   margin: 6px 0;
@@ -697,31 +680,31 @@ onBeforeUnmount(() => {
 }
 
 .b1 {
-  top: 28%;
+  top: 18%;
   left: 16%;
   animation-delay: 0s;
 }
 
 .b2 {
-  top: 50%;
+  top: 43%;
   left: 12%;
   animation-delay: 0.8s;
 }
 
 .b3 {
-  top: 72%;
+  top: 66%;
   left: 18%;
   animation-delay: 1.6s;
 }
 
 .b4 {
-  top: 24%;
-  right: 12%;
+  top: 18%;
+  right: 20%;
   animation-delay: 2.4s;
 }
 
 .b5 {
-  top: 70%;
+  top: 66%;
   right: 16%;
   animation-delay: 3.2s;
 }

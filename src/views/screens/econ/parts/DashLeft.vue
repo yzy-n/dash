@@ -65,7 +65,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab === activeInvestTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handleInvestTabClick(tab)"
         >
           {{ tab }}
@@ -107,7 +106,6 @@
           type="button"
           class="tab"
           :class="{ 'tab--active': tab === activePileTab }"
-          :style="{ backgroundImage: `url(${tabBgUrl})` }"
           @click="handlePileTabClick(tab)"
         >
           {{ tab }}
@@ -192,7 +190,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import PieRing from '../charts/PieRing.vue'
 import Line from '../charts/line.vue'
 import {
@@ -468,14 +465,14 @@ const gdpLineOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 14 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
     },
     legend: {
       top: 10,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 14 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 34 }
     },
     grid: { left: 60, right: 24, top: 54, bottom: 34 },
     xAxis: {
@@ -538,7 +535,7 @@ const regionGdpOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 24 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
     },
     grid: { left: 82, right: 84, top: 48, bottom: 66 },
     xAxis: {
@@ -574,7 +571,7 @@ const regionGdpOption = computed(() => {
         type: 'bar',
         yAxisIndex: 0,
         data: gdp,
-        barWidth: 14,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
@@ -678,8 +675,7 @@ const currentInvestDateOptions = computed<string[]>(() => {
 })
 
 const currentInvestDate = computed<string>({
-  get: () =>
-    activeInvestTab.value === '园区' ? dateInvestPark.value : dateInvestFixed.value,
+  get: () => (activeInvestTab.value === '园区' ? dateInvestPark.value : dateInvestFixed.value),
   set: (v: string) => {
     if (activeInvestTab.value === '园区') dateInvestPark.value = v
     else dateInvestFixed.value = v
@@ -747,7 +743,7 @@ const investOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
     },
     grid: { left: 60, right: 24, top: 64, bottom: 80 },
     xAxis: {
@@ -769,7 +765,7 @@ const investOption = computed(() => {
     series: [
       {
         type: 'bar',
-        barWidth: 24,
+        barWidth: 50,
         data: values,
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
@@ -851,12 +847,7 @@ const fetchPileData = async () => {
       }))
     } else {
       const res: any = await getEconomicIndicatorsPark(datePilePark.value)
-      console.log(
-        '[pile-economicindicatorspark] souseDate=',
-        datePilePark.value,
-        'res=',
-        res
-      )
+      console.log('[pile-economicindicatorspark] souseDate=', datePilePark.value, 'res=', res)
 
       const list = pickList(res)
       pileData.value = list.map((it: any) => ({
@@ -1022,28 +1013,28 @@ const investOption2 = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 36 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
     },
     legend: {
       top: 8,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 30 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 34 }
     },
-    grid: { left: 90, right: 24, top: 50, bottom: 400 },
+    grid: { left: 120, right: 24, top: 50, bottom: 400 },
     xAxis: {
       type: 'category',
       data: names,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 36, rotate: 40 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：亿元',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 36 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 36 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -1282,18 +1273,16 @@ onMounted(() => {
     0 0 24px #0f58d1;
 }
 .panel-date {
-   height: 50px;
+  height: 50px;
   padding: 0 18px;
-  border-radius: 999px;
+  border-radius: 25px;
   border: 1px solid rgba(78, 184, 255, 0.22);
   background: rgba(5, 26, 66, 0.45);
   color: rgba(209, 234, 255, 0.86);
   font-size: 40px;
   font-weight: 800;
-  letter-spacing: 1px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
+  line-height: 50px;
 }
 .panel-tabs {
   position: absolute;
@@ -1317,28 +1306,14 @@ onMounted(() => {
   padding: 0 38px;
   border: none;
   outline: none;
-  background-color: transparent;
-  appearance: none;
-  -webkit-appearance: none;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
   color: rgba(214, 238, 255, 0.52);
   font-size: 28px;
   font-weight: 700;
   line-height: 56px;
   text-align: center;
   cursor: pointer;
-  opacity: 0.72;
-  filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
-  text-shadow:
-    0 0 6px #fff,
-    0 0 12px #7cf,
-    0 0 24px #0cf,
-    0 0 40px #00a8ff;
   letter-spacing: 2px;
 }
 .tab--active {
@@ -1414,7 +1389,7 @@ onMounted(() => {
 }
 .four-reform-title {
   text-align: center;
-  font-size: 24px;
+  font-size: 40px;
   font-weight: 900;
   color: #40f3b8;
   letter-spacing: 2px;
@@ -1435,7 +1410,7 @@ onMounted(() => {
   background: rgba(10, 30, 65, 0.35);
 }
 .four-reform-label {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 800;
   color: rgba(214, 238, 255, 0.75);
 }
@@ -1451,7 +1426,7 @@ onMounted(() => {
   text-shadow: 0 0 10px rgba(54, 232, 255, 0.16);
 }
 .four-reform-value .unit {
-  font-size: 40px;
+  font-size: 34px;
   color: rgba(214, 238, 255, 0.6);
 }
 .pile-body {
@@ -1466,6 +1441,8 @@ onMounted(() => {
 }
 .steel-body {
   width: 100%;
+  height: 100%;
+  overflow-y: scroll;
 }
 .steel-header-row {
   display: flex;
@@ -1477,14 +1454,14 @@ onMounted(() => {
   text-align: center;
   font-size: 34px;
   color: #fff;
-  padding: 12px 4px;
+  padding: 8px 4px;
   text-shadow: 0 0 8px #2178dd;
 }
 .steel-row-wrap {
   display: flex;
   align-items: center;
   position: relative;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 .arrow {
   width: 14px;
@@ -1507,7 +1484,7 @@ onMounted(() => {
 .steel-data-row .col {
   flex: 1;
   text-align: center;
-  font-size: 34px;
+  font-size: 40px;
   color: #ffffff;
   padding: 16px 4px;
   text-shadow: 0 0 6px #247ddd;

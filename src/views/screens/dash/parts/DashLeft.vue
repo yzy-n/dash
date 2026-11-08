@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import tabBgUrl from '@/assets/img/tabBg.png'
 import CityGreeningChart from '../charts/CityGreeningChart.vue'
 import LandUseAreaChart from '../charts/LandUseAreaChart.vue'
 import PopulationDensityLineChart from '../charts/PopulationDensityLineChart.vue'
@@ -92,7 +91,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
               type="button"
               class="tab"
               :class="{ 'tab--active': activeGreeningTab === item.key }"
-              :style="{ backgroundImage: `url(${tabBgUrl})` }"
               @click="handleGreeningTabClick(item.key)"
             >
               {{ item.label }}
@@ -111,7 +109,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
               type="button"
               class="tab"
               :class="{ 'tab--active': activeTrendTab === item.key }"
-              :style="{ backgroundImage: `url(${tabBgUrl})` }"
               @click="handleTrendTabClick(item.key)"
             >
               {{ item.label }}
@@ -137,7 +134,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
             type="button"
             class="tab"
             :class="{ 'tab--active': activeSanitationTab === item.key }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleSanitationTabClick(item.key)"
           >
             {{ item.label }}
@@ -169,7 +165,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
             type="button"
             class="tab"
             :class="{ 'tab--active': activeParkTab === item.key }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="activeParkTab = item.key"
           >
             {{ item.label }}

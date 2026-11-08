@@ -17,7 +17,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab.type === activeGasTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleGasTabClick(tab.type)"
           >
             {{ tab.label }}
@@ -117,7 +116,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab.type === activeHeatTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="handleHeatTabClick(tab.type)"
           >
             {{ tab.label }}
@@ -198,7 +196,6 @@ import {
   getAedcondition
 } from '@/api/service'
 import EChart from '@/components/echarts/EChart.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 
 // ============================================================
 // 燃气（接口版）

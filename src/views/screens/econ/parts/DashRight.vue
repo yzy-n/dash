@@ -4,11 +4,7 @@
       <section class="panel market-panel">
         <div class="panel-head">
           <div class="panel-title">各地区市场主体</div>
-          <select
-            v-model="dateMarket"
-            class="panel-date"
-            @change="fetchMarketData"
-          >
+          <select v-model="dateMarket" class="panel-date" @change="fetchMarketData">
             <option v-for="item in marketDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -18,15 +14,11 @@
         <div class="market-metrics-wrap">
           <div class="metric-item">
             <div class="metric-label">总计</div>
-            <div class="metric-value">
-              {{ marketTotals.total }} <span class="unit">户</span>
-            </div>
+            <div class="metric-value">{{ marketTotals.total }} <span class="unit">户</span></div>
           </div>
           <div class="metric-item">
             <div class="metric-label">内资企业</div>
-            <div class="metric-value">
-              {{ marketTotals.domestic }} <span class="unit">户</span>
-            </div>
+            <div class="metric-value">{{ marketTotals.domestic }} <span class="unit">户</span></div>
           </div>
           <div class="metric-item">
             <div class="metric-label">个体工商户</div>
@@ -35,16 +27,14 @@
             </div>
           </div>
           <div class="metric-item">
-            <div class="metric-label">农民专业合作社</div>
+            <div class="metric-label">农民合作社</div>
             <div class="metric-value">
               {{ marketTotals.cooperative }} <span class="unit">户</span>
             </div>
           </div>
           <div class="metric-item">
             <div class="metric-label">外资企业</div>
-            <div class="metric-value">
-              {{ marketTotals.overseas }} <span class="unit">户</span>
-            </div>
+            <div class="metric-value">{{ marketTotals.overseas }} <span class="unit">户</span></div>
           </div>
         </div>
         <!-- 柱状图区域 -->
@@ -57,11 +47,7 @@
       <section class="panel panel--tower">
         <div class="panel-head">
           <div class="panel-title">价格监测</div>
-          <select
-            v-model="datePrice"
-            class="panel-date"
-            @change="fetchPriceData"
-          >
+          <select v-model="datePrice" class="panel-date" @change="fetchPriceData">
             <option v-for="item in priceDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -74,7 +60,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab === activePriceTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="switchPriceTab(tab)"
           >
             {{ tab }}
@@ -116,11 +101,7 @@
       <section class="panel panel--water">
         <div class="panel-head">
           <div class="panel-title">消费品总额增速</div>
-          <select
-            v-model="dateWater"
-            class="panel-date"
-            @change="fetchWaterData"
-          >
+          <select v-model="dateWater" class="panel-date" @change="fetchWaterData">
             <option v-for="item in waterDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -135,11 +116,7 @@
       <section class="panel panel--heat">
         <div class="panel-head">
           <div class="panel-title">建筑业增值增速</div>
-          <select
-            v-model="dateHeat"
-            class="panel-date"
-            @change="fetchHeatData"
-          >
+          <select v-model="dateHeat" class="panel-date" @change="fetchHeatData">
             <option v-for="item in heatDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -152,7 +129,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab === activeHeatTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="activeHeatTab = tab"
           >
             {{ tab }}
@@ -168,11 +144,7 @@
       <section class="panel panel--red">
         <div class="panel-head red-panel-head">
           <div class="panel-title">数字经济与服务</div>
-          <select
-            v-model="dateRed"
-            class="panel-date"
-            @change="fetchRedData"
-          >
+          <select v-model="dateRed" class="panel-date" @change="fetchRedData">
             <option v-for="item in redDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -203,11 +175,7 @@
       <section class="panel panel--aed">
         <div class="panel-head red-panel-head">
           <div class="panel-title">商品房交易情况</div>
-          <select
-            v-model="dateHouse"
-            class="panel-date"
-            @change="fetchHouseData"
-          >
+          <select v-model="dateHouse" class="panel-date" @change="fetchHouseData">
             <option v-for="item in houseDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -220,7 +188,6 @@
             type="button"
             class="tab"
             :class="{ 'tab--active': tab === activeHouseTab }"
-            :style="{ backgroundImage: `url(${tabBgUrl})` }"
             @click="switchHouseTab(tab)"
           >
             {{ tab }}
@@ -241,7 +208,6 @@ import productChart from '@/views/screens/econ/charts/product.vue'
 import plusChart from '@/views/screens/econ/charts/plus.vue'
 import houseChart from '@/views/screens/econ/charts/house.vue'
 import serviceChart from '@/views/screens/econ/charts/service.vue'
-import tabBgUrl from '@/assets/img/tabBg.png'
 import {
   getEachRegion,
   getAmountGrowth,
@@ -347,12 +313,11 @@ const barOption = computed(() => {
       trigger: 'axis',
       backgroundColor: 'rgba(4,24,48,0.85)',
       borderColor: '#26c9dd',
-      textStyle: { color: '#fff' },
-      formatter: (params: any) =>
-        `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
+      textStyle: { color: '#fff', fontSize: 40 },
+      formatter: (params: any) => `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
     },
     grid: {
-      left: '8%',
+      left: '9%',
       right: '4%',
       top: '12%',
       bottom: '22%'
@@ -362,24 +327,24 @@ const barOption = computed(() => {
       data: names,
       axisLine: { lineStyle: { color: '#287892' } },
       axisLabel: {
-        color: '#82d8e8',
+        color: 'rgba(214, 238, 255, 0.6)',
         rotate: 40,
-        fontSize: 36
+        fontSize: 28
       }
     },
     yAxis: {
       name: '单位：户',
-      nameTextStyle: { color: '#82d8e8' },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       type: 'value',
       splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
       axisLine: { show: false },
-      axisLabel: { color: '#82d8e8', fontSize: 30 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 }
     },
     series: [
       {
         name: '内资企业',
         type: 'bar',
-        barWidth: '40%',
+        barWidth: '50',
         data: values,
         itemStyle: {
           color: {
@@ -595,11 +560,7 @@ const fetchPriceData = async () => {
   try {
     const goodsType = priceGoodsTypeMap[activePriceTab.value] ?? '1'
     const res: any = await getPrice(datePrice.value, goodsType)
-    console.log(
-      '[price] souseDate=', datePrice.value,
-      'goodsType=', goodsType,
-      'res=', res
-    )
+    console.log('[price] souseDate=', datePrice.value, 'goodsType=', goodsType, 'res=', res)
 
     const list = pickPriceList(res)
     priceTableData.value = list.map((it: any) => ({
@@ -823,7 +784,7 @@ const serviceBarOption = computed(() => {
       axisPointer: { type: 'shadow' },
       backgroundColor: 'rgba(4,24,48,0.85)',
       borderColor: '#26c9dd',
-      textStyle: { color: '#fff' },
+      textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any) => {
         const p = params[0]
         const row = redData.value[p.dataIndex]
@@ -832,7 +793,7 @@ const serviceBarOption = computed(() => {
     },
     grid: {
       left: '3%',
-      right: '9%',
+      right: '19%',
       top: '6%',
       bottom: '4%',
       containLabel: true
@@ -840,22 +801,22 @@ const serviceBarOption = computed(() => {
     xAxis: {
       type: 'value',
       name: '单位：亿元',
-      nameTextStyle: { color: '#82d8e8' },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(38,201,221,0.15)' } },
       axisLine: { show: false },
-      axisLabel: { color: '#82d8e8', fontSize: 36 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 }
     },
     yAxis: {
       type: 'category',
       data: names,
       axisLine: { lineStyle: { color: '#287892' } },
-      axisLabel: { color: '#82d8e8', fontSize: 36 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 }
     },
     series: [
       {
         name: '营业收入',
         type: 'bar',
-        barWidth: '50%',
+        barWidth: '50',
         data: values,
         itemStyle: {
           color: {
@@ -1103,7 +1064,7 @@ onMounted(() => {
   border-left: 2px solid #ffdd66;
 }
 .metric-label {
-  font-size: 26px;
+  font-size: 34px;
   color: #c6ecf8;
 }
 .metric-value {
@@ -1317,7 +1278,7 @@ onMounted(() => {
 }
 .red-top-label {
   min-width: 0;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.92);
   letter-spacing: 1px;

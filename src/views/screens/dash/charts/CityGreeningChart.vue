@@ -31,20 +31,24 @@ const option = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { trigger: 'axis' },
+    tooltip: {
+      trigger: 'axis',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
     grid: { left: 116, right: 18, top: 26, bottom: 46 },
     xAxis: {
       type: 'category',
       data: selected.years,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 40 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 28 }
     },
     yAxis: {
       type: 'value',
       max: selected.yMax,
       name: selected.unit ? `单位：${selected.unit}` : undefined,
       nameTextStyle: { color: 'rgba(214,238,255,0.55)', fontSize: 40, padding: [0, 0, 0, 10] },
-      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 40 },
+      axisLabel: { color: 'rgba(214,238,255,0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(101,200,255,0.12)' } }
     },
     series: [

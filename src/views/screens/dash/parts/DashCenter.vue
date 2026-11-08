@@ -258,6 +258,7 @@ watch(
   width: 100%;
   height: 100%;
   padding: 0 42px 0 42px;
+  background: rgba(5, 26, 66, 0.45);
   appearance: none;
   border: none;
   outline: none;
@@ -267,6 +268,13 @@ watch(
   letter-spacing: inherit;
   text-align: center;
   cursor: pointer;
+}
+.map-caption-select option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .map-chart {

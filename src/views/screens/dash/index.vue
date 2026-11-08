@@ -278,17 +278,20 @@ const loadCaseStatisticsByArea = async (areaName: string) => {
   const root = isRecord(payload) ? payload : ({} as UnknownRecord)
   const summary =
     (isRecord(root.summary) && root.summary) ||
-    ((isRecord((root as any).data) && isRecord((root as any).data.summary) && (root as any).data.summary) as
-      | UnknownRecord
-      | undefined)
+    ((isRecord((root as any).data) &&
+      isRecord((root as any).data.summary) &&
+      (root as any).data.summary) as UnknownRecord | undefined)
 
   const latestSource =
-    (summary && (summary.latestData || (summary as any).latestList || (summary as any).latest)) || []
+    (summary && (summary.latestData || (summary as any).latestList || (summary as any).latest)) ||
+    []
   const previousSource =
-    (summary && (summary.previousData || (summary as any).previousList || (summary as any).previous)) || []
+    (summary &&
+      (summary.previousData || (summary as any).previousList || (summary as any).previous)) ||
+    []
 
-  const latestRows = preferPublishedRows(Array.isArray(latestSource) ? latestSource : []).filter((item) =>
-    isRecord(item)
+  const latestRows = preferPublishedRows(Array.isArray(latestSource) ? latestSource : []).filter(
+    (item) => isRecord(item)
   )
   const previousRows = preferPublishedRows(
     Array.isArray(previousSource) ? previousSource : []
@@ -313,7 +316,7 @@ const loadCaseStatisticsByArea = async (areaName: string) => {
     stats.push({
       name,
       year: getValue(row) ?? 0,
-      last: prev ? getValue(prev) ?? 0 : 0
+      last: prev ? (getValue(prev) ?? 0) : 0
     })
     previousMap.delete(name)
   })

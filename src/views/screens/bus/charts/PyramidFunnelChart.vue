@@ -15,11 +15,11 @@ import { computed, ref, watch } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
 import * as echarts from 'echarts'
 
-type FunnelRow = { name: string; value: number }
+type PieRow = { name: string; value: number }
 
 const props = withDefaults(
   defineProps<{
-    monthDataMap?: Record<string, FunnelRow[]>
+    monthDataMap?: Record<string, PieRow[]>
     unit?: string
   }>(),
   {
@@ -42,17 +42,14 @@ watch(monthOptions, (list) => {
 
 // 径向渐变 模拟圆柱3D明暗光影（从上至下三层）
 const gradientList = [
-  // 顶层跨市：浅蓝径向渐变，中间亮边缘暗，模拟3D锥顶
   new echarts.graphic.RadialGradient(0.5, 0.3, 0.8, [
     { offset: 0, color: '#99e0ff' },
     { offset: 1, color: '#1a78dd' }
   ]),
-  // 中层跨县：青绿渐变
   new echarts.graphic.RadialGradient(0.5, 0.3, 0.8, [
     { offset: 0, color: '#a8fff0' },
     { offset: 1, color: '#18b8a8' }
   ]),
-  // 底层县内：深蓝渐变
   new echarts.graphic.RadialGradient(0.5, 0.3, 0.8, [
     { offset: 0, color: '#80bfff' },
     { offset: 1, color: '#1044bb' }
@@ -74,7 +71,7 @@ const chartOption = computed(() => {
     })
   }
 
-  const uniqueRows: FunnelRow[] = Array.from(rowMap.entries()).map(([name, value]) => ({
+  const uniqueRows: PieRow[] = Array.from(rowMap.entries()).map(([name, value]) => ({
     name,
     value
   }))
@@ -106,36 +103,40 @@ const chartOption = computed(() => {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(0,0,0,0.75)',
-      textStyle: { color: '#fff' },
-      formatter: (params: any) => `${params.name}：${params.value} ${props.unit}`
+      textStyle: { color: '#fff', fontSize: 40 },
+      formatter: (params: any) =>
+        `${params.name}：${params.value} ${props.unit}（${params.percent}%）`
     },
     series: [
       {
-        type: 'funnel',
-        left: '8%',
-        top: '5%',
-        width: '65%',
-        height: '90%',
-        sort: 'ascending', // 数值小在上，金字塔上尖下宽
-        gap: 2,
-        min: 0,
-        max: 90,
+        type: 'pie',
+        // 环形内外半径，留出中心空白放置数据也可以
+        radius: ['38%', '68%'],
+        center: ['50%', '50%'],
+        // 数值不按比例，按数据顺序排列，视觉更均匀
+        sort: 'none',
+        gap: 4, // 扇区间隙
+        avoidLabelOverlap: true,
         itemStyle: {
-          borderRadius: 14, // 圆角模拟圆柱侧面
-          shadowBlur: 22, // 外发光增强立体
+          borderRadius: 14, // 扇区圆角
+          borderWidth: 2, // 外描边发光线
+          borderColor: 'auto',
+          shadowBlur: 22,
           shadowColor: 'rgba(80,200,255,0.45)',
           shadowOffsetX: 4,
           shadowOffsetY: 6
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'outside',
           color: '#ffffff',
-          fontSize: 40,
-          formatter: `{b} {c} ${props.unit}`
+          fontSize: 36,
+          formatter: `{b}\n{c} ${props.unit}`
         },
         labelLine: {
           show: true,
+          length: 14,
+          length2: 12,
           lineStyle: {
             color: '#70e0ff',
             width: 1

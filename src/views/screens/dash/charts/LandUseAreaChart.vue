@@ -25,13 +25,13 @@ const option = computed(() => {
       data: props.data.map((d) => d.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 36 }
+      axisLabel: { color: 'rgba(214,238,255,0.78)', fontSize: 28 }
     },
     series: [
       {
         type: 'bar',
         data: props.data.map((d) => d.value),
-        barWidth: 30,
+        barWidth: 50,
         showBackground: true,
         backgroundStyle: { color: 'rgba(6,18,48,0.55)' },
         label: {
@@ -39,7 +39,7 @@ const option = computed(() => {
           position: 'right',
           formatter: (p: any) => `${Number(p.value).toFixed(2)}%`,
           color: '#dff3ff',
-          fontSize: 36
+          fontSize: 28
         },
         itemStyle: {
           borderRadius: 8,

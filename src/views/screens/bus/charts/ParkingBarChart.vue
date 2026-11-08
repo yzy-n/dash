@@ -40,24 +40,24 @@ const renderChart = () => {
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.7)',
         rotate: 15,
-        fontSize: 30
+        fontSize: 28
       }
     },
     yAxis: {
       type: 'value',
       name: `单位：${props.unit || '万个'}`,
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)' },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       max: yAxisMax,
-      axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)', fontSize: 30 } },
-      splitLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.1)', fontSize: 30 } },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 30 }
+      axisLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.2)', fontSize: 28 } },
+      splitLine: { lineStyle: { color: 'rgba(90, 200, 255, 0.1)', fontSize: 28 } },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 }
     },
     series: [
       {
         name: '停车位数量',
         type: 'bar',
         data: props.yData,
-        barWidth: 80,
+        barWidth: 50,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#fff266' },

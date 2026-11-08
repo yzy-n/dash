@@ -47,7 +47,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff' },
+      textStyle: { color: '#fff', fontSize: 40 },
       formatter: '{b}<br/>增速: {c} %'
     },
     grid: {
@@ -61,23 +61,23 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLabel: {
-        color: '#fff',
-        fontSize: 26,
+        color: 'rgba(214, 238, 255, 0.6)',
+        fontSize: 28,
         rotate: 65
       },
       axisLine: {
-        lineStyle: { color: 'rgba(120, 200, 255, 0.4)' }
+        lineStyle: { color: 'rgba(214, 238, 255, 0.6)' }
       },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: '#fff', fontSize: 14 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: {
-        lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
+        lineStyle: { color: 'rgba(214, 238, 255, 0.6)' }
       },
-      axisLabel: { color: '#fff', fontSize: 30 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { show: false }
     },
     series: [

@@ -49,7 +49,7 @@ const option = computed(() => {
       trigger: 'axis',
       backgroundColor: 'rgba(0,24,53,0.75)',
       borderColor: '#26c9dd',
-      textStyle: { color: '#ffffff' },
+      textStyle: { color: '#ffffff', fontSize: 40 },
       formatter: (params: any) => {
         let result = params[0].axisValue
         params.forEach((p: any) => {
@@ -66,16 +66,16 @@ const option = computed(() => {
     grid: {
       left: '8%',
       right: '8%',
-      bottom: '10%',
-      top: '12%',
+      bottom: '5%',
+      top: '20%',
       containLabel: true
     },
     xAxis: {
       type: 'category',
       data: xAxisData,
       axisLabel: {
-        color: '#fff',
-        fontSize: 36,
+        color: 'rgba(214, 238, 255, 0.6)',
+        fontSize: 28,
         rotate: 35
       },
       axisLine: {
@@ -87,19 +87,19 @@ const option = computed(() => {
       {
         type: 'value',
         name: '单位：万平方米',
-        nameTextStyle: { color: '#82d8e8', fontSize: 36 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: {
           lineStyle: { color: 'rgba(120, 200, 255, 0.2)' }
         },
-        axisLabel: { color: '#82d8e8', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         axisLine: { show: false }
       },
       {
         type: 'value',
         name: '单位：%',
-        nameTextStyle: { color: '#82d8e8', fontSize: 36 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { show: false },
-        axisLabel: { color: '#82d8e8', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         axisLine: { show: false }
       }
     ],

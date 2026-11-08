@@ -26,7 +26,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff' }
+      textStyle: { color: '#fff', fontSize: 34 }
     },
     series: [
       {
@@ -42,8 +42,7 @@ const option = computed(() => {
           position: 'outside',
           formatter: (params: any) => {
             const it = params.data || {}
-            const rate =
-              it.rate !== undefined && it.rate !== null ? it.rate : params.percent
+            const rate = it.rate !== undefined && it.rate !== null ? it.rate : params.percent
             return `${it.name}\n增加值:${it.value}亿元\n占比:${rate}%`
           },
           color: '#fff',

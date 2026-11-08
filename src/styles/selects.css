@@ -1,0 +1,47 @@
+/*
+ * 卡片筛选 Select 统一样式
+ * 与 service 页面日期下拉保持一致：胶囊形、深蓝半透明底、细蓝边、无原生箭头。
+ * 统一字号 34px。
+ */
+
+body .screen:not(.screen--party) select:not(.map-caption-select) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 50px;
+  padding: 0 22px;
+  border: 1px solid rgba(78, 184, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(5, 26, 66, 0.45);
+  color: rgba(209, 234, 255, 0.86);
+  font-family: inherit;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 1px;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+body .screen:not(.screen--party) select:not(.map-caption-select) option {
+  background-color: #0a1f4a;
+  color: rgba(214, 238, 255, 0.92);
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+body .screen:not(.screen--party) select:not(.map-caption-select) option:checked {
+  background: linear-gradient(0deg, #1a4d8c 0%, #1a4d8c 100%);
+  color: #fff;
+}
+
+/* 地图标题内的下拉是标题形态，仅统一字号，不套胶囊底 */
+body .screen:not(.screen--party) select.map-caption-select {
+  font-size: 34px;
+}

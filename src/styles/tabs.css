@@ -1,0 +1,78 @@
+/*
+ * 卡片 Tab 统一样式
+ * 与党建页面「人才政策」卡片的胶囊形 Tab 保持一致：
+ * 党建页面沿用红金配色，其余页面使用贴合页面背景的蓝色。
+ */
+
+.screen:not(.screen--party) .tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(110, 200, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(10, 40, 90, 0.24);
+  box-shadow: inset 0 0 16px rgba(34, 121, 255, 0.08);
+  color: rgba(214, 238, 255, 0.86);
+  text-shadow: none;
+  opacity: 1;
+  filter: none;
+  font-style: normal;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.screen:not(.screen--party) .tab--active {
+  border-color: rgba(130, 220, 255, 0.85);
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(120, 220, 255, 0.52),
+    rgba(12, 60, 125, 0.42)
+  );
+  box-shadow:
+    inset 0 0 20px rgba(54, 232, 255, 0.12),
+    0 0 18px rgba(54, 232, 255, 0.14);
+  color: #f2fbff;
+  text-shadow: none;
+}
+
+.screen:not(.screen--party) .tab:not(.tab--active):hover {
+  border-color: rgba(130, 220, 255, 0.7);
+  background: rgba(16, 55, 110, 0.38);
+}
+
+/* 各页面卡片内的轻量 Tab 也统一成同款胶囊描边 */
+.screen:not(.screen--party) :is(.action-tab, .station-tab, .rebuild-tab, .time-tab) {
+  box-sizing: border-box;
+  border: 2px solid rgba(110, 200, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(10, 40, 90, 0.24);
+  box-shadow: inset 0 0 16px rgba(34, 121, 255, 0.08);
+  color: rgba(214, 238, 255, 0.86);
+  text-shadow: none;
+  opacity: 1;
+  filter: none;
+  font-style: normal;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.screen:not(.screen--party)
+  :is(.action-tab--active, .station-tab--active, .rebuild-tab--active, .time-tab--active) {
+  border-color: rgba(130, 220, 255, 0.85);
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(120, 220, 255, 0.52),
+    rgba(12, 60, 125, 0.42)
+  );
+  box-shadow:
+    inset 0 0 20px rgba(54, 232, 255, 0.12),
+    0 0 18px rgba(54, 232, 255, 0.14);
+  color: #f2fbff;
+  text-shadow: none;
+}
