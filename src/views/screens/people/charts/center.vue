@@ -120,7 +120,7 @@ const option = computed(() => {
         style: {
           text: '地图加载中...',
           fill: 'rgba(214, 238, 255, 0.75)',
-          fontSize: 16,
+          fontSize: 40,
           fontWeight: 800
         }
       }
@@ -176,7 +176,7 @@ const option = computed(() => {
       label: {
         show: true,
         color: 'rgba(240, 252, 255, 0.92)',
-        fontSize: 14,
+        fontSize: 40,
         fontWeight: 'bold',
         textShadowBlur: 10,
         textShadowColor: 'rgba(0, 120, 200, 0.6)',

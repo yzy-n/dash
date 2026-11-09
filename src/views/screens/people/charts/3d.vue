@@ -253,10 +253,10 @@ function buildLabelGraphicElements(pieData: any[], series: any[], chart: echarts
             y: y3,
             text: `${name}\n${value}`,
             fill: color,
-            font: '700 23px Microsoft YaHei',
+            font: '700 40px Microsoft YaHei',
             textAlign: dir > 0 ? 'left' : 'right',
             textVerticalAlign: 'middle',
-            lineHeight: 16
+            lineHeight: 40
           }
         }
       ]

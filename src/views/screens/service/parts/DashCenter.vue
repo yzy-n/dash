@@ -14,20 +14,10 @@
                 <div class="metric-row">
                   <span class="metric-city">鞍山</span>
                   <span class="metric-val">{{ item.anshan }}</span>
-                  <span
-                    v-if="item.anshanTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.anshanTrend}`"
-                  ></span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-city">辽宁</span>
                   <span class="metric-val">{{ item.liaoning }}</span>
-                  <span
-                    v-if="item.liaoningTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.liaoningTrend}`"
-                  ></span>
                 </div>
               </div>
               <span class="metric-connector"></span>
@@ -45,20 +35,10 @@
                 <div class="metric-row">
                   <span class="metric-city">鞍山</span>
                   <span class="metric-val">{{ item.anshan }}</span>
-                  <span
-                    v-if="item.anshanTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.anshanTrend}`"
-                  ></span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-city">辽宁</span>
                   <span class="metric-val">{{ item.liaoning }}</span>
-                  <span
-                    v-if="item.liaoningTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.liaoningTrend}`"
-                  ></span>
                 </div>
               </div>
               <span class="metric-connector"></span>
@@ -90,20 +70,10 @@
                 <div class="metric-row">
                   <span class="metric-city">鞍山</span>
                   <span class="metric-val">{{ item.anshan }}</span>
-                  <span
-                    v-if="item.anshanTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.anshanTrend}`"
-                  ></span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-city">辽宁</span>
                   <span class="metric-val">{{ item.liaoning }}</span>
-                  <span
-                    v-if="item.liaoningTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.liaoningTrend}`"
-                  ></span>
                 </div>
               </div>
               <span class="metric-connector"></span>
@@ -121,20 +91,10 @@
                 <div class="metric-row">
                   <span class="metric-city">鞍山</span>
                   <span class="metric-val">{{ item.anshan }}</span>
-                  <span
-                    v-if="item.anshanTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.anshanTrend}`"
-                  ></span>
                 </div>
                 <div class="metric-row">
                   <span class="metric-city">辽宁</span>
                   <span class="metric-val">{{ item.liaoning }}</span>
-                  <span
-                    v-if="item.liaoningTrend"
-                    class="metric-trend"
-                    :class="`metric-trend--${item.liaoningTrend}`"
-                  ></span>
                 </div>
               </div>
               <span class="metric-connector"></span>

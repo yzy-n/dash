@@ -379,17 +379,17 @@ const waterOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: true },
-    grid: { left: 90, right: 26, top: 46, bottom: 30 },
+    grid: { left: 90, right: 26, top: 66, bottom: 40 },
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -465,7 +465,14 @@ const towerOption = computed(() => {
   }))
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: true },
+    tooltip: {
+      trigger: 'item',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
+    },
     series: [
       {
         type: 'pie',
@@ -939,7 +946,7 @@ onMounted(() => {
 }
 
 .gas-metric-label {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
@@ -1005,6 +1012,7 @@ onMounted(() => {
   font-weight: 900;
   letter-spacing: 2px;
   color: rgba(214, 238, 255, 0.78);
+  margin-top: 60px;
 }
 
 .tower-kpi-value {
@@ -1107,7 +1115,7 @@ onMounted(() => {
   min-height: 0;
   display: grid;
   gap: 6px;
-  margin-top: 90px;
+  margin-top: 120px;
   padding-bottom: 160px;
   box-sizing: border-box;
 }

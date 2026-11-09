@@ -32,11 +32,15 @@ const renderChart = () => {
     backgroundColor: '#091835',
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'shadow' }
+      axisPointer: { type: 'shadow' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
     },
     legend: {
       data: ['总户数', '总人数'],
-      textStyle: { color: '#fff' },
+      textStyle: { color: '#fff', fontSize: 40 },
       top: 8
     },
     grid: {
@@ -49,25 +53,25 @@ const renderChart = () => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: '#335488' } },
-      axisLabel: { color: '#ffffff', fontSize: 26 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 }
     },
     yAxis: [
       {
         type: 'value',
         name: '单位：万户',
-        nameTextStyle: { color: '#fff', fontSize: 26 },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { lineStyle: { color: '#25406b' } },
         axisLine: { show: false },
-        axisLabel: { color: '#fff', fontSize: 26 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         max: 35
       },
       {
         type: 'value',
         name: '单位：万人',
-        nameTextStyle: { color: '#fff' },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { show: false },
         axisLine: { show: false },
-        axisLabel: { color: '#fff' },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         max: 120
       }
     ],

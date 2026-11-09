@@ -13,15 +13,7 @@ const props = defineProps<{
 }>()
 
 // 默认模拟数据（鞍山各区县）
-const defaultList: ChartListItem[] = [
-  { name: '海城市', 农村人口数: 76, 城镇人口数: 31 },
-  { name: '台安县', 农村人口数: 29, 城镇人口数: 8 },
-  { name: '岫岩县', 农村人口数: 36, 城镇人口数: 15 },
-  { name: '铁东区', 农村人口数: 2, 城镇人口数: 52 },
-  { name: '铁西区', 农村人口数: 6, 城镇人口数: 24 },
-  { name: '立山区', 农村人口数: 2, 城镇人口数: 47 },
-  { name: '千山区', 农村人口数: 10, 城镇人口数: 4 }
-]
+const defaultList: ChartListItem[] = []
 
 const chartList = computed(() => props.list ?? defaultList)
 
@@ -71,13 +63,13 @@ const option = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },
     legend: {
       data: seriesNames,
       top: 4,
       right: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 26 },
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 40 },
       itemWidth: 10,
       itemHeight: 10
     },
@@ -93,7 +85,7 @@ const option = computed(() => {
       data: xAxisData,
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.6)',
-        fontSize: 26,
+        fontSize: 28,
         rotate: 30
       },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
@@ -103,8 +95,8 @@ const option = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：万人',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 26 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }

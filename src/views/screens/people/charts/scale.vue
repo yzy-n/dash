@@ -78,14 +78,14 @@ const option = computed(() => {
       backgroundColor: 'rgba(0,24,53,0.85)',
       borderColor: 'rgba(84,188,255,0.22)',
       borderWidth: 1,
-      textStyle: { color: '#ffffff' },
+      textStyle: { color: '#ffffff', fontSize: 40 },
       formatter: '{b}<br/>● {a}: {c}'
     },
     legend: {
       data: seriesNames,
       top: 8,
       right: 12,
-      textStyle: { color: '#fff', fontSize: 26 },
+      textStyle: { color: '#fff', fontSize: 40 },
       itemWidth: 12,
       itemHeight: 12
     },
@@ -100,19 +100,19 @@ const option = computed(() => {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(120,200,255,0.35)' } },
-      axisLabel: { color: '#fff', fontSize: 26 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisTick: { show: false },
       splitLine: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：人',
-      nameTextStyle: { color: '#fff', fontSize: 26 },
+      nameTextStyle: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       min: 0,
       max: 6,
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: '#fff', fontSize: 26 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120,200,255,0.15)' } }
     },
     series

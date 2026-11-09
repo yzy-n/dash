@@ -380,7 +380,7 @@ onMounted(() => {
 
 .block-tag {
   position: absolute;
-  top: 180px;
+  top: 200px;
   left: 700px;
   font-size: 50px;
 }
@@ -388,7 +388,7 @@ onMounted(() => {
   width: 390px;
   position: absolute;
   left: 580px;
-  top: 180px;
+  top: 200px;
   text-align: center;
   font-size: 50px;
   color: #ffe7ac;
@@ -515,7 +515,7 @@ onMounted(() => {
   height: 42px;
   position: absolute;
   left: 50%;
-  top: 0;
+  top: 20px;
   transform: translateX(-50%);
   text-align: center;
   line-height: 42px;

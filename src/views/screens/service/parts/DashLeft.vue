@@ -381,28 +381,72 @@ const electricPieOption = computed(() => {
     name: item.label,
     value: Number(item.capacityNum) || 0
   }))
+  const total = data.reduce((acc, item) => acc + item.value, 0)
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 20 }, // 缩小 tooltip 字号以匹配滚动图例
+      formatter: (params: any) => {
+        const percent = total ? ((Number(params.value) / total) * 100).toFixed(2) : '0.00'
+        return `${params.marker}${params.name}<br/>用电量：${params.value} 万千瓦时<br/>占比：${percent}%`
+      }
+    },
     legend: {
-      bottom: 10,
-      left: 'center',
-      itemWidth: 10,
-      itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 }
+      type: 'scroll', // 开启图例滚动（超出高度出现翻页按钮，防止无限往下撑并折行）
+      orient: 'vertical',
+      right: 10,
+      top: 'middle',
+      height: '80%', // 限制图例高度，防止占满右侧或换列
+      itemWidth: 14,
+      itemHeight: 14,
+      itemGap: 16, // 稍微增加间距让滚动更清晰
+      icon: 'circle',
+      pageIconColor: '#37d5ff',
+      pageIconInactiveColor: '#2f4554',
+      pageTextStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 40 },
+      formatter: (name: string) => {
+        const item = data.find((d) => d.name === name)
+        const percent = total && item ? ((item.value / total) * 100).toFixed(1) : '0.0'
+        return `{n|${name}}  {v|${percent}%}`
+      },
+      textStyle: {
+        rich: {
+          // 将字号缩小为 20（原来 40 会导致 10 条数据直接超出容器高度）
+          n: { color: 'rgba(214, 238, 255, 0.78)', fontSize: 40, verticalAlign: 'middle' },
+          v: { color: '#fff', fontSize: 40, fontWeight: 800, verticalAlign: 'middle' }
+        }
+      }
     },
     series: [
       {
         type: 'pie',
-        radius: ['44%', '78%'],
-        center: ['54%', '50%'],
+        radius: ['38%', '65%'],
+        center: ['30%', '50%'], // 饼图稍微左移，给右侧滚动条/图例留出空间
         label: { show: false },
+        labelLine: { show: false },
         itemStyle: { borderWidth: 2, borderColor: 'rgba(2, 10, 30, 0.92)' },
         data
       }
     ],
-    color: ['#37d5ff', '#ffe24a', '#ffb84a', '#7c5cff']
+    // 增加颜色池，确保数据项变多时颜色不会重复
+    color: [
+      '#37d5ff',
+      '#ffe24a',
+      '#ffb84a',
+      '#7c5cff',
+      '#40f3b8',
+      '#ff7c7c',
+      '#2f4554',
+      '#61a0a8',
+      '#d48265',
+      '#91c7ae',
+      '#749f83'
+    ]
   }
 })
 
@@ -555,18 +599,18 @@ const pileOption = computed(() => {
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 40 }
     },
     xAxis: {
       type: 'category',
       data: districts,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -801,7 +845,7 @@ const energyOption = computed(() => {
     yAxis: {
       type: 'category',
       data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.8)', fontSize: 28 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { show: false },
       axisTick: { show: false }
     },
@@ -1013,7 +1057,7 @@ onMounted(() => {
 }
 
 .metric-label {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
 }
@@ -1041,7 +1085,7 @@ onMounted(() => {
 
 .electric-chart,
 .capacity-chart {
-  margin-top: 40px;
+  margin-top: 10px;
   height: 80%;
   min-height: 0;
 }
@@ -1419,9 +1463,10 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  font-size: 20px;
+  font-size: 34px;
   font-weight: 900;
   letter-spacing: 2px;
+  margin-top: 20px;
 }
 .energy-kpi-label {
   color: rgba(214, 238, 255, 0.78);

@@ -304,14 +304,14 @@ const genderOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
-    grid: { left: 154, right: 118, top: 18, bottom: 18 },
+    grid: { left: 84, right: 118, top: 18, bottom: 18 },
     xAxis: { type: 'value', show: false },
     yAxis: {
       type: 'category',
       data: ['男性', '女性'],
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 36, fontWeight: 800 }
+      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 34 }
     },
     series: [
       {
@@ -319,26 +319,52 @@ const genderOption = computed(() => {
         data: [
           {
             value: d.male,
-            itemStyle: { color: '#63d8ff' },
+            // 水平渐变色：左侧半透明，右侧实色
+            itemStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 1,
+                y2: 0,
+                colorStops: [
+                  { offset: 0, color: 'rgba(0, 80, 179, 0.1)' },
+                  { offset: 1, color: '#63d8ff' }
+                ]
+              }
+            },
             label: {
               show: true,
               position: 'right',
-              formatter: `${d.male}万  ${maleRate}%`,
+              formatter: `${d.male}万`,
               color: 'rgba(240, 251, 255, 0.9)',
               fontWeight: 800,
-              fontSize: 36
+              fontSize: 34
             }
           },
           {
             value: d.female,
-            itemStyle: { color: '#ffe24a' },
+            // 水平渐变色：左侧半透明，右侧实色
+            itemStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 1,
+                y2: 0,
+                colorStops: [
+                  { offset: 0, color: 'rgba(179, 124, 0, 0.1)' },
+                  { offset: 1, color: '#ffe24a' }
+                ]
+              }
+            },
             label: {
               show: true,
               position: 'right',
-              formatter: `${d.female}万  ${femaleRate}%`,
+              formatter: `${d.female}万 `,
               color: 'rgba(240, 251, 255, 0.9)',
               fontWeight: 800,
-              fontSize: 36
+              fontSize: 34
             }
           }
         ],
@@ -349,35 +375,91 @@ const genderOption = computed(() => {
   }
 })
 
+// ⭐ 年龄构成：修改为环形饼图，并增加渐变色
 const ageOption = computed(() => {
   const d = ageData.value
   const list = [
-    { name: '0-17岁', value: d.firstStage, color: '#63d8ff' },
-    { name: '18-34岁', value: d.secondStage, color: '#ffe24a' },
-    { name: '35-59岁', value: d.thirdStage, color: '#40f3b8' },
-    { name: '60岁以上', value: d.fourthStage, color: '#ff9aa2' }
+    { name: '0-17岁', value: d.firstStage, color: '#63d8ff', bgColor: 'rgba(0, 80, 179, 0.2)' },
+    { name: '18-34岁', value: d.secondStage, color: '#ffe24a', bgColor: 'rgba(179, 124, 0, 0.2)' },
+    { name: '35-59岁', value: d.thirdStage, color: '#40f3b8', bgColor: 'rgba(0, 139, 92, 0.2)' },
+    { name: '60岁以上', value: d.fourthStage, color: '#ff9aa2', bgColor: 'rgba(179, 0, 0, 0.2)' }
   ]
+
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 24 },
+      formatter: '{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      right: '3%',
+      top: 'middle',
+      itemWidth: 14,
+      itemHeight: 14,
+      itemGap: 24,
+      icon: 'circle',
+      textStyle: {
+        color: 'rgba(214, 238, 255, 0.75)',
+        fontSize: 30
+      },
+      formatter: (name: string) => {
+        const item = list.find((i) => i.name === name)
+        return `${name}   ${item ? item.value : 0}`
+      }
+    },
     series: [
       {
-        type: 'funnel',
-        left: '18%',
-        top: '10%',
-        width: '64%',
-        height: '80%',
-        sort: 'descending',
-        gap: 3,
-        label: {
-          show: true,
-          color: 'rgba(240, 251, 255, 0.88)',
-          fontSize: 26,
-          formatter: '{b}  {c}'
+        type: 'pie',
+        radius: ['38%', '50%'],
+        center: ['35%', '50%'],
+        avoidLabelOverlap: true,
+        itemStyle: {
+          borderColor: 'rgba(2, 10, 30, 0.9)',
+          borderWidth: 2,
+          borderRadius: 4
         },
-        labelLine: { show: false },
-        itemStyle: { borderColor: 'rgba(2, 10, 30, 0.9)', borderWidth: 1 },
-        data: list.map((i) => ({ name: i.name, value: i.value, itemStyle: { color: i.color } }))
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 36,
+            fontWeight: 900,
+            color: 'rgba(240, 251, 255, 0.9)',
+            formatter: '{b}\n{c}'
+          },
+          itemStyle: {
+            shadowBlur: 20,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: list.map((i) => ({
+          name: i.name,
+          value: i.value,
+          itemStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: i.color },
+                { offset: 1, color: i.bgColor }
+              ]
+            }
+          }
+        }))
       }
     ]
   }
@@ -396,26 +478,26 @@ const birthOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },
     legend: {
       top: 0,
       right: 10,
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 22 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 40 }
     },
-    grid: { left: 70, right: 18, top: 46, bottom: 30 },
+    grid: { left: 90, right: 18, top: 46, bottom: 40 },
     xAxis: {
       type: 'category',
       data: categories,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 28 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 22 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -425,7 +507,7 @@ const birthOption = computed(() => {
         name: '男',
         type: 'bar',
         data: boys,
-        barWidth: 26,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
@@ -436,7 +518,7 @@ const birthOption = computed(() => {
             y2: 1,
             colorStops: [
               { offset: 0, color: '#63d8ff' },
-              { offset: 1, color: 'rgba(99, 216, 255, 0.3)' }
+              { offset: 1, color: 'rgba(0, 80, 179, 0.2)' }
             ]
           }
         }
@@ -445,7 +527,7 @@ const birthOption = computed(() => {
         name: '女',
         type: 'bar',
         data: girls,
-        barWidth: 26,
+        barWidth: 50,
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
@@ -456,7 +538,7 @@ const birthOption = computed(() => {
             y2: 1,
             colorStops: [
               { offset: 0, color: '#ffe24a' },
-              { offset: 1, color: 'rgba(255, 226, 74, 0.3)' }
+              { offset: 1, color: 'rgba(179, 124, 0, 0.2)' }
             ]
           }
         }
@@ -470,7 +552,14 @@ const moveOption = computed(() => {
   const d = mobileData.value
   const x = ['省内迁入', '省内迁出', '省外迁入', '省外迁出']
   const y = [d.moveInProvince, d.moveOutProvince, d.inProvinceMigra, d.outProvinceMigra]
-  const colors = ['#40f3b8', '#ffe24a', '#63d8ff', '#ff7a7a']
+
+  // 为每一根柱子配置不同的渐变色
+  const colorsMap = [
+    ['#40f3b8', 'rgba(0, 139, 92, 0.2)'], // 绿
+    ['#ffe24a', 'rgba(179, 124, 0, 0.2)'], // 黄
+    ['#63d8ff', 'rgba(0, 80, 179, 0.2)'], // 蓝
+    ['#ff7a7a', 'rgba(179, 0, 0, 0.2)'] // 红
+  ]
 
   return {
     backgroundColor: 'transparent',
@@ -479,19 +568,19 @@ const moveOption = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },
     grid: { left: 90, right: 18, top: 22, bottom: 62 },
     xAxis: {
       type: 'category',
       data: x,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 24, rotate: 18 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.75)', fontSize: 28, rotate: 18 },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.18)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -499,8 +588,23 @@ const moveOption = computed(() => {
     series: [
       {
         type: 'bar',
-        data: y.map((v, idx) => ({ value: v, itemStyle: { color: colors[idx] } })),
-        barWidth: 46,
+        data: y.map((v, idx) => ({
+          value: v,
+          itemStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: colorsMap[idx][0] },
+                { offset: 1, color: colorsMap[idx][1] }
+              ]
+            }
+          }
+        })),
+        barWidth: 50,
         itemStyle: { borderRadius: [10, 10, 0, 0] },
         label: {
           show: true,
@@ -547,11 +651,11 @@ const moveOption = computed(() => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  width: 1020px;
+  width: 1820px;
   z-index: 10;
 }
 .top-metric {
-  height: 64px;
+  height: 80px;
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.18);
   background: linear-gradient(90deg, rgba(16, 66, 130, 0.22), rgba(6, 18, 48, 0.45));
@@ -572,7 +676,7 @@ const moveOption = computed(() => {
   pointer-events: none;
 }
 .top-metric-label {
-  font-size: 18px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.78);
   letter-spacing: 1px;
@@ -585,16 +689,16 @@ const moveOption = computed(() => {
   z-index: 1;
 }
 .top-metric-value--small .num {
-  font-size: 26px;
+  font-size: 40px;
 }
 .top-metric-value .num {
-  font-size: 30px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.95);
   text-shadow: 0 0 12px rgba(54, 232, 255, 0.18);
 }
 .top-metric-value .unit {
-  font-size: 14px;
+  font-size: 40px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.55);
 }
@@ -612,7 +716,8 @@ const moveOption = computed(() => {
   right: 30px;
   top: -120px;
   z-index: 20;
-  width: 220px;
+  width: 290px;
+  text-align: center;
 }
 .anshan-map {
   position: absolute;
@@ -699,38 +804,49 @@ const moveOption = computed(() => {
   width: 100%;
 }
 .map-select-wrap .el-select__wrapper {
-  height: 50px;
-  min-height: 50px;
-  padding: 0 22px;
-  border-radius: 999px;
-  border: 1px solid rgba(78, 184, 255, 0.22);
-  background: rgba(5, 26, 66, 0.45);
-  color: rgba(209, 234, 255, 0.86);
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  justify-content: center;
+  height: 60px !important;
+  min-height: 60px !important;
+  padding: 0 20px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(78, 184, 255, 0.22) !important;
+  background: rgba(5, 26, 66, 0.45) !important;
   box-shadow: none !important;
   cursor: pointer;
   transition: border-color 0.2s;
 }
 .map-select-wrap .el-select__wrapper:hover {
-  border-color: rgba(78, 184, 255, 0.5);
+  border-color: rgba(78, 184, 255, 0.5) !important;
 }
 .map-select-wrap .el-select__wrapper.is-focused {
   box-shadow: none !important;
-  border-color: rgba(78, 184, 255, 0.6);
+  border-color: rgba(78, 184, 255, 0.6) !important;
 }
+
+/* 让选中区域占满宽度并居中 */
+.map-select-wrap .el-select__selection {
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+/* 核心修复：强制解除文字截断机制 */
 .map-select-wrap .el-select__placeholder,
 .map-select-wrap .el-select__selected-item {
+  text-align: center !important;
+  width: 100% !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
   color: rgba(209, 234, 255, 0.86) !important;
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+  line-height: 60px !important;
 }
-.map-select-wrap .el-select__caret {
-  display: none;
-  color: rgba(209, 234, 255, 0.65);
+
+/* 隐藏后缀图标容器 */
+.map-select-wrap .el-select__suffix {
+  display: none !important;
 }
 
 .map-select-popper {
@@ -743,8 +859,8 @@ const moveOption = computed(() => {
   padding: 6px 4px;
 }
 .map-select-popper .el-select-dropdown__item {
-  height: 50px;
-  line-height: 50px;
+  height: 60px;
+  line-height: 60px;
   color: rgba(214, 238, 255, 0.9);
   font-size: 34px;
   font-weight: 700;

@@ -15,13 +15,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // 默认模拟数据
-const defaultList: ChartListItem[] = [
-  { name: '2017', 总户数: 120.3, 总人数: 343 },
-  { name: '2018', 总户数: 121.0, 总人数: 341 },
-  { name: '2019', 总户数: 121.4, 总人数: 338 },
-  { name: '2020', 总户数: 121.45, 总人数: 335 },
-  { name: '2021', 总户数: 121.48, 总人数: 333 }
-]
+const defaultList: ChartListItem[] = []
 
 const chartList = computed(() => props.list ?? defaultList)
 
@@ -55,7 +49,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff' }
+      textStyle: { color: '#fff', fontSize: 40 }
     },
     legend: {
       data: props.seriesNames,
@@ -66,13 +60,14 @@ const option = computed(() => {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: 80, // 增加顶部留白，防止 y 轴 name 和 legend 挤在一起
       containLabel: true
     },
     xAxis: {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-      axisLabel: { color: '#fff', fontSize: 36 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       splitLine: { show: false }
     },
     yAxis: [
@@ -81,8 +76,14 @@ const option = computed(() => {
         name: '单位：万户',
         min: 120,
         max: 125,
+        // 专门设置 y 轴 name 的字体大小和颜色
+        nameTextStyle: {
+          color: 'rgba(214, 238, 255, 0.6)',
+          fontSize: 28, // 调整为你需要的大小
+          fontWeight: 'bold'
+        },
         axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-        axisLabel: { color: '#fff', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.15)' } }
       },
       {
@@ -91,8 +92,14 @@ const option = computed(() => {
         min: 300,
         max: 350,
         position: 'right',
+        // 专门设置 y 轴 name 的字体大小和颜色
+        nameTextStyle: {
+          color: 'rgba(214, 238, 255, 0.6)',
+          fontSize: 28, // 调整为你需要的大小
+          fontWeight: 'bold'
+        },
         axisLine: { lineStyle: { color: 'rgba(120, 200, 255, 0.4)' } },
-        axisLabel: { color: '#fff', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
         splitLine: { show: false }
       }
     ],

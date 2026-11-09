@@ -62,7 +62,7 @@ const option = computed(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)' },
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: (p: any) => {
         const v = Number(p?.value)
         const valueText = Number.isFinite(v) ? v : '-'

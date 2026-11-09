@@ -1043,7 +1043,7 @@ const investOption2 = computed(() => {
       {
         name: '营业收入',
         type: 'bar',
-        barWidth: 10,
+        barWidth: 50,
         data: benefitList.value.map((r) => r.taking),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],

@@ -17,48 +17,7 @@ const props = defineProps<{
 }>()
 
 // 和截图匹配的模拟数据
-const defaultRows: MarriageRow[] = [
-  {
-    year: '2017',
-    firstMarry: 14800,
-    remarry: 4709,
-    remarryRestore: 2189,
-    permitMarry: 11660,
-    divorceRate: 3.4
-  },
-  {
-    year: '2018',
-    firstMarry: 18200,
-    remarry: 3400,
-    remarryRestore: 2000,
-    permitMarry: 11400,
-    divorceRate: 2.8
-  },
-  {
-    year: '2019',
-    firstMarry: 10800,
-    remarry: 5600,
-    remarryRestore: 2300,
-    permitMarry: 9800,
-    divorceRate: 2.7
-  },
-  {
-    year: '2020',
-    firstMarry: 11800,
-    remarry: 4000,
-    remarryRestore: 2200,
-    permitMarry: 10200,
-    divorceRate: 5.6
-  },
-  {
-    year: '2021',
-    firstMarry: 11400,
-    remarry: 3800,
-    remarryRestore: 1900,
-    permitMarry: 5800,
-    divorceRate: 3.6
-  }
-]
+const defaultRows: MarriageRow[] = []
 
 const rows = computed(() => (props.data && props.data.length ? props.data : defaultRows))
 
@@ -75,7 +34,7 @@ const option = computed<EChartsOption>(() => {
     },
     legend: {
       data: ['初婚', '再婚', '复婚', '准许登记结婚', '离婚率'],
-      top: 4,
+      top: 44,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
@@ -84,34 +43,34 @@ const option = computed<EChartsOption>(() => {
     grid: {
       left: '12%',
       right: '8%',
-      top: '14%',
+      top: '24%',
       bottom: '12%'
     },
     xAxis: {
       type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 },
       splitLine: { show: false }
     },
     yAxis: [
       {
         type: 'value',
         name: '单位：对',
-        nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)' },
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 },
         max: 21000,
         axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 },
         splitLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.3)' } }
       },
       {
         type: 'value',
-        name: '单位：‰',
-        nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)' },
+        name: '单位：%',
+        nameTextStyle: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 },
         max: 6,
         position: 'right',
         axisLine: { lineStyle: { color: 'rgba(24, 110, 155, 0.45)' } },
-        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 36 },
+        axisLabel: { color: 'rgba(214, 238, 255, 0.7)', fontSize: 28 },
         splitLine: { show: false }
       }
     ],

@@ -124,6 +124,7 @@
           </select>
         </div>
         <div class="heat-chart">
+          <!-- 确保传入子组件的是普通 JSON 对象，避免引用类型死循环 -->
           <marryChart :data="marryData" />
         </div>
       </section>
@@ -204,7 +205,6 @@ import pie3dChart from '@/views/screens/people/charts/3d.vue'
 import pensionChart from '@/views/screens/people/charts/pension.vue'
 import roseChart from '@/views/screens/people/charts/rose.vue'
 import marryChart from '@/views/screens/people/charts/marry.vue'
-// ⭐ 引入接口
 import {
   getEduLevel,
   getBaseEndIns,
@@ -227,7 +227,6 @@ const pieData = ref<Array<{ name: string; value: number }>>([])
 const fetchEduLevel = async () => {
   try {
     const res: any = await getEduLevel(dateCapacity.value)
-    console.log('[edulevel] res=', res)
     const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
     pieData.value = list.map((item) => ({
       name: item.label ?? '',
@@ -305,30 +304,40 @@ const pensionSummary = computed(() => {
 // ============================================================
 // ⭐ 婚姻情况
 // ============================================================
+interface MarriageRow {
+  year: string
+  firstMarry: number
+  remarry: number
+  remarryRestore: number
+  permitMarry: number
+  divorceRate: number
+}
+
 const marryDateOptions = ['2021', '2020', '2019', '2018', '2017']
 const dateHeat = ref<string>('2021')
-
-const marryData = ref({
-  firstNum: 0,
-  againNum: 0,
-  remarryNum: 0,
-  divorceNum: 0,
-  divorceRate: 0
-})
+const marryData = ref<MarriageRow[]>([])
 
 const fetchMaritalStatus = async () => {
   try {
     const res: any = await getMaritalStatus(dateHeat.value)
-    const row = res?.data?.dataList?.[0] ?? res?.dataList?.[0] ?? {}
-    marryData.value = {
-      firstNum: Number(row.firstNum ?? 0),
-      againNum: Number(row.againNum ?? 0),
-      remarryNum: Number(row.remarryNum ?? 0),
-      divorceNum: Number(row.divorceNum ?? 0),
-      divorceRate: Number(row.divorceRate ?? 0)
-    }
+    const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
+
+    // 精确映射，剥离所有可能引发循环引用的复杂结构，转为纯基本类型
+    const mapped = list.map((item) => ({
+      year: String(item.year ?? ''),
+      firstMarry: Number(item.firstNum ?? 0),
+      remarry: Number(item.againNum ?? 0),
+      remarryRestore: Number(item.remarryNum ?? 0),
+      permitMarry: Number(item.divorceNum ?? 0),
+      divorceRate: Number(item.divorceRate ?? 0)
+    }))
+
+    // 按年份升序
+    mapped.sort((a, b) => Number(a.year) - Number(b.year))
+    marryData.value = mapped
   } catch (e) {
     console.error('婚姻情况查询失败', e)
+    marryData.value = []
   }
 }
 
@@ -401,19 +410,15 @@ const handleDisabledTabClick = (tab: (typeof houseTabs)[number]) => {
 }
 
 // ============================================================
-// ⭐ 社会救助情况（接口版）
+// ⭐ 社会救助情况
 // ============================================================
 const socialAssistTabs = ['城区合计', '海城市', '台安县', '岫岩县'] as const
 const activeAssistTab = ref<(typeof socialAssistTabs)[number]>(socialAssistTabs[0])
 
-// 时间选项（默认给一个，接口返回 timeOptions 会覆盖）
 const assistDateOptions = ref<string[]>(['2024年统计年鉴'])
 const dateAssist = ref<string>('2024年统计年鉴')
-
-// 接口返回的原始列表（按 areaName 索引）
 const assistList = ref<Array<{ areaName: string; cityNum: number; countyNum: number }>>([])
 
-// 当前 tab 显示的数据
 const assistData = computed(() => {
   const target = assistList.value.find((i) => i.areaName === activeAssistTab.value)
   return {
@@ -425,8 +430,6 @@ const assistData = computed(() => {
 const fetchSingleData = async () => {
   try {
     const res: any = await getSingleData(dateAssist.value)
-    console.log('[singledata] res=', res)
-
     const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
     assistList.value = list.map((item) => ({
       areaName: item.areaName ?? '',
@@ -434,7 +437,6 @@ const fetchSingleData = async () => {
       countyNum: Number(item.countyNum ?? 0)
     }))
 
-    // 覆盖时间选项
     const options: string[] = res?.data?.summary?.timeOptions ?? res?.summary?.timeOptions ?? []
     if (options.length) {
       assistDateOptions.value = options
@@ -442,14 +444,12 @@ const fetchSingleData = async () => {
         dateAssist.value = res?.data?.summary?.souseDate ?? res?.summary?.souseDate ?? options[0]
       }
     }
-    console.log('[singledata] assistList=', assistList.value)
   } catch (e) {
     console.error('社会救助情况查询失败', e)
     assistList.value = []
   }
 }
 
-// tab 点击（不需要重新请求，因为接口一次性返回全部区域）
 const handleAssistTabClick = (tab: (typeof socialAssistTabs)[number]) => {
   activeAssistTab.value = tab
 }
@@ -465,7 +465,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 完全保持原样 */
+/* 样式保持不变 */
 .right {
   min-height: 0;
   height: 100%;
@@ -671,7 +671,7 @@ onMounted(() => {
   min-height: 0;
 }
 .pension-summary {
-  height: 72px;
+  height: 100px;
   border-radius: 14px;
   border: 1px solid rgba(84, 188, 255, 0.18);
   background: linear-gradient(
@@ -681,10 +681,11 @@ onMounted(() => {
     rgba(6, 18, 48, 0.12)
   );
   display: grid;
-  grid-template-columns: 220px 1fr 1fr;
+  grid-template-columns: 190px 1fr 1fr;
   align-items: center;
   overflow: hidden;
   margin-bottom: 12px;
+  margin-top: 40px;
 }
 .pension-city {
   height: 100%;
@@ -701,10 +702,10 @@ onMounted(() => {
 .pension-metric {
   height: 100%;
   display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 10px;
+  grid-template-columns: 48px 1fr;
+  gap: 8px;
   align-items: center;
-  padding: 0 14px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 .pension-metric + .pension-metric {
@@ -731,15 +732,18 @@ onMounted(() => {
   filter: hue-rotate(28deg) saturate(1.15);
 }
 .pension-label {
-  font-size: 18px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.72);
+  white-space: nowrap;
+  line-height: 1.1;
 }
 .pension-value {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
   margin-top: 4px;
+  line-height: 1.1;
 }
 .pension-value .num {
   font-size: 34px;
@@ -753,7 +757,7 @@ onMounted(() => {
   color: rgba(214, 238, 255, 0.6);
 }
 .pension-chart {
-  height: calc(100% - 84px);
+  height: calc(100% - 112px);
   min-height: 0;
 }
 .water-chart {
