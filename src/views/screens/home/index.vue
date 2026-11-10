@@ -11,17 +11,17 @@
       >
         <header class="header">
           <div class="header-side header-side-left">
-            <span class="header-chip">{{ timeText }}</span>
-            <span class="header-chip2">{{ weekText }}</span>
+            <span class="header-chip2">{{ timeText }}</span>
           </div>
           <div class="brand">城 市 体 征</div>
           <div class="header-side header-side-right">
-            <span class="header-chip3">北京时间</span>
-            <span class="header-chip4">{{ hmsText }}</span>
+            <span class="header-chip3">{{ hmsText }}</span>
           </div>
         </header>
         <section class="body body--home">
           <div class="center-container">
+            <!-- 3D 光晕层（位于面板后方） -->
+            <div class="nav-halo" aria-hidden="true"></div>
             <section class="home-panel">
               <div class="home-panel-head"></div>
               <div class="nav-grid">
@@ -44,13 +44,16 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import bgUrl from '@/assets/img/bg.jpg'
+
 const designWidth = 11520
 const designHeight = 2160
 const router = useRouter()
+
 const navItems = [
   { title: '城市管理', path: '/dash', desc: '基础城市管理大屏（默认主屏）' },
   { title: '城市交通', path: '/bus', desc: '公交线路与运行态势' },
@@ -59,34 +62,42 @@ const navItems = [
   { title: '经济运行', path: '/econ', desc: '经济指标与产业分析' },
   { title: '人口信息', path: '/people', desc: '人口结构与区域画像' }
 ]
+
 const go = (path: string) => {
   router.push(path)
 }
+
 const now = ref(new Date())
 let timer: number | undefined
+
 onMounted(() => {
   timer = window.setInterval(() => {
     now.value = new Date()
   }, 1000)
 })
+
 onBeforeUnmount(() => {
   if (timer) window.clearInterval(timer)
 })
+
 const timeText = computed(() => {
   const d = now.value
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 })
+
 const weekText = computed(() => {
   const list = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
   return list[now.value.getDay()]
 })
+
 const hmsText = computed(() => {
   const d = now.value
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
 })
 </script>
+
 <style scoped>
 .shell {
   width: 100%;
@@ -140,11 +151,11 @@ const hmsText = computed(() => {
 }
 .header-side-left {
   justify-content: flex-start;
-  margin-top: -100px;
+  margin-top: -104px;
 }
 .header-side-right {
   justify-content: flex-end;
-  margin-top: -100px;
+  margin-top: -104px;
 }
 .header-chip {
   width: 140px;
@@ -162,7 +173,7 @@ const hmsText = computed(() => {
 .header-chip2 {
   width: 140px;
   justify-content: center;
-  margin-left: 92px;
+  margin-left: 290px;
   height: 44px;
   padding: 0 40px;
   display: inline-flex;
@@ -176,7 +187,7 @@ const hmsText = computed(() => {
 .header-chip3 {
   width: 140px;
   justify-content: center;
-  margin-right: -10px;
+  margin-right: 280px;
   height: 44px;
   padding: 0 40px;
   display: inline-flex;
@@ -223,6 +234,7 @@ const hmsText = computed(() => {
   grid-template-columns: minmax(1px, 1fr);
   min-height: 0;
 }
+
 /* 核心居中容器：宽度=大屏1/3，高度=大屏1/2，垂直水平居中 */
 .center-container {
   width: calc(100% / 3);
@@ -231,7 +243,72 @@ const hmsText = computed(() => {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  /* 3D 透视：让子元素的 translateZ 产生纵深 */
+  perspective: 1400px;
 }
+
+/* ================= 3D 光晕 ================= */
+.nav-halo {
+  position: absolute;
+  inset: -60px;
+  border-radius: 44px;
+  pointer-events: none;
+  z-index: 0;
+
+  /* 主光晕：向外扩散的蓝青色柔光 */
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(54, 232, 255, 0.38) 0%,
+    rgba(58, 132, 255, 0.22) 38%,
+    transparent 72%
+  );
+  filter: blur(36px);
+  opacity: 0.75;
+
+  /* 3D 关键：Z 轴后移 + 轻微缩放，配合父级 perspective 形成悬浮纵深 */
+  transform: translateZ(-90px) scale(0.98);
+  animation: navHaloBreath 4.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* 外轮廓辉光线：让光晕有"实体边缘" */
+.nav-halo::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 40px;
+  border: 1px solid rgba(84, 188, 255, 0.25);
+  box-shadow:
+    0 0 46px rgba(54, 232, 255, 0.28),
+    0 0 100px rgba(58, 132, 255, 0.16),
+    inset 0 0 46px rgba(54, 232, 255, 0.12);
+  animation: navHaloPulse 4.5s ease-in-out infinite;
+}
+
+/* 呼吸：Z 轴前后移动 + 缩放，产生"浮出/后退"的 3D 感 */
+@keyframes navHaloBreath {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateZ(-90px) scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: translateZ(-40px) scale(1.05);
+  }
+}
+
+@keyframes navHaloPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* ========================================== */
+
 .home-panel {
   width: 100%;
   height: 100%;
@@ -249,6 +326,8 @@ const hmsText = computed(() => {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  /* 层级提升，盖在光晕之上，光晕从半透明面板中透出 */
+  z-index: 1;
 }
 .home-panel::before {
   content: '';

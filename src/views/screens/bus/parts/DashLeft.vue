@@ -188,10 +188,39 @@ const currentParkingChart = computed(() => {
   padding: 90px 30px 30px;
   background: url('@/assets/img/leftBg.png') no-repeat center center;
   background-size: 100% 100%;
+  /* 用去掉头部的基础底图，避免和九宫格头部叠出重影 */
+  background-image:
+    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
+    url('@/assets/img/panelBody.png') !important;
   border: 1px solid rgba(90, 200, 255, 0.18);
   color: rgba(214, 238, 255, 0.84);
   display: flex;
   flex-direction: column;
+}
+
+/*
+ * 这两个卡片很宽，直接 100% 100% 拉伸底图会把标题斜切拉变形。
+ * 头部单独用九宫格只拉伸中间直边，左侧标题区保持原始比例。
+ */
+.panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 113px;
+  z-index: 1;
+  pointer-events: none;
+  border-style: solid;
+  border-width: 113px 40px 0 calc(var(--title-slice, 820) * 1px);
+  border-image-source: var(--title-bg);
+  border-image-slice: 110 40 0 var(--title-slice, 820);
+  border-image-repeat: stretch;
 }
 
 .panel-parking {

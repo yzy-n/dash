@@ -906,6 +906,10 @@ onMounted(() => {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
+  /* 用去掉头部的基础底图，避免和九宫格头部叠出重影 */
+  background-image:
+    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
+    url('@/assets/img/panelBody.png') !important;
   border: 1px solid rgba(84, 188, 255, 0.22);
   box-shadow:
     inset 0 0 36px rgba(34, 121, 255, 0.08),
@@ -920,6 +924,28 @@ onMounted(() => {
   inset: 10px;
   border: 1px solid rgba(94, 197, 255, 0.12);
   pointer-events: none;
+}
+
+/* 卡片较窄较高时底图会被纵向拉变形，头部同样用九宫格单独处理 */
+.panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 113px;
+  z-index: 1;
+  pointer-events: none;
+  border-style: solid;
+  border-width: 113px 40px 0 calc(var(--title-slice, 820) * 1px);
+  border-image-source: var(--title-bg);
+  border-image-slice: 110 40 0 var(--title-slice, 820);
+  border-image-repeat: stretch;
 }
 
 /* 充电桩面板放大：占据原“企业复工复产情况”所在的整列（跨两行） */
