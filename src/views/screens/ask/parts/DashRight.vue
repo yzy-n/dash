@@ -505,7 +505,6 @@ const warnRingOption = computed(() => {
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
   text-shadow:
     0 0 6px #fff,

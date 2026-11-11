@@ -125,11 +125,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import {
-  getSpecialActions,
-  getBuildEffect,
-  getForestFireStack
-} from '@/api/disaster'
+import { getSpecialActions, getBuildEffect, getForestFireStack } from '@/api/disaster'
 
 /* =========================================================
    静态节点
@@ -157,7 +153,10 @@ const pickList = (res: any): any[] => {
   return []
 }
 
-const clean = (v: any) => String(v ?? '').replace(/[\r\n]/g, '').trim()
+const clean = (v: any) =>
+  String(v ?? '')
+    .replace(/[\r\n]/g, '')
+    .trim()
 
 const toNum = (v: any) => {
   const n = Number(v)
@@ -426,9 +425,7 @@ const forestOption = computed(() => {
   }
 
   // 根据数据自动计算 x 轴上限：取所有区县各等级之和的最大值，向上取整到 5 的倍数
-  const totals = source.map(
-    (it) => it.high + it.mediumHigh + it.medium + it.mediumLow + it.low
-  )
+  const totals = source.map((it) => it.high + it.mediumHigh + it.medium + it.mediumLow + it.low)
   const maxTotal = Math.max(1, ...totals)
   const xMax = Math.ceil(maxTotal / 5) * 5
 
@@ -532,7 +529,6 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   font-size: 44px;
-  font-style: italic;
   transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;

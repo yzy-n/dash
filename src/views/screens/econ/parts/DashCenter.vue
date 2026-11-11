@@ -61,14 +61,14 @@
       <!-- 右侧小气泡：城市 / 农村居民人均收入（接口驱动） -->
       <div class="bubble b4">
         <div class="time">{{ urbanIncome.quarter }}</div>
-        <div class="label">城市居民人均收入情况</div>
+        <div class="label">城市居民人均收入</div>
         <div class="num">{{ urbanIncome.amount }} <span class="unit">元</span></div>
         <div class="rate red">{{ urbanIncome.yearOnYearGrowth }}%↑</div>
       </div>
 
       <div class="bubble b5">
         <div class="time">{{ ruralIncome.quarter }}</div>
-        <div class="label">农村居民人均收入情况</div>
+        <div class="label">农村居民人均收入</div>
         <div class="num">{{ ruralIncome.amount }} <span class="unit">元</span></div>
         <div class="rate red">{{ ruralIncome.yearOnYearGrowth }}%↑</div>
       </div>

@@ -151,7 +151,8 @@
             >
               <span class="material-name" :title="item.name">{{ item.name }}</span>
               <span class="material-row-qty">
-                <strong>{{ item.num }}</strong><em>{{ item.unit }}</em>
+                <strong>{{ item.num }}</strong
+                ><em>{{ item.unit }}</em>
               </span>
             </div>
           </div>
@@ -307,9 +308,7 @@ const fetchRescueTeam = async () => {
 
 const rescueTeam = computed<RescueTeamRow>(() => {
   const found = rescueTeamList.value.find((r) => r.type === '1')
-  return (
-    found ?? { type: '1', label: '应急救援队伍', fieldCnt: 13, teamCnt: 47, peopleCnt: 3122 }
-  )
+  return found ?? { type: '1', label: '应急救援队伍', fieldCnt: 13, teamCnt: 47, peopleCnt: 3122 }
 })
 
 const publicTeam = computed<RescueTeamRow>(() => {
@@ -503,11 +502,7 @@ const fetchFund = async () => {
 /* =========================================================
    资金保障图：把 graph option 构造抽成工具
    ========================================================= */
-const buildFundGraphOption = (
-  rootId: string,
-  nodes: FundGraphNode[],
-  links: FundGraphLink[]
-) => {
+const buildFundGraphOption = (rootId: string, nodes: FundGraphNode[], links: FundGraphLink[]) => {
   return {
     backgroundColor: 'transparent',
     tooltip: { show: false },
@@ -817,7 +812,6 @@ onMounted(() => {
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
   text-shadow:
     0 0 6px #fff,

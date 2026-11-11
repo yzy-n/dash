@@ -11,13 +11,11 @@
       >
         <header class="header">
           <div class="header-side header-side-left">
-            <span class="header-chip">{{ timeText }}</span>
-            <span class="header-chip2">{{ weekText }}</span>
+            <span class="header-chip2">{{ timeText }}</span>
           </div>
           <div class="brand">城 市 交 通</div>
           <div class="header-side header-side-right">
-            <span class="header-chip3">北京时间</span>
-            <span class="header-chip4">{{ hmsText }}</span>
+            <span class="header-chip3">{{ hmsText }}</span>
           </div>
         </header>
 
@@ -775,11 +773,6 @@ const timeText = computed(() => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 })
 
-const weekText = computed(() => {
-  const list = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-  return list[now.value.getDay()]
-})
-
 const hmsText = computed(() => {
   const d = now.value
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -848,12 +841,12 @@ const hmsText = computed(() => {
 
 .header-side-left {
   justify-content: flex-start;
-  margin-top: -100px;
+  margin-top: -104px;
 }
 
 .header-side-right {
   justify-content: flex-end;
-  margin-top: -100px;
+  margin-top: -104px;
 }
 
 .header-chip {
@@ -873,7 +866,7 @@ const hmsText = computed(() => {
 .header-chip2 {
   width: 140px;
   justify-content: center;
-  margin-left: 92px;
+  margin-left: 290px;
   height: 44px;
   padding: 0 40px;
   display: inline-flex;
@@ -887,7 +880,7 @@ const hmsText = computed(() => {
 .header-chip3 {
   width: 140px;
   justify-content: center;
-  margin-right: -10px;
+  margin-right: 280px;
   height: 44px;
   padding: 0 40px;
   display: inline-flex;

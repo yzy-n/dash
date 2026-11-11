@@ -412,7 +412,7 @@ const popDecreaseRows = ref([])
   background-position: center;
   background-size: 100% 100%;
   color: rgba(214, 238, 255, 0.76);
-  font-size: 18px;
+  font-size: 34px;
   font-weight: 900;
   letter-spacing: 2px;
   cursor: pointer;

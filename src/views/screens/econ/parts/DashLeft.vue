@@ -1307,7 +1307,7 @@ onMounted(() => {
   border: none;
   outline: none;
   color: rgba(214, 238, 255, 0.52);
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 56px;
   text-align: center;

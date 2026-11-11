@@ -906,10 +906,6 @@ onMounted(() => {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  /* 用去掉头部的基础底图，避免和九宫格头部叠出重影 */
-  background-image:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/panelBody.png') !important;
   border: 1px solid rgba(84, 188, 255, 0.22);
   box-shadow:
     inset 0 0 36px rgba(34, 121, 255, 0.08),
@@ -927,12 +923,17 @@ onMounted(() => {
 }
 
 /* 卡片较窄较高时底图会被纵向拉变形，头部同样用九宫格单独处理 */
-.panel > * {
-  position: relative;
+.panel.title-bg-custom {
+  background-image:
+    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
+    url('@/assets/img/panelBody.png') !important;
+}
+
+.panel.title-bg-custom > * {
   z-index: 2;
 }
 
-.panel::after {
+.panel.title-bg-custom::after {
   content: '';
   position: absolute;
   left: 0;
@@ -1038,7 +1039,7 @@ onMounted(() => {
   background-position: center;
   background-size: 100% 100%;
   color: rgba(214, 238, 255, 0.52);
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 56px;
   text-align: center;
@@ -1046,7 +1047,6 @@ onMounted(() => {
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
   text-shadow:
     0 0 6px #fff,
@@ -1088,13 +1088,13 @@ onMounted(() => {
   color: rgba(214, 238, 255, 0.78);
 }
 .metric-num {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(240, 251, 255, 0.94);
   text-shadow: 0 0 12px rgba(45, 216, 255, 0.16);
 }
 .metric-unit {
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 900;
   color: rgba(214, 238, 255, 0.62);
 }
@@ -1478,7 +1478,7 @@ onMounted(() => {
 .energy-body {
   height: 100%;
   min-height: 0;
-  margin-top: 20px;
+  margin-top: 30px;
   display: grid;
   grid-template-rows: 72px 1fr;
   gap: 10px;

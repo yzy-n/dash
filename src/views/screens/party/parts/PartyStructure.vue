@@ -666,7 +666,6 @@ onMounted(() => {
   font-weight: 800;
   color: rgba(255, 238, 206, 0.98);
   letter-spacing: 20px;
-  font-style: italic;
   box-shadow:
     inset 0 0 0 1px rgba(255, 230, 172, 0.08),
     0 0 16px rgba(255, 92, 32, 0.12);
@@ -683,7 +682,6 @@ onMounted(() => {
   font-weight: 800;
   color: rgba(255, 238, 206, 0.98);
   letter-spacing: 20px;
-  font-style: italic;
   box-shadow:
     inset 0 0 0 1px rgba(255, 230, 172, 0.08),
     0 0 16px rgba(255, 92, 32, 0.12);

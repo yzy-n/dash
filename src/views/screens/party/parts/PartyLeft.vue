@@ -1,9 +1,9 @@
 <template>
   <div class="left-wrap">
     <h3 class="org-title" :style="getPointStyle(layout.orgTitle)">{{ data.orgTitle }}</h3>
-    <div class="org-total" :style="getPointStyle(layout.orgTotal)">
+    <!-- <div class="org-total" :style="getPointStyle(layout.orgTotal)">
       合计：<strong>{{ data.orgTotal }}</strong> 个
-    </div>
+    </div> -->
 
     <button
       type="button"
@@ -142,12 +142,12 @@ const ORG_LIST_HEIGHT =
   (ORG_VISIBLE_COUNT - 1) * ORG_ITEM_GAP
 
 const layout = {
-  orgTitle: { left: 152, top: 175 },
+  orgTitle: { left: 140, top: 182 },
   orgTotal: { left: 1018, top: 200 },
   cityTab: { left: 308, top: 306, width: 296, height: 66 },
   districtTab: { left: 692, top: 306, width: 296, height: 66 },
   orgList: { left: 126, top: 386, width: 1028, height: ORG_LIST_HEIGHT },
-  starsTitle: { left: 14, top: 1140 },
+  starsTitle: { left: 5, top: 1150 },
   starsCityTab: { left: 26, top: 1266, width: 296, height: 66 },
   starsDistrictTab: { left: 382, top: 1266, width: 296, height: 66 },
   starsTotal: { left: 266, top: 1350 },
@@ -156,8 +156,7 @@ const layout = {
 
 const getPointStyle = (point: Point) => ({
   left: `${point.left}px`,
-  top: `${point.top}px`,
-  fontStyle: 'italic'
+  top: `${point.top}px`
 })
 
 const getRectStyle = (rect: Rect) => ({

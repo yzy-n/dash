@@ -1178,7 +1178,7 @@ onMounted(() => {
   background-position: center;
   background-size: 100% 100%;
   color: rgba(214, 238, 255, 0.52);
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 56px;
   text-align: center;
@@ -1186,7 +1186,6 @@ onMounted(() => {
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
   text-shadow:
     0 0 6px #fff,

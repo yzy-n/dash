@@ -12,10 +12,8 @@
         <header class="header">
           <div class="header-side header-side-left">
             <span class="header-chip">{{ timeText }}</span>
-            <span class="header-chip2">{{ weekText }}</span>
           </div>
           <div class="header-side header-side-right">
-            <span class="header-chip3">北京时间</span>
             <span class="header-chip4">{{ hmsText }}</span>
           </div>
         </header>
@@ -128,14 +126,14 @@ const hmsText = computed(() => {
 
 .header-side-left {
   justify-content: flex-start;
-  margin-top: 0px;
+  margin-top: 15px;
   margin-left: 100px;
 }
 
 .header-side-right {
   justify-content: flex-end;
-  margin-top: 0px;
-  margin-left: 10300px;
+  margin-top: 15px;
+  margin-left: 10800px;
 }
 
 .header-chip {

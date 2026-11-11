@@ -860,7 +860,7 @@ onMounted(() => {
 }
 
 .panel--dev .tab {
-  min-width: 250px;
+  min-width: 280px;
   height: 60px;
   line-height: 60px;
   font-size: 40px;
@@ -938,7 +938,7 @@ onMounted(() => {
 
 /* ==================== 原人才政策位置：群团组织 ==================== */
 .panel--talent {
-  left: 1460px;
+  left: 1420px;
   top: 180px;
   width: 1000px;
   height: 950px;
@@ -947,7 +947,7 @@ onMounted(() => {
 
 .panel--talent .panel-head {
   height: 150px;
-  padding: 14px 18px 0;
+  padding: 18px 30px 0;
 }
 
 .panel--talent .panel-title {
@@ -1149,7 +1149,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 30px;
-  border: 2px solid rgba(255, 200, 130, 0.55);
   border-radius: 6px;
 }
 
@@ -1291,7 +1290,6 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  border: 2px solid rgba(255, 200, 130, 0.55);
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
@@ -1449,7 +1447,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
-  border: 2px solid rgba(255, 200, 130, 0.55);
   background:
     linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
     linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));

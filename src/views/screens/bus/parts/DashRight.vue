@@ -253,7 +253,7 @@ const currentGoodsShipSeries = computed(() =>
   background-color: transparent;
   appearance: none;
   color: #ffffff;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 64px;
   text-align: center;
