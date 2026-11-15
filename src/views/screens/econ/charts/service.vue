@@ -26,7 +26,7 @@ const option = computed(() => {
   const totalLine = chartData.value.map((i) => i.val1 + i.val2)
 
   return {
-    backgroundColor: '#2c424b',
+    backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis'
     },
@@ -41,13 +41,13 @@ const option = computed(() => {
       type: 'category',
       data: xData,
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
-      axisLine: { lineStyle: { color: '#556e78' } },
+      axisLine: { lineStyle: { color: 'rgba(84, 188, 255, 0.28)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       max: 7000,
-      splitLine: { lineStyle: { color: '#445962' } },
+      splitLine: { lineStyle: { color: 'rgba(84, 188, 255, 0.14)' } },
       axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28 },
       axisLine: { show: false }
     },
@@ -57,7 +57,7 @@ const option = computed(() => {
         type: 'bar',
         stack: 'total',
         data: part1,
-        itemStyle: { color: '#ff8877' },
+        itemStyle: { color: '#b14cff' },
         label: {
           show: true,
           position: 'inside',
@@ -69,7 +69,7 @@ const option = computed(() => {
         type: 'bar',
         stack: 'total',
         data: part2,
-        itemStyle: { color: '#00bcb4' },
+        itemStyle: { color: '#36e8ff' },
         label: {
           show: true,
           position: 'inside',
@@ -82,12 +82,12 @@ const option = computed(() => {
         data: totalLine,
         symbol: 'circle',
         symbolSize: 8,
-        lineStyle: { color: '#f8e238', width: 2 },
-        itemStyle: { color: '#f8e238' },
+        lineStyle: { color: '#ffd15c', width: 2 },
+        itemStyle: { color: '#ffd15c' },
         label: {
           show: true,
           position: 'top',
-          color: '#f8e238'
+          color: '#ffd15c'
         }
       }
     ]

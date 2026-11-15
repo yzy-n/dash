@@ -46,8 +46,8 @@ const option = computed(() => {
           x2: 0,
           y2: 1,
           colorStops: [
-            { offset: 0, color: '#22c8ff' },
-            { offset: 1, color: '#084894' }
+            { offset: 0, color: '#5dffcb' },
+            { offset: 1, color: '#00a67a' }
           ]
         },
         borderRadius: [3, 3, 0, 0]
@@ -67,7 +67,7 @@ const option = computed(() => {
           symbol: 'rect',
           symbolSize: 2,
           rotation: 45,
-          color: 'rgba(170,225,255,0.22)',
+          color: 'rgba(150,255,225,0.22)',
           dashArrayX: [4, 6],
           dashArrayY: [0, 0]
         }
@@ -75,10 +75,8 @@ const option = computed(() => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,24,53,0.85)',
-      borderColor: 'rgba(84,188,255,0.22)',
-      borderWidth: 1,
-      textStyle: { color: '#ffffff', fontSize: 40 },
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       formatter: '{b}<br/>● {a}: {c}'
     },
     legend: {

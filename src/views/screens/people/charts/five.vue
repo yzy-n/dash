@@ -24,10 +24,10 @@ const option = computed(() => {
 
   // 根据 seriesNames 自动生成series
   const series = props.seriesNames.map((name, idx) => {
-    // 配色，可自行扩展
+    // 配色：亮金色 + 冰蓝，与左侧其余面板的紫/绿/青拉开层次
     const colorMap: Record<string, string> = {
-      总户数: '#ffd058',
-      总人数: '#38d8d0'
+      总户数: '#ffd15c',
+      总人数: '#36e8ff'
     }
     // 双y轴：0=总户数（左），1=总人数（右）
     const yAxisIndexMap: Record<string, number> = {
@@ -38,7 +38,8 @@ const option = computed(() => {
       name,
       type: 'line',
       smooth: true,
-      color: colorMap[name],
+      lineStyle: { width: 3, color: colorMap[name] },
+      itemStyle: { color: colorMap[name] },
       yAxisIndex: yAxisIndexMap[name] ?? 0,
       data: chartList.value.map((item) => item[name] as number)
     }
@@ -48,8 +49,8 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff', fontSize: 40 }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     legend: {
       data: props.seriesNames,

@@ -11,6 +11,11 @@ const props = defineProps<{
 const option = computed(() => {
   return {
     backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
     grid: { left: 160, right: 18, top: 12, bottom: 10, containLabel: true },
     xAxis: {
       type: 'value',

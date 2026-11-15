@@ -180,13 +180,10 @@
         </div>
 
         <div class="project-stage">
-          <div class="project-base"></div>
-          <div class="project-ring project-ring--a"></div>
-          <div class="project-ring project-ring--b"></div>
           <div class="project-chart-wrap">
-            <ProjectPie3D
+            <EChart
               :key="`project-${activeProjectTab}-${dateProject}-${projectRenderKey}`"
-              :items="projectPieItems"
+              :option="projectPieOption"
             />
           </div>
         </div>
@@ -195,7 +192,7 @@
           <div v-for="(item, idx) in projectPieItems" :key="item.name" class="project-table-row">
             <span
               class="project-dot"
-              :class="idx === 0 ? 'project-dot--done' : 'project-dot--todo'"
+              :class="idx === 0 ? 'project-dot--done' : (idx === 1 ? 'project-dot--todo' : 'project-dot--other')"
             ></span>
             <span class="project-name">{{ item.name }}</span>
             <div class="project-stat">
@@ -253,7 +250,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import ProjectPie3D from '../charts/ProjectPie3D.vue'
 import {
   getPowervolume,
   getPowertype,
@@ -264,65 +260,36 @@ import {
 
 // 用电情况
 const electricDateOptions = [
-  '2023-03',
-  '2023-04',
-  '2023-05',
-  '2023-06',
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
+  '2023-03', '2023-04', '2023-05', '2023-06', '2023-07',
+  '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
 ]
 const dateElectric = ref(electricDateOptions[0])
 
 // 用电容量情况
 const capacityDateOptions = [
-  '2023-03',
-  '2023-04',
-  '2023-05',
-  '2023-06',
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
+  '2023-03', '2023-04', '2023-05', '2023-06', '2023-07',
+  '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
 ]
 const dateCapacity = ref(capacityDateOptions[0])
 
-// 充电桩建设情况（接口返回 timeOptions 会覆盖）
+// 充电桩建设情况
 const pileDateOptions = ref<string[]>(['2022年统计数据'])
 const datePile = ref<string>('2022年统计数据')
 
-// 重点项目报装情况（接口返回 timeOptions 会覆盖）
+// 重点项目报装情况
 const projectDateOptions = ref<string[]>([
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12'
+  '2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12'
 ])
 const dateProject = ref<string>(projectDateOptions.value[0])
 
-// 能源装机情况（接口返回 timeOptions 会覆盖）
+// 能源装机情况
 const energyDateOptions = ref<string[]>([
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
+  '2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
 ])
 const dateEnergy = ref<string>(energyDateOptions.value[0])
 
 // ============================================================
-// 用电情况（接口版）
+// 用电情况
 // ============================================================
 const electricTabs = [
   { type: 1, label: '全社会用电量' },
@@ -363,9 +330,7 @@ const electricMetrics = computed(() => {
       : '0'
   const avgRing =
     list.length > 0
-      ? (list.reduce((acc, item) => acc + (Number(item.ringRatio) || 0), 0) / list.length).toFixed(
-          2
-        )
+      ? (list.reduce((acc, item) => acc + (Number(item.ringRatio) || 0), 0) / list.length).toFixed(2)
       : '0'
 
   return [
@@ -388,23 +353,23 @@ const electricPieOption = computed(() => {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 20 }, // 缩小 tooltip 字号以匹配滚动图例
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: (params: any) => {
         const percent = total ? ((Number(params.value) / total) * 100).toFixed(2) : '0.00'
         return `${params.marker}${params.name}<br/>用电量：${params.value} 万千瓦时<br/>占比：${percent}%`
       }
     },
     legend: {
-      type: 'scroll', // 开启图例滚动（超出高度出现翻页按钮，防止无限往下撑并折行）
+      type: 'scroll',
       orient: 'vertical',
       right: 10,
       top: 'middle',
-      height: '80%', // 限制图例高度，防止占满右侧或换列
+      height: '80%',
       itemWidth: 14,
       itemHeight: 14,
-      itemGap: 16, // 稍微增加间距让滚动更清晰
+      itemGap: 16,
       icon: 'circle',
       pageIconColor: '#37d5ff',
       pageIconInactiveColor: '#2f4554',
@@ -416,7 +381,6 @@ const electricPieOption = computed(() => {
       },
       textStyle: {
         rich: {
-          // 将字号缩小为 20（原来 40 会导致 10 条数据直接超出容器高度）
           n: { color: 'rgba(214, 238, 255, 0.78)', fontSize: 40, verticalAlign: 'middle' },
           v: { color: '#fff', fontSize: 40, fontWeight: 800, verticalAlign: 'middle' }
         }
@@ -426,32 +390,19 @@ const electricPieOption = computed(() => {
       {
         type: 'pie',
         radius: ['38%', '65%'],
-        center: ['30%', '50%'], // 饼图稍微左移，给右侧滚动条/图例留出空间
+        center: ['30%', '50%'],
         label: { show: false },
         labelLine: { show: false },
         itemStyle: { borderWidth: 2, borderColor: 'rgba(2, 10, 30, 0.92)' },
         data
       }
     ],
-    // 增加颜色池，确保数据项变多时颜色不会重复
-    color: [
-      '#37d5ff',
-      '#ffe24a',
-      '#ffb84a',
-      '#7c5cff',
-      '#40f3b8',
-      '#ff7c7c',
-      '#2f4554',
-      '#61a0a8',
-      '#d48265',
-      '#91c7ae',
-      '#749f83'
-    ]
+    color: ['#37d5ff', '#ffe24a', '#ffb84a', '#7c5cff', '#40f3b8', '#ff7c7c', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83']
   }
 })
 
 // ============================================================
-// 用电容量情况（接口版）
+// 用电容量情况
 // ============================================================
 const capacityTabs = [
   { type: 1, label: '全社会用电容量' },
@@ -541,12 +492,7 @@ const capacityRingOption = computed(() => {
         labelLine: { show: false },
         data: [
           { value: val, name: item.label, itemStyle: { color: colors[idx % colors.length] } },
-          {
-            value: rest,
-            name: '',
-            itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
-            label: { show: false }
-          }
+          { value: rest, name: '', itemStyle: { color: 'rgba(89, 194, 255, 0.08)' }, label: { show: false } }
         ]
       }
     })
@@ -592,7 +538,10 @@ const pileOption = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: true },
+    tooltip: {
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
     grid: { left: 70, right: 26, top: 26, bottom: 94 },
     legend: {
       bottom: 6,
@@ -624,11 +573,7 @@ const pileOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(51, 213, 255, 0.95)' },
               { offset: 1, color: 'rgba(51, 213, 255, 0.15)' }
@@ -644,11 +589,7 @@ const pileOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(255, 226, 74, 0.95)' },
               { offset: 1, color: 'rgba(255, 226, 74, 0.15)' }
@@ -733,8 +674,81 @@ const projectPieTotal = computed(() =>
   projectPieItems.value.reduce((acc, item) => acc + item.value, 0)
 )
 
+// 👇 使用普通 2D 环形饼图
+const projectPieOption = computed(() => {
+  const data = projectPieItems.value
+  const total = projectPieTotal.value
+  // 多色配置池
+  const colors = ['#33d5ff', '#ffe24a', '#8b5cff', '#40f3b8', '#ff9f43']
+
+  if (!data.length || total === 0) return {}
+
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: '#fff', fontSize: 36 },
+      formatter: (params: any) => {
+        const percent = total ? ((params.value / total) * 100).toFixed(2) : '0.00'
+        return `${params.marker}${params.name}<br/>数量：${params.value} 个<br/>占比：${percent}%`
+      }
+    },
+    legend: {
+      show: false 
+    },
+    series: [
+      {
+        type: 'pie',
+        radius: ['45%', '70%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        itemStyle: {
+          borderWidth: 2,
+          borderColor: 'rgba(2, 10, 30, 0.92)'
+        },
+        label: {
+          show: true,
+          position: 'outside',
+          formatter: '{b}\n{d}%',
+          color: 'rgba(214, 238, 255, 0.9)',
+          fontSize: 28,
+          lineHeight: 36
+        },
+        labelLine: {
+          show: true,
+          length: 20,
+          length2: 30,
+          lineStyle: {
+            color: 'rgba(89, 194, 255, 0.4)',
+            width: 2
+          }
+        },
+        data: data.map((item, idx) => ({
+          name: item.name,
+          value: item.value,
+          itemStyle: {
+            color: colors[idx % colors.length]
+          }
+        }))
+      },
+      // 内环装饰圈
+      {
+        type: 'pie',
+        radius: ['38%', '40%'],
+        center: ['50%', '50%'],
+        silent: true,
+        label: { show: false },
+        data: [{ value: 1, itemStyle: { color: 'rgba(51, 213, 255, 0.15)' } }]
+      }
+    ]
+  }
+})
+
 // ============================================================
-// 能源装机情况（接口版）
+// 能源装机情况
 // ============================================================
 const energyTabs = [
   { type: 1, label: '能源发电量' },
@@ -757,12 +771,10 @@ const fetchEnergyData = async (type: 1 | 2) => {
       type,
       souseDate: dateEnergy.value
     })
-    console.log('[energy] type=', type, 'res=', res)
     const data = res?.data ?? res ?? {}
 
     energyList.value = data.dataList ?? []
     energySummary.value = data.summary ?? {}
-    console.log('[energy] dataList=', energyList.value, 'summary=', energySummary.value)
 
     const options: string[] = data.summary?.timeOptions ?? []
     if (options.length) {
@@ -782,7 +794,6 @@ watch(dateEnergy, () => {
   fetchEnergyData(activeEnergyTab.value)
 })
 
-// KPI 显示：type=1 总装机量，type=2 项目总数
 const energyKpiLabel = computed(() =>
   activeEnergyTab.value === 1 ? '能源总发电量' : '能源项目总数'
 )
@@ -790,12 +801,10 @@ const energyKpiUnit = computed(() => (activeEnergyTab.value === 1 ? '万千瓦�
 
 const energyTotal = computed(() => {
   if (activeEnergyTab.value === 2) {
-    // type=2 显示项目总数
     const s = energySummary.value
     const total = Number(s?.totalNum) || 0
     return total ? String(total) : String(energyList.value.length || 0)
   }
-  // type=1 显示总装机量
   const s = energySummary.value
   const total = Number(s?.totalNum) || Number(s?.totalPower) || 0
   return total ? String(total) : '-'
@@ -806,16 +815,12 @@ const energyOption = computed(() => {
   let values: number[] = []
 
   if (activeEnergyTab.value === 1) {
-    // type=1：{ label, num }
     categories = energyList.value.map((i: any) => i.label ?? '')
     values = energyList.value.map((i: any) => Number(i.num) || 0)
   } else {
-    // type=2：{ sendPowerType, place, deviceVolume, ... }
-    // 按发电类型统计数量
     const map: Record<string, number> = {}
     energyList.value.forEach((item: any) => {
       const raw = item.sendPowerType || '其他'
-      // "风电、陆上风电" → 取"风电"
       const key = raw.split('、')[0].trim() || '其他'
       map[key] = (map[key] || 0) + 1
     })
@@ -823,13 +828,15 @@ const energyOption = computed(() => {
     values = Object.values(map)
   }
 
-  // 若 type=1 的最大值 ≤ 100，视为百分比
   const maxVal = values.length ? Math.max(...values) : 0
   const isPercent = activeEnergyTab.value === 1 && maxVal > 0 && maxVal <= 100
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: {
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+    },
     grid: { left: 120, right: 66, top: 16, bottom: 68 },
     xAxis: {
       type: 'value',
@@ -857,11 +864,7 @@ const energyOption = computed(() => {
         itemStyle: {
           borderRadius: [0, 10, 10, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 1,
-            y2: 0,
+            type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
             colorStops: [
               { offset: 0, color: 'rgba(255, 120, 120, 0.25)' },
               { offset: 1, color: 'rgba(255, 120, 120, 0.95)' }
@@ -922,7 +925,6 @@ onMounted(() => {
   pointer-events: none;
 }
 
-/* 卡片较窄较高时底图会被纵向拉变形，头部同样用九宫格单独处理 */
 .panel.title-bg-custom {
   background-image:
     linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
@@ -949,7 +951,6 @@ onMounted(() => {
   border-image-repeat: stretch;
 }
 
-/* 充电桩面板放大：占据原“企业复工复产情况”所在的整列（跨两行） */
 .panel--pile {
   grid-row: span 2;
 }
@@ -971,10 +972,9 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   font-size: 60px;
-  transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
-  margin-left: 35px;
+  margin-left: 10px;
   letter-spacing: 2px;
   color: #f8fbff;
   text-shadow:
@@ -1017,12 +1017,8 @@ onMounted(() => {
   pointer-events: auto;
 }
 
-.panel-tabs--center {
-  justify-content: center;
-}
-.panel-tabs--right {
-  justify-content: center;
-}
+.panel-tabs--center { justify-content: center; }
+.panel-tabs--right { justify-content: center; }
 
 .tab {
   position: relative;
@@ -1116,18 +1112,17 @@ onMounted(() => {
   min-height: 0;
 }
 
-/* ========== 充电桩面板（上下各占一半） ========== */
 .pile-body {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-rows: 1fr 1fr; /* 上下各占一半 */
+  grid-template-rows: 1fr 1fr;
   gap: 14px;
 }
 
 .pile-top {
   display: grid;
-  grid-template-columns: minmax(0, 4.5fr) minmax(0, 5.5fr); /* 调整比例，给右侧更多空间 */
+  grid-template-columns: minmax(0, 4.5fr) minmax(0, 5.5fr);
   gap: 14px;
   min-height: 0;
   height: 100%;
@@ -1146,7 +1141,7 @@ onMounted(() => {
   min-height: 0;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 1fr 1fr; /* 左右块内部两行均分高度 */
+  grid-template-rows: 1fr 1fr;
 }
 
 .pile-top-left::before,
@@ -1214,15 +1209,15 @@ onMounted(() => {
   padding: 6px 16px;
 }
 
-/* 将右侧行改为纵向布局，给 40px 字体腾出充足空间 */
 .pile-top-right-row {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
   position: relative;
-  padding: 0 16px 0 24px;
+  padding: 0 16px 0 32px;
   box-sizing: border-box;
 }
 
@@ -1234,12 +1229,12 @@ onMounted(() => {
 .pile-top-right-row::before {
   content: '';
   width: 4px;
-  height: 24px; /* 指示条稍微加长 */
+  height: 32px;
   border-radius: 999px;
   background: rgba(54, 232, 255, 0.35);
   box-shadow: 0 0 12px rgba(54, 232, 255, 0.16);
   position: absolute;
-  left: 6px; /* 缩进 */
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -1262,11 +1257,12 @@ onMounted(() => {
   color: rgba(214, 238, 255, 0.82);
   letter-spacing: 2px;
 }
+
 .pile-top-right-metrics {
   display: flex;
-  align-items: baseline;
-  gap: 24px;
-  flex-wrap: wrap; /* 避免极端情况下的超出边界 */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 .pile-top-right-val,
 .pile-top-right-yoy {
@@ -1282,7 +1278,6 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-/* 统一数字大小并防止换行 */
 .pile-num {
   font-size: 40px;
   font-weight: 900;
@@ -1322,7 +1317,7 @@ onMounted(() => {
   min-height: 0;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 12px;
+  gap: 16px;
   margin-top: 50px;
 }
 
@@ -1361,50 +1356,16 @@ onMounted(() => {
 
 .project-stage {
   position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-  margin-top: -180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 250px;
 }
 
 .project-chart-wrap {
-  position: relative;
-  z-index: 1;
-}
-
-.project-base {
-  position: absolute;
-  width: 620px;
-  height: 180px;
-  border-radius: 999px;
-  border: 1px solid rgba(54, 232, 255, 0.14);
-  background: radial-gradient(circle at 50% 40%, rgba(54, 232, 255, 0.16), rgba(6, 18, 48, 0));
-  transform: perspective(900px) rotateX(72deg) translateY(28px);
-  box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
-  pointer-events: none;
-}
-
-.project-ring {
-  position: absolute;
-  left: 50%;
-  top: 58%;
-  border-radius: 999px;
-  transform: translate(-50%, -50%) perspective(900px) rotateX(72deg);
-  pointer-events: none;
-}
-
-.project-ring--a {
-  width: 700px;
-  height: 250px;
-  border: 2px solid rgba(54, 232, 255, 0.14);
-  box-shadow: 0 0 34px rgba(54, 232, 255, 0.12);
-}
-
-.project-ring--b {
-  width: 560px;
-  height: 210px;
-  border: 2px solid rgba(54, 232, 255, 0.1);
-  opacity: 0.75;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
 }
 
 .project-table {
@@ -1413,8 +1374,6 @@ onMounted(() => {
   background: rgba(6, 18, 48, 0.42);
   overflow: hidden;
   min-height: 0;
-  margin-top: -280px;
-  margin-bottom: 80px;
 }
 
 .project-table-row {
@@ -1443,6 +1402,10 @@ onMounted(() => {
 .project-dot--todo {
   background: rgba(255, 226, 74, 0.95);
   box-shadow: 0 0 12px rgba(255, 226, 74, 0.18);
+}
+.project-dot--other {
+  background: rgba(139, 92, 255, 0.95);
+  box-shadow: 0 0 12px rgba(139, 92, 255, 0.18);
 }
 .project-name {
   font-size: 28px;
@@ -1510,7 +1473,6 @@ onMounted(() => {
   margin-top: -50px;
 }
 
-/* 统一 select 展开后的选项背景 */
 .panel-date option {
   background-color: #0a1f4a;
   color: rgba(214, 238, 255, 0.92);

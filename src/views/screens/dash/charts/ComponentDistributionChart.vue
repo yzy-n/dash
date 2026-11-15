@@ -33,7 +33,7 @@ const option = computed(() => {
       type: 'category',
       data: categories,
       axisLine: { lineStyle: { color: 'rgba(101,200,255,0.25)' } },
-      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 28, rotate: 18 }
+      axisLabel: { color: 'rgba(214,238,255,0.7)', fontSize: 28, }
     },
     yAxis: {
       type: 'value',

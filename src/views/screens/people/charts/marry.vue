@@ -27,10 +27,8 @@ const option = computed<EChartsOption>(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.92)' }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     legend: {
       data: ['初婚', '再婚', '复婚', '准许登记结婚', '离婚率'],
@@ -78,39 +76,40 @@ const option = computed<EChartsOption>(() => {
       {
         name: '初婚',
         type: 'bar',
-        barWidth: '16%',
+        barWidth: '50',
         data: rows.value.map((i) => i.firstMarry),
-        itemStyle: { color: '#4096ff' }
+        itemStyle: { color: '#b14cff' }
       },
       {
         name: '再婚',
         type: 'bar',
-        barWidth: '16%',
+        barWidth: '50',
         data: rows.value.map((i) => i.remarry),
-        itemStyle: { color: '#52c41a' }
+        itemStyle: { color: '#5dffcb' }
       },
       {
         name: '复婚',
         type: 'bar',
-        barWidth: '16%',
+        barWidth: '50',
         data: rows.value.map((i) => i.remarryRestore),
-        itemStyle: { color: '#faad14' }
+        itemStyle: { color: '#ffd15c' }
       },
       {
         name: '准许登记结婚',
         type: 'bar',
-        barWidth: '16%',
+        barWidth: '50',
         data: rows.value.map((i) => i.permitMarry),
-        itemStyle: { color: '#f55442' }
+        itemStyle: { color: '#2f7dff' }
       },
       {
         name: '离婚率',
         type: 'line',
         yAxisIndex: 1,
+        barWidth: '50',
         smooth: true,
         data: rows.value.map((i) => i.divorceRate),
-        itemStyle: { color: '#36cfc9' },
-        lineStyle: { width: 2 }
+        itemStyle: { color: '#ff6b8a' },
+        lineStyle: { width: 3, color: '#ff6b8a' }
       }
     ]
   }

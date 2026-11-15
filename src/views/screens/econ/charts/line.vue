@@ -18,12 +18,12 @@ const chartData = computed(() => props.data ?? defaultData)
 
 // ✅ 渐变移到 computed 外面，只实例化一次
 const positiveGradient = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-  { offset: 0, color: '#33d8ff' },
-  { offset: 1, color: '#0066bb' }
+  { offset: 0, color: '#5dffcb' },
+  { offset: 1, color: '#009e78' }
 ])
 const negativeGradient = new echarts.graphic.LinearGradient(0, 1, 0, 0, [
-  { offset: 0, color: '#bb2233' },
-  { offset: 1, color: '#ff6677' }
+  { offset: 0, color: '#8b1220' },
+  { offset: 1, color: '#ff4d6d' }
 ])
 
 const option = computed(() => {
@@ -40,7 +40,7 @@ const option = computed(() => {
         show: true,
         position: isNeg ? 'bottom' : 'top',
         color: '#fff',
-        fontSize: 13
+        fontSize: 28
       }
     }
   })
@@ -50,8 +50,8 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,24,53,0.75)',
-      textStyle: { color: '#fff', fontSize: 34 },
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       formatter: '{b}<br/>{c} %'
     },
     grid: {
@@ -93,7 +93,7 @@ const option = computed(() => {
         markLine: {
           silent: true,
           data: [{ yAxis: 0 }],
-          lineStyle: { color: '#ff3344', width: 2 }
+          lineStyle: { color: '#ff4d6d', width: 2 }
         }
       }
     ]

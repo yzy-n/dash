@@ -32,11 +32,8 @@ const renderChart = () => {
     backgroundColor: '#091835',
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     legend: {
       data: ['总户数', '总人数'],
@@ -88,8 +85,8 @@ const renderChart = () => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: '#ffdd22' },
-              { offset: 1, color: '#d4b000' }
+              { offset: 0, color: '#ffb13d' },
+              { offset: 1, color: '#c97a00' }
             ]
           }
         },
@@ -108,8 +105,8 @@ const renderChart = () => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: '#36e8b2' },
-              { offset: 1, color: '#08a878' }
+              { offset: 0, color: '#36e8ff' },
+              { offset: 1, color: '#1668ff' }
             ]
           }
         },

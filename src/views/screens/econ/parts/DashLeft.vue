@@ -43,7 +43,7 @@
       </div>
       <div class="capacity-body">
         <div class="capacity-chart">
-          <PieRing :data="capacityData" />
+          <EChart :option="capacityPieOption" />
         </div>
       </div>
     </section>
@@ -190,7 +190,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import EChart from '@/components/echarts/EChart.vue'
-import PieRing from '../charts/PieRing.vue'
 import Line from '../charts/line.vue'
 import {
   getSteelPrice,
@@ -217,53 +216,17 @@ const gdpDateOptions = ref<string[]>([...DEFAULT_GDP_YEARS])
 const dateGdp = ref('2024')
 
 const capacityDateOptions = [
-  '1',
-  '2022.01~12',
-  '2023.01~03',
-  '2023.01~06',
-  '2023.01~09',
-  '2023.1-12',
-  '2023.12',
-  '2024.01-06',
-  '2024.01-09',
-  '2024.01-12',
-  '2024.1-3',
-  '2025.01-03',
-  '222'
+  '1', '2022.01~12', '2023.01~03', '2023.01~06', '2023.01~09', '2023.1-12',
+  '2023.12', '2024.01-06', '2024.01-09', '2024.01-12', '2024.1-3', '2025.01-03', '222'
 ]
 const dateCapacity = ref('222')
 
 const investDateOptions = [
-  '1',
-  '2022.01~12',
-  '2023.01~02',
-  '2023.01~03',
-  '2023.01~04',
-  '2023.01~05',
-  '2023.01~06',
-  '2023.01~07',
-  '2023.01~08',
-  '2023.01~09',
-  '2023.01~10',
-  '2023.01~11',
-  '2023.1-12',
-  '2023.12',
-  '2024.01~02',
-  '2024.01-03',
-  '2024.01-04',
-  '2024.01-05',
-  '2024.01-06',
-  '2024.01-07',
-  '2024.01-08',
-  '2024.01-09',
-  '2024.01-10',
-  '2024.01-11',
-  '2024.01-12',
-  '2025.01-02',
-  '2025.01-03',
-  '2025.01-04',
-  '2025.01-06',
-  '2025.01-2025.02'
+  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
+  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01~10', '2023.01~11',
+  '2023.1-12', '2023.12', '2024.01~02', '2024.01-03', '2024.01-04', '2024.01-05',
+  '2024.01-06', '2024.01-07', '2024.01-08', '2024.01-09', '2024.01-10', '2024.01-11',
+  '2024.01-12', '2025.01-02', '2025.01-03', '2025.01-04', '2025.01-06', '2025.01-2025.02'
 ]
 const dateInvestFixed = ref('2025.01-2025.02')
 
@@ -271,73 +234,27 @@ const parkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.1-9']
 const dateInvestPark = ref('2023.1-9')
 
 const pileDistrictDateOptions = [
-  '1',
-  '2022.01~12',
-  '2023.01~02',
-  '2023.01~03',
-  '2023.01~04',
-  '2023.01~05',
-  '2023.01~06',
-  '2023.01~07',
-  '2023.01~08',
-  '2023.01~09',
-  '2023.01-10',
-  '2023.01~10',
-  '2023.01~11',
-  '2023.1-12',
-  '2024.01~02',
-  '2024.01-04',
-  '2024.01-05',
-  '2024.01-06',
-  '2024.01-07',
-  '2024.01-08',
-  '2024.01-09',
-  '2024.01-10',
-  '2024.01-11',
-  '2024.01-12',
-  '2024.1-3',
-  '2025.01-02',
-  '2025.01-03',
-  '2025.01-04',
-  '2025.01-06',
-  '2025.01-2025.02'
+  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
+  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01-10', '2023.01~10',
+  '2023.01~11', '2023.1-12', '2024.01~02', '2024.01-04', '2024.01-05', '2024.01-06',
+  '2024.01-07', '2024.01-08', '2024.01-09', '2024.01-10', '2024.01-11', '2024.01-12',
+  '2024.1-3', '2025.01-02', '2025.01-03', '2025.01-04', '2025.01-06', '2025.01-2025.02'
 ]
 const datePileDistrict = ref('2025.01-2025.02')
 
 const pileIndustryDateOptions = [
-  '1',
-  '2022.01~12',
-  '2023.01~02',
-  '2023.01~03',
-  '2023.01~04',
-  '2023.01~05',
-  '2023.01~06',
-  '2023.01~07',
-  '2023.01~08',
-  '2023.01~09',
-  '2023.01~10',
-  '2023.01~11',
-  '2023-1~2023-12',
-  '2024.01~02'
+  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
+  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01~10', '2023.01~11',
+  '2023-1~2023-12', '2024.01~02'
 ]
 const datePileIndustry = ref('2024.01~02')
 
 const pileParkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.01~11']
 const datePilePark = ref('2023.01~11')
 
-// ⭐ 规模以上工业效益卡片专属时间下拉
 const benefitDateOptions = ref<string[]>([
-  '1',
-  '2022.01~12',
-  '2023.01~02',
-  '2023.01~03',
-  '2023.01~05',
-  '2023.01~06',
-  '2023.01~07',
-  '2023.01~08',
-  '2023.01~10',
-  '2023-01~2023-11',
-  '2023.1-12'
+  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~05', '2023.01~06',
+  '2023.01~07', '2023.01~08', '2023.01~10', '2023-01~2023-11', '2023.1-12'
 ])
 const dateBenefit = ref('2023.1-12')
 
@@ -371,7 +288,6 @@ const toNum = (v: any) => {
 /* =========================================================
    1. GDP 增速同比（接口驱动）
    ========================================================= */
-
 type GdpGrowthRow = {
   quarter: string
   internalLevel: number
@@ -413,7 +329,6 @@ const fetchGdpGrowth = async () => {
 /* =========================================================
    2. 各地区生产总值（接口驱动）
    ========================================================= */
-
 type RegionGdpRow = {
   area: string
   gdp: number
@@ -447,10 +362,6 @@ const fetchGdpData = async () => {
     gdpLoading.value = false
   }
 }
-
-/* =========================================================
-   GDP 增速同比 - 三条折线
-   ========================================================= */
 
 const gdpLineOption = computed(() => {
   const x = gdpGrowthList.value.map((r) => r.quarter)
@@ -496,7 +407,7 @@ const gdpLineOption = computed(() => {
         data: national,
         showSymbol: false,
         smooth: true,
-        lineStyle: { width: 3, color: 'rgba(255, 226, 74, 0.95)' }
+        lineStyle: { width: 3, color: 'rgba(255, 209, 92, 0.95)' }
       },
       {
         name: '辽宁',
@@ -504,7 +415,7 @@ const gdpLineOption = computed(() => {
         data: liaoning,
         showSymbol: false,
         smooth: true,
-        lineStyle: { width: 3, color: 'rgba(64, 243, 184, 0.95)' }
+        lineStyle: { width: 3, color: 'rgba(177, 76, 255, 0.95)' }
       },
       {
         name: '鞍山',
@@ -512,15 +423,11 @@ const gdpLineOption = computed(() => {
         data: anshan,
         showSymbol: false,
         smooth: true,
-        lineStyle: { width: 3, color: 'rgba(51, 213, 255, 0.95)' }
+        lineStyle: { width: 3, color: 'rgba(54, 232, 255, 0.95)' }
       }
     ]
   }
 })
-
-/* =========================================================
-   各地区生产总值 - 柱状 + 折线（双 Y 轴）
-   ========================================================= */
 
 const regionGdpOption = computed(() => {
   const names = regionGdpList.value.map((r) => r.area)
@@ -575,14 +482,10 @@ const regionGdpOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(51, 213, 255, 0.85)' },
-              { offset: 1, color: 'rgba(51, 213, 255, 0.12)' }
+              { offset: 0, color: 'rgba(54, 232, 255, 0.85)' },
+              { offset: 1, color: 'rgba(54, 232, 255, 0.12)' }
             ]
           }
         }
@@ -594,7 +497,7 @@ const regionGdpOption = computed(() => {
         data: yoy,
         showSymbol: false,
         smooth: true,
-        lineStyle: { width: 3, color: 'rgba(255, 184, 74, 0.92)' }
+        lineStyle: { width: 3, color: 'rgba(255, 209, 92, 0.92)' }
       }
     ]
   }
@@ -603,7 +506,6 @@ const regionGdpOption = computed(() => {
 /* =========================================================
    3. 三次产业分析（接口驱动）
    ========================================================= */
-
 type PieItem = {
   name: string
   value: number
@@ -650,10 +552,72 @@ const fetchCapacityData = async () => {
   }
 }
 
+const capacityPieOption = computed(() => {
+  const data = capacityData.value.map((item, idx) => ({
+    name: item.name,
+    value: item.value,
+    rate: item.rate,
+    itemStyle: {
+      // 一产绿、二产橙、三产冰蓝，与上方"地区生产总值增速"的金/紫/青区分
+      color: ['#5dffcb', '#ff8822', '#36e8ff'][idx % 3]
+    }
+  }))
+
+  return {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: '#fff', fontSize: 34 },
+      formatter: '{b}<br/>增加值: {c} 亿元<br/>占比: {d}%',
+      confine: true
+    },
+    legend: {
+      show: false
+    },
+    series: [
+      {
+        type: 'pie',
+        radius: ['32%', '48%'],
+        center: ['50%', '46%'],
+        avoidLabelOverlap: true,
+        itemStyle: {
+          borderWidth: 2,
+          borderColor: 'rgba(2, 10, 30, 0.92)'
+        },
+        label: {
+          show: true,
+          position: 'outside',
+          formatter: (params: any) => {
+            const item = data[params.dataIndex]
+            return `{name|${item.name}}\n{val|增加值: ${item.value} 亿元}\n{rate|占比: ${item.rate}%}`
+          },
+          rich: {
+            name: { fontSize: 32, fontWeight: 'bold', color: '#fff', lineHeight: 42, align: 'center' },
+            val: { fontSize: 26, color: 'rgba(214, 238, 255, 0.8)', lineHeight: 36, align: 'center' },
+            rate: { fontSize: 26, color: 'rgba(214, 238, 255, 0.8)', lineHeight: 36, align: 'center' }
+          }
+        },
+        labelLine: {
+          show: true,
+          length: 35,
+          length2: 60,
+          lineStyle: {
+            color: 'rgba(89, 194, 255, 0.5)',
+            width: 2
+          }
+        },
+        data: data
+      }
+    ]
+  }
+})
+
 /* =========================================================
    4. 固定资产投资增速（接口驱动）
    ========================================================= */
-
 const investTabs = ['地区', '行业', '园区']
 type InvestTab = (typeof investTabs)[number]
 
@@ -687,8 +651,6 @@ const fetchInvestData = async () => {
   try {
     if (activeInvestTab.value === '地区') {
       const res: any = await getEconomicIndicatorsDName(dateInvestFixed.value)
-      console.log('[economicindicatorsdname] souseDate=', dateInvestFixed.value, 'res=', res)
-
       const list = pickList(res)
       investDistrictList.value = list.map((it: any) => ({
         area: String(it?.departmentName ?? ''),
@@ -696,8 +658,6 @@ const fetchInvestData = async () => {
       }))
     } else if (activeInvestTab.value === '行业') {
       const res: any = await getFixedInvestments(dateInvestFixed.value)
-      console.log('[fixedinvestments] souseDate=', dateInvestFixed.value, 'res=', res)
-
       const list = pickList(res)
       investIndustryList.value = list.map((it: any) => ({
         area: String(it?.industry ?? ''),
@@ -705,8 +665,6 @@ const fetchInvestData = async () => {
       }))
     } else {
       const res: any = await getParkProperty(dateInvestPark.value)
-      console.log('[parkproperty] souseDate=', dateInvestPark.value, 'res=', res)
-
       const list = pickList(res)
       investParkList.value = list.map((it: any) => ({
         area: String(it?.parkName ?? ''),
@@ -741,23 +699,36 @@ const investOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
+      confine: true,
+      extraCssText: 'box-shadow: 0 0 10px rgba(0,0,0,0.5);'
     },
-    grid: { left: 60, right: 24, top: 64, bottom: 80 },
+    // 👇 核心：把 bottom 加大，避免倾斜文字被切掉
+    grid: { left: 70, right: 24, top: 40, bottom: 110 },
     xAxis: {
       type: 'category',
       data: names,
-      axisLabel: { color: 'rgba(214, 238, 255, 0.6)', fontSize: 28, rotate: 40 },
+      axisLabel: { 
+        color: 'rgba(214, 238, 255, 0.6)', 
+        fontSize: 24, 
+        rotate: 25, // 👇 稍微减小角度，减少垂直高度
+        interval: 0, 
+        margin: 12 
+      },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
-      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
+      nameTextStyle: { 
+        color: 'rgba(214, 238, 255, 0.55)', 
+        fontSize: 24,
+        padding: [0, 0, 10, 10] 
+      },
+      axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
       axisLine: { show: false },
       axisTick: { show: false }
@@ -770,14 +741,10 @@ const investOption = computed(() => {
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: '#54e8ff' },
-              { offset: 1, color: '#1966ff' }
+              { offset: 0, color: '#b14cff' },
+              { offset: 1, color: '#5a1fbf' }
             ]
           }
         },
@@ -790,7 +757,6 @@ const investOption = computed(() => {
 /* =========================================================
    5. 规模以上工业增项（接口驱动）
    ========================================================= */
-
 type PileRow = {
   name: string
   value: number
@@ -824,8 +790,6 @@ const fetchPileData = async () => {
   try {
     if (activePileTab.value === '地区') {
       const res: any = await getEconomicIndicatorsDName(datePileDistrict.value)
-      console.log('[pile-economicindicatorsdname] souseDate=', datePileDistrict.value, 'res=', res)
-
       const list = pickList(res)
       pileData.value = list.map((it: any) => ({
         name: String(it?.departmentName ?? ''),
@@ -833,13 +797,6 @@ const fetchPileData = async () => {
       }))
     } else if (activePileTab.value === '行业') {
       const res: any = await getEconomicIndicatorsIndustry(datePileIndustry.value)
-      console.log(
-        '[pile-economicindicatorsindustry] souseDate=',
-        datePileIndustry.value,
-        'res=',
-        res
-      )
-
       const list = pickList(res)
       pileData.value = list.map((it: any) => ({
         name: String(it?.industry ?? ''),
@@ -847,8 +804,6 @@ const fetchPileData = async () => {
       }))
     } else {
       const res: any = await getEconomicIndicatorsPark(datePilePark.value)
-      console.log('[pile-economicindicatorspark] souseDate=', datePilePark.value, 'res=', res)
-
       const list = pickList(res)
       pileData.value = list.map((it: any) => ({
         name: String(it?.parkName ?? ''),
@@ -872,7 +827,6 @@ const handlePileTabClick = async (tab: string) => {
 /* =========================================================
    6. 工业“四改”投资完成情况（接口驱动）
    ========================================================= */
-
 type FourChangeMetrics = {
   amount: string
   yearOnYearGrowth: string
@@ -883,17 +837,12 @@ type FourChangeMetrics = {
 const FOUR_CHANGES_DATE = '2024.01-03'
 
 const fourChangesData = ref<FourChangeMetrics>({
-  amount: '0',
-  yearOnYearGrowth: '0',
-  accountingGrowth: '0',
-  periodLastYear: '0'
+  amount: '0', yearOnYearGrowth: '0', accountingGrowth: '0', periodLastYear: '0'
 })
 
 const fetchFourChanges = async () => {
   try {
     const res: any = await getFourChanges(FOUR_CHANGES_DATE)
-    console.log('[fourchanges] souseDate=', FOUR_CHANGES_DATE, 'res=', res)
-
     const list = pickList(res)
     const row = list[0]
     if (row) {
@@ -918,12 +867,7 @@ const fourReformMetrics = computed(() => [
 
 /* =========================================================
    7. 规模以上工业效益（接口驱动）
-   - 接口：/economicoperation/bigscreen/economicbenefit?souseDate=xxx
-   - dataList: 每个行业一条 { industry, taking, averageNumber, amount, profit }
-   - summary.totals: { income, workers, tax, profit } → 4 个指标卡片
-   - summary.timeOptions / souseDate: 时间下拉
    ========================================================= */
-
 type BenefitRow = {
   industry: string
   taking: number
@@ -941,10 +885,7 @@ type BenefitTotals = {
 
 const benefitList = ref<BenefitRow[]>([])
 const benefitTotals = ref<BenefitTotals>({
-  income: '0',
-  workers: '0',
-  tax: '0',
-  profit: '0'
+  income: '0', workers: '0', tax: '0', profit: '0'
 })
 const benefitLoading = ref(false)
 
@@ -952,8 +893,6 @@ const fetchBenefitData = async () => {
   benefitLoading.value = true
   try {
     const res: any = await getEconomicBenefit(dateBenefit.value)
-    console.log('[economicbenefit] souseDate=', dateBenefit.value, 'res=', res)
-
     const list = pickList(res)
     benefitList.value = list.map((it: any) => ({
       industry: String(it?.industry ?? ''),
@@ -963,7 +902,6 @@ const fetchBenefitData = async () => {
       profit: toNum(it?.profit)
     }))
 
-    // summary.totals + timeOptions
     const summary = pickSummary(res)
     const totals = summary?.totals ?? {}
     benefitTotals.value = {
@@ -973,7 +911,6 @@ const fetchBenefitData = async () => {
       profit: String(totals?.profit ?? '0')
     }
 
-    // ⭐ 用接口返回的 timeOptions 覆盖本地时间下拉
     const timeOptions = summary?.timeOptions
     if (Array.isArray(timeOptions) && timeOptions.length) {
       const opts = timeOptions.map((t: any) => String(t))
@@ -993,7 +930,6 @@ const fetchBenefitData = async () => {
   }
 }
 
-// 顶部 4 个指标卡片：营业收入 / 税金总额 / 平均用工人数 / 利润总额
 const fourReformMetrics2 = computed(() => [
   { label: '营业收入', value: benefitTotals.value.income, unit: '亿元' },
   { label: '税金总额', value: benefitTotals.value.tax, unit: '亿元' },
@@ -1001,7 +937,6 @@ const fourReformMetrics2 = computed(() => [
   { label: '利润总额', value: benefitTotals.value.profit, unit: '亿元' }
 ])
 
-// 图表：9 个行业 × 4 个指标（多系列柱状图）
 const investOption2 = computed(() => {
   const names = benefitList.value.map((r) => r.industry)
 
@@ -1011,16 +946,17 @@ const investOption2 = computed(() => {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
+      confine: true
     },
     legend: {
       top: 8,
       left: 'center',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 34 }
+      textStyle: { color: 'rgba(214, 238, 255, 0.72)', fontSize: 40 }
     },
     grid: { left: 120, right: 24, top: 50, bottom: 400 },
     xAxis: {
@@ -1035,7 +971,7 @@ const investOption2 = computed(() => {
       name: '单位：亿元',
       nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)',fontSize:28 } },
       axisLine: { show: false },
       axisTick: { show: false }
     },
@@ -1048,14 +984,10 @@ const investOption2 = computed(() => {
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: '#54e8ff' },
-              { offset: 1, color: '#1966ff' }
+              { offset: 0, color: '#36e8ff' },
+              { offset: 1, color: '#1668ff' }
             ]
           }
         }
@@ -1063,19 +995,15 @@ const investOption2 = computed(() => {
       {
         name: '税金总额',
         type: 'bar',
-        barWidth: 10,
+        barWidth: 50,
         data: benefitList.value.map((r) => r.amount),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: '#36e8bc' },
-              { offset: 1, color: 'rgba(22,160,120,0.4)' }
+              { offset: 0, color: '#ffd15c' },
+              { offset: 1, color: 'rgba(201, 138, 0, 0.4)' }
             ]
           }
         }
@@ -1083,19 +1011,15 @@ const investOption2 = computed(() => {
       {
         name: '利润总额',
         type: 'bar',
-        barWidth: 10,
+        barWidth: 50,
         data: benefitList.value.map((r) => r.profit),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: '#ffd058' },
-              { offset: 1, color: 'rgba(255,150,20,0.4)' }
+              { offset: 0, color: '#b14cff' },
+              { offset: 1, color: 'rgba(106, 31, 208, 0.4)' }
             ]
           }
         }
@@ -1107,44 +1031,13 @@ const investOption2 = computed(() => {
 /* =========================================================
    8. 钢价走势（接口驱动）
    ========================================================= */
-
 const steelDateOptions = [
-  '2023.02',
-  '2023.03',
-  '2023.03.21',
-  '2023.03.22',
-  '2023.03.27',
-  '2023.04.20',
-  '2023.05.05',
-  '2023.05.18',
-  '2023.05.26',
-  '2023.06.02',
-  '2023.06.09',
-  '2023.06.16',
-  '2023.06.21',
-  '2023.06.29',
-  '2023.07.07',
-  '2023.07.14',
-  '2023.07.21',
-  '2023.07.28',
-  '2023.08',
-  '2023.08.04',
-  '2023.08.11',
-  '2023.08.18',
-  '2023.08.25',
-  '2023.09.01',
-  '2023.09.08',
-  '2023.09.15',
-  '2023.09.21',
-  '2023.09.26',
-  '2023.10.09',
-  '2023.10.17',
-  '2023.11.29',
-  '2024.03.13',
-  '2024.05',
-  '2024.07',
-  '2024.12',
-  '2025.06'
+  '2023.02', '2023.03', '2023.03.21', '2023.03.22', '2023.03.27', '2023.04.20',
+  '2023.05.05', '2023.05.18', '2023.05.26', '2023.06.02', '2023.06.09', '2023.06.16',
+  '2023.06.21', '2023.06.29', '2023.07.07', '2023.07.14', '2023.07.21', '2023.07.28',
+  '2023.08', '2023.08.04', '2023.08.11', '2023.08.18', '2023.08.25', '2023.09.01',
+  '2023.09.08', '2023.09.15', '2023.09.21', '2023.09.26', '2023.10.09', '2023.10.17',
+  '2023.11.29', '2024.03.13', '2024.05', '2024.07', '2024.12', '2025.06'
 ]
 
 const dateSteel = ref('2025.06')
@@ -1165,8 +1058,6 @@ const fetchSteelData = async () => {
   steelLoading.value = true
   try {
     const res: any = await getSteelPrice(dateSteel.value)
-    console.log('[steelprice] souseDate=', dateSteel.value, 'res=', res)
-
     const list = pickList(res)
     steelTableData.value = list.map((it: any, idx: number) => {
       const price = Number(it?.price ?? 0)
@@ -1191,14 +1082,12 @@ const fetchSteelData = async () => {
 /* =========================================================
    其余 Tab / 静态指标
    ========================================================= */
-
 const capacityTabs = ['全社会用电容量', '全行业实际用电容量']
 const activeCapacityTab = ref<(typeof capacityTabs)[number]>(capacityTabs[0])
 
 /* =========================================================
    初始化
    ========================================================= */
-
 onMounted(() => {
   fetchGdpData()
   fetchCapacityData()
@@ -1259,7 +1148,6 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   font-size: 60px;
-  transform: skewX(-10deg);
   font-weight: 800;
   margin-top: -15px;
   margin-left: 20px;
@@ -1293,6 +1181,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   gap: 14px;
+  z-index: 99; 
 }
 .panel-tabs--center {
   justify-content: center;
@@ -1329,6 +1218,8 @@ onMounted(() => {
 .capacity-chart {
   height: 100%;
   min-height: 0;
+  padding: 10px 0; 
+  box-sizing: border-box;
 }
 .gdp-wrap {
   height: 100%;
@@ -1375,17 +1266,19 @@ onMounted(() => {
   display: grid;
   grid-template-rows: 1fr auto;
   gap: 14px;
-  margin-top: 50px;
+  margin-top: 30px; 
 }
 .resume-invest-chart {
-  min-height: 0;
+  min-height: 0; 
+  padding-bottom: 5px; /* 👈 加一点底边距，防止底部的文字贴边被切 */
+  box-sizing: border-box;
 }
 .four-reform-wrap {
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.42);
   padding: 14px 18px;
-  margin-bottom: 90px;
+  margin-bottom: 40px;
 }
 .four-reform-title {
   text-align: center;

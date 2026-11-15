@@ -68,7 +68,8 @@ function getPie3DOption(
       ? (1 - internalDiameterRatio) / (1 + internalDiameterRatio)
       : 1 / 3
 
-  const palette = ['#00b8e8', '#4068e8', '#9c54d8', '#f2a22c', '#d4d028', '#36d268', '#28bcb0']
+  // 配色参考城市管理主题：冰蓝 → 蓝 → 紫罗兰 → 荧光绿 → 亮金
+  const palette = ['#36e8ff', '#2f7dff', '#7c4dff', '#b14cff', '#5dffcb', '#ffd15c', '#ff8822']
   const colorOf = (item: any, idx: number) =>
     item?.itemStyle?.color ?? palette[idx % palette.length]
 

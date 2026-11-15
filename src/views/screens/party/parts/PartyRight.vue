@@ -126,6 +126,7 @@
       <div class="panel-head">
         <div class="panel-title panel-title--service">党员服务中心分布</div>
         <div class="panel-total">
+          <span class="total-dot"></span>
           <span class="total-label">合计</span>
           <span class="total-value" style="margin-left: 100px">{{ serviceTotal }}</span>
           <span>个</span>
@@ -138,7 +139,6 @@
           :key="`service-${item.label}-${index}`"
           class="service-row"
         >
-          <span class="service-dot"></span>
           <span class="service-label">{{ item.label }}</span>
           <span class="service-value">{{ item.value }}</span>
           <span
@@ -234,7 +234,8 @@ const getFillX = (value: unknown, rows: unknown) => {
   return scale.toFixed(4)
 }
 
-const talentPalette = ['#ffe04b', '#ff8b39', '#16d2ff', '#ff4d6d', '#8a5cff']
+// 👇 核心修改：把青色 '#16d2ff' 放到第一位，黄色 '#ffe04b' 放到第三位
+const talentPalette = ['#16d2ff', '#ff8b39', '#ffe04b', '#ff4d6d', '#8a5cff']
 
 // ==========================================
 // 核心：基于参考代码的 3D 曲面饼图实现
@@ -375,15 +376,15 @@ const getPie3DOption = (rows: any[]) => {
         const bfb = ((pieData.endRatio - pieData.startRatio) * 100).toFixed(2)
 
         return `
-          <div style="padding: 8px 16px;">
-            <div style="font-size: 22px; font-weight: bold; color: #ffe04b; margin-bottom: 10px;">${pieData.name}</div>
-            <div style="font-size: 18px; color: #fff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="color: rgba(255,255,255,0.7); margin-right: 32px;">数量：</span>
+          <div style="padding: 12px 20px;">
+            <div style="font-size: 32px; font-weight: bold; color: #16d2ff; margin-bottom: 14px;">${pieData.name}</div>
+            <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">数量：</span>
               <span style="font-weight: bold; color: #ff8b39;">${pieData.raw}</span>
             </div>
-            <div style="font-size: 18px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
-              <span style="color: rgba(255,255,255,0.7); margin-right: 32px;">占比：</span>
-              <span style="font-weight: bold; color: #16d2ff;">${bfb}%</span>
+            <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">占比：</span>
+              <span style="font-weight: bold; color: #ffe04b;">${bfb}%</span>
             </div>
           </div>
         `
@@ -705,13 +706,13 @@ const volOption = computed(() => {
       axisPointer: { type: 'shadow' },
       borderWidth: 0,
       backgroundColor: 'rgba(0,0,0,0.65)',
-      textStyle: { color: '#fff', fontSize: 40 }
+      textStyle: { color: '#fff', fontSize: 180 }
     },
     grid: { left: 106, right: 26, top: 36, bottom: 66, containLabel: false },
     xAxis: {
       type: 'category',
       data: data.map((d: any) => d.name),
-      axisLabel: { color: 'rgba(255, 238, 206, 0.86)', fontSize: 30, interval: 0, margin: 16 },
+      axisLabel: { color: 'rgba(255, 238, 206, 0.86)', fontSize: 28, interval: 0, margin: 16 },
       axisTick: { show: false },
       axisLine: { lineStyle: { color: 'rgba(255, 210, 140, 0.35)' } }
     },
@@ -720,16 +721,16 @@ const volOption = computed(() => {
       max: maxAxis,
       interval: step,
       splitNumber: 5,
-      axisLabel: { color: 'rgba(255, 238, 206, 0.78)', fontSize: 30 },
+      axisLabel: { color: 'rgba(255, 238, 206, 0.78)', fontSize: 28 },
       axisTick: { show: false },
       axisLine: { show: false },
-      splitLine: { show: true, lineStyle: { color: 'rgba(255, 210, 140, 0.18)' } }
+      splitLine: { show: true, lineStyle: { color: 'rgba(255, 210, 140, 0.18)',fontSize:28 } }
     },
     series: [
       {
         type: 'bar',
         data: data.map((d: any) => d.value),
-        barWidth: 46,
+        barWidth: 50,
         barMinHeight: 6,
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
@@ -831,10 +832,11 @@ onMounted(() => {
   overflow: visible;
 }
 
+/* ==================== 发展党员 ==================== */
 .panel--dev {
-  left: 180px;
-  top: 180px;
-  width: 1000px;
+  left: 150px;
+  top: 190px;
+  width: 1100px;
   height: 950px;
   overflow: hidden;
 }
@@ -887,8 +889,20 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-.panel--dev .table-head {
+.panel--dev .table-head,
+.panel--dev .table-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
   height: 64px;
+}
+
+.panel--dev .table-row {
+  height: 74px;
+  margin-top: 14px;
+}
+
+.panel--dev .table-head {
   padding: 0 18px;
   background: transparent;
   border-bottom: 1px solid rgba(255, 200, 130, 0.2);
@@ -898,8 +912,6 @@ onMounted(() => {
 
 .panel--dev .table-row {
   position: relative;
-  height: 74px;
-  margin-top: 14px;
   padding: 0 18px;
   border-bottom: none;
   border-radius: 8px;
@@ -917,14 +929,22 @@ onMounted(() => {
     linear-gradient(90deg, rgba(100, 25, 15, 0.6), rgba(70, 15, 10, 0.3));
 }
 
-.panel--dev .table-row .c1 {
+.panel--dev .c1 {
+  text-align: left;
   font-size: 40px;
   color: rgba(255, 238, 206, 0.92);
 }
 
-.panel--dev .table-row .c2,
-.panel--dev .table-row .c3 {
+.panel--dev .c2 {
+  text-align: center;
   font-size: 40px;
+  font-weight: 800;
+}
+
+.panel--dev .c3 {
+  text-align: right;
+  font-size: 40px;
+  font-weight: 800;
 }
 
 .panel--dev .table-empty {
@@ -936,10 +956,10 @@ onMounted(() => {
   color: rgba(255, 238, 206, 0.6);
 }
 
-/* ==================== 原人才政策位置：群团组织 ==================== */
+/* ==================== 群团组织 ==================== */
 .panel--talent {
-  left: 1420px;
-  top: 180px;
+  left: 1410px;
+  top: 187px;
   width: 1000px;
   height: 950px;
   overflow: hidden;
@@ -1100,10 +1120,10 @@ onMounted(() => {
   color: rgba(255, 238, 206, 0.6);
 }
 
-/* ==================== 原群团组织位置：人才政策 ==================== */
+/* ==================== 人才政策 ==================== */
 .panel--mass {
-  left: 2700px;
-  top: 180px;
+  left: 2640px;
+  top: 190px;
   width: 1000px;
   height: 1930px;
   overflow: hidden;
@@ -1261,8 +1281,8 @@ onMounted(() => {
 
 /* ==================== 党员服务中心分布 ==================== */
 .panel--service {
-  left: 180px;
-  top: 1190px;
+  left: 150px;
+  top: 1195px;
   width: 1000px;
   height: 950px;
 }
@@ -1290,12 +1310,6 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
-    linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 220, 160, 0.06),
-    0 0 18px rgba(255, 140, 70, 0.06);
   border-radius: 6px;
 }
 
@@ -1315,7 +1329,7 @@ onMounted(() => {
 
 .service-list {
   position: absolute;
-  left: 26px;
+  left: 46px;
   right: 26px;
   top: 300px;
   bottom: 26px;
@@ -1342,7 +1356,8 @@ onMounted(() => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 210, 120, 0.85);
+  background: rgba(255, 210, 120, 0.9);
+  box-shadow: 0 0 12px rgba(255, 210, 120, 0.18);
 }
 
 .service-label {
@@ -1360,6 +1375,7 @@ onMounted(() => {
 .service-track {
   position: absolute;
   left: 24px;
+  top: 80px;
   right: 24px;
   bottom: 10px;
   height: 22px;
@@ -1394,8 +1410,8 @@ onMounted(() => {
 
 /* ==================== 志愿服务 ==================== */
 .panel--vol {
-  left: 1460px;
-  top: 1160px;
+  left: 1420px;
+  top: 1165px;
   width: 1000px;
   height: 950px;
 }
@@ -1435,7 +1451,7 @@ onMounted(() => {
 }
 
 .panel--vol .vol-unit {
-  font-size: 18px;
+  font-size: 28px;
   color: rgba(255, 238, 206, 0.82);
 }
 
@@ -1447,12 +1463,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
-  background:
-    linear-gradient(135deg, rgba(255, 210, 120, 0.26) 0 16%, transparent 16% 100%),
-    linear-gradient(90deg, rgba(120, 30, 20, 0.65), rgba(80, 20, 10, 0.35));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 220, 160, 0.06),
-    0 0 18px rgba(255, 140, 70, 0.06);
   border-radius: 6px;
 }
 
@@ -1564,7 +1574,7 @@ onMounted(() => {
 .table-head,
 .table-row {
   display: grid;
-  grid-template-columns: 1fr 180px 180px;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   height: 96px;
   padding: 0 20px;
@@ -1583,12 +1593,5 @@ onMounted(() => {
 .table-row {
   font-size: 28px;
   color: rgba(255, 238, 206, 0.96);
-}
-
-.table-row .c2,
-.table-row .c3 {
-  text-align: right;
-  font-weight: 800;
-  color: rgba(255, 238, 206, 0.98);
 }
 </style>

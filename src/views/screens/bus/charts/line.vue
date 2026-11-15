@@ -43,7 +43,7 @@ const chartOption = computed(() => {
         },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'

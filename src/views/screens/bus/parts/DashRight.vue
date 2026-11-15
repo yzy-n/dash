@@ -54,6 +54,7 @@ const currentGoodsShipSeries = computed(() =>
         </div>
       </div>
     </div>
+    
     <div class="col col-left">
       <div class="panel panel--full">
         <div class="section">
@@ -77,7 +78,9 @@ const currentGoodsShipSeries = computed(() =>
             </button>
           </div>
           <div class="panel-chart">
+            <!-- 👇 核心改动 1：加上了 :key="passengerTab" 强制重绘 -->
             <TaxiPassengerLine
+              :key="passengerTab" 
               :x-data="currentPassengerShipSeries.xData"
               :province-num-data="currentPassengerShipSeries.provinceNumData"
               :province-growth-data="currentPassengerShipSeries.provinceGrowthData"
@@ -116,7 +119,9 @@ const currentGoodsShipSeries = computed(() =>
           </button>
         </div>
         <div class="panel-chart">
+          <!-- 👇 核心改动 2：顺便给货物运输也加上 :key 防止出现同样的问题 -->
           <CargoMixChart
+            :key="cargoTab"
             :x-data="currentGoodsShipSeries.xData"
             :province-num-data="currentGoodsShipSeries.provinceNumData"
             :province-growth-data="currentGoodsShipSeries.provinceGrowthData"
@@ -218,7 +223,6 @@ const currentGoodsShipSeries = computed(() =>
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;
   color: #f8fbff;
@@ -270,6 +274,7 @@ const currentGoodsShipSeries = computed(() =>
   min-height: 0;
 }
 
+/* 下面这些 table 样式原本没用到，但我保留你原来的代码 */
 .table {
   flex: 1;
   min-height: 0;

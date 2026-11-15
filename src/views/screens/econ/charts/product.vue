@@ -88,17 +88,17 @@ const option = computed(() => {
         symbol: 'circle',
         symbolSize: 8,
         lineStyle: {
-          color: '#33d8ff',
+          color: '#36e8ff',
           width: 2
         },
         itemStyle: {
-          color: '#33d8ff'
+          color: '#36e8ff'
         },
         data: seriesData,
         markLine: {
           silent: true,
           data: [{ yAxis: 0 }],
-          lineStyle: { color: '#ff3344', width: 2 }
+          lineStyle: { color: '#ff4d6d', width: 2 }
         }
       }
     ]

@@ -23,15 +23,15 @@ const option = computed(() => {
   // 自动提取指标名称（排除name字段）
   const seriesNames = Object.keys(chartList.value[0] ?? {}).filter((key) => key !== 'name')
 
-  // 颜色映射
+  // 颜色映射：紫罗兰 / 荧光绿，与上方"进5年人口总数"的金-冰蓝区分
   const colorMap: Record<string, Array<{ offset: number; color: string }>> = {
     农村人口数: [
-      { offset: 0, color: '#ffdd44' },
-      { offset: 1, color: '#b89c20' }
+      { offset: 0, color: '#5dffcb' },
+      { offset: 1, color: '#00a67a' }
     ],
     城镇人口数: [
-      { offset: 0, color: '#33c8ff' },
-      { offset: 1, color: '#1772d8' }
+      { offset: 0, color: '#b14cff' },
+      { offset: 1, color: '#6a1fd0' }
     ]
   }
 
@@ -60,10 +60,8 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     legend: {
       data: seriesNames,

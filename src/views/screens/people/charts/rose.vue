@@ -17,6 +17,8 @@ const rows = computed(() => (props.data && props.data.length ? props.data : defa
 const option = computed<EChartsOption>(() => {
   const config = {
     backgroundColor: 'transparent',
+    // 暖色系配色：与左侧金色、右侧其余面板的冷色形成对比
+    color: ['#ff6b8a', '#ff8822', '#ffd15c', '#b14cff', '#36e8ff', '#5dffcb'],
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
@@ -47,7 +49,7 @@ const option = computed<EChartsOption>(() => {
           show: true,
           position: 'outside',
           // 移除 alignTo: 'edge'，让它自然跟在引线后面
-          color: '#fce647',
+          color: '#ffd15c',
           fontSize: 28
         },
         labelLine: {
@@ -56,7 +58,7 @@ const option = computed<EChartsOption>(() => {
           length: 15,
           length2: 20,
           lineStyle: {
-            color: '#fce647',
+            color: '#ffd15c',
             width: 1
           }
         },

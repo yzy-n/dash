@@ -76,16 +76,18 @@ const companySource = computed(() => [
   }
 ])
 
-// 组装series：柱体 + 顶盖底盖
+// 组装 series：只有纯柱体，没有顶盖，没有底盖
 const buildSeries = () => {
   const seriesArr: any[] = []
+  
   companySource.value.forEach((item) => {
     seriesArr.push({
       name: item.name,
       type: 'bar',
       stack: 'total',
       barWidth: 50,
-      barBorderRadius: [0, 0, 0, 0],
+      // 注意：这里只在最顶部的系列加圆角，或者都不加，看你需要
+      // 因为你要完全干净，我就默认全部直角
       itemStyle: {
         color: item.gradient
       },
@@ -93,36 +95,8 @@ const buildSeries = () => {
     })
   })
 
-  // 顶部椭圆顶盖（所有堆叠总和，模拟圆柱上圆面）
-  seriesArr.push({
-    name: '顶盖',
-    type: 'pictorialBar',
-    stack: 'total',
-    symbolSize: [32, 12],
-    symbolOffset: [0, -6],
-    z: 99,
-    itemStyle: {
-      color: 'rgba(255,255,255,0.4)'
-    },
-    data: xAxisList.value.map((_, idx) => {
-      const total = companySource.value.reduce((sum, comp) => sum + (comp.data[idx] || 0), 0)
-      return total
-    })
-  })
-
-  // 底部椭圆底盖（最底层圆柱底面）
-  seriesArr.push({
-    name: '底盖',
-    type: 'pictorialBar',
-    stack: 'total',
-    symbolSize: [32, 12],
-    symbolOffset: [0, 6],
-    z: 99,
-    itemStyle: {
-      color: 'rgba(255,255,255,0.2)'
-    },
-    data: xAxisList.value.map(() => 0)
-  })
+  // 👇 什么顶盖、底盖，全删了！只留纯柱子！
+  
   return seriesArr
 }
 
@@ -133,6 +107,7 @@ const chartOption = computed(() => {
   )
   const maxTotal = totals.length ? Math.max(...totals) : 0
   const yAxisMax = maxTotal <= 0 ? 100 : Math.ceil((maxTotal * 1.2) / 100) * 100
+
   return {
     backgroundColor: 'transparent',
     graphic: hasData
@@ -151,14 +126,12 @@ const chartOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any[]) => {
         let tipStr = `${params[0].axisValue}<br/>`
         params.forEach((p) => {
-          if (!['顶盖', '底盖'].includes(p.seriesName)) {
-            tipStr += `${p.seriesName}: ${p.value} 万人<br/>`
-          }
+          tipStr += `${p.seriesName}: ${p.value} 万人<br/>`
         })
         return tipStr
       }

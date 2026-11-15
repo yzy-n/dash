@@ -322,8 +322,8 @@ onMounted(() => {
 .title {
   margin: 0;
   position: absolute;
-  left: 380px;
-  top: 280px;
+  left: 360px;
+  top: 288px;
   font-size: 90px;
   font-weight: 700;
   color: #ffefc8;

@@ -11,20 +11,56 @@ const props = defineProps<{
   data: RoseDatum[]
 }>()
 
-const legendNames = ['安装路灯道路长度', '道路照明灯盏数', '城市照明装灯总功率', '城市照明总用电量']
+// 💡 步骤1：定义一个高级的“科技色板”
+// 替换掉后端的默认色，按顺序分配给这四个扇形
+const techColorPalette = [
+  '#00E5FF', // 冰蓝
+  '#FFB13D', // 亮金色（替代原来的土黄）
+  '#7C4DFF', // 紫罗兰
+  '#00FFB4'  // 荧光绿
+]
+
+// 💡 步骤2：优化渐变，增加玻璃质感，而不是渐变到发黑的颜色
+const getGlassGradient = (color: string) => {
+  return {
+    type: 'linear',
+    x: 0,
+    y: 0,
+    x2: 1,
+    y2: 1,
+    colorStops: [
+      {
+        offset: 0,
+        color: color // 起始颜色使用传入的亮色
+      },
+      {
+        offset: 1,
+        // 用颜色本身加透明度，或者渐变到高亮白色，质感更好
+        color: hexToRgba(color, 0.1) 
+      }
+    ]
+  }
+}
+
+// 辅助函数：将 Hex 颜色转换为带透明度的 RGBA
+const hexToRgba = (hex: string, opacity: number) => {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
 
 const chartOption = computed(() => {
   const roseData = props.data
+
   return {
     backgroundColor: 'transparent',
-
     tooltip: {
-      // 饼图必须用 item，不能用 axis
       trigger: 'item',
       formatter: '{b}<br/>{c}（{d}%）',
       textStyle: { fontSize: 40, color: '#ffffff' },
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.5)',
+      borderColor: '#fff',
       borderWidth: 1,
       padding: [12, 20],
       confine: true
@@ -32,42 +68,56 @@ const chartOption = computed(() => {
     series: [
       {
         type: 'pie',
-        // 空心环形内外半径（原 ['22%', '82%']，整体缩小）
-        radius: ['18%', '40%'],
+        radius: ['30%', '55%'],
         center: ['50%', '50%'],
-        // 玫瑰图核心配置：radius 扇区长度随数值变化
         roseType: 'radius',
-        // 删除 silent: true，否则鼠标事件被禁用，tooltip 无法触发
-        avoidLabelOverlap: false,
+        avoidLabelOverlap: true,
+        minAngle: 15, 
+        
         itemStyle: {
-          borderRadius: 6, // 扇区圆角
-          borderWidth: 2, // 外描边发光线
-          borderColor: 'auto',
-          shadowBlur: 18, // 外发光效果
-          shadowColor: 'auto'
+          borderRadius: 8,
+          borderWidth: 2,
+          // 边框使用半透明白色，增加切割感
+          borderColor: 'rgba(255, 255, 255, 0.4)', 
+          shadowBlur: 15,
+          // 阴影使用当前颜色的发光效果
+          shadowColor: 'auto' 
         },
-        // 外侧文字引导线
+        
         label: {
           show: true,
           position: 'outside',
-          formatter: '{b}：{c}',
-          fontSize: 28,
-          color: '#fff'
+          formatter: '{b}\n{c}', 
+          fontSize: 24, 
+          color: '#e0f2fe',
+          lineHeight: 34,
+          fontWeight: 'bold'
         },
+        
         labelLine: {
           show: true,
-          length: 10,
-          length2: 4,
+          length: 20,
+          length2: 40,
           lineStyle: {
-            color: 'auto',
-            width: 1
+            color: 'rgba(84, 188, 255, 0.5)',
+            width: 2
           }
         },
-        data: roseData.map((item) => ({
-          name: item.name,
-          value: item.value,
-          itemStyle: { color: item.color }
-        }))
+        
+        // 💡 步骤3：覆盖原本的 item.color，使用我们的科技色板
+        data: roseData.map((item, index) => {
+          // 如果数据超过 4 个，循环使用色板
+          const color = techColorPalette[index % techColorPalette.length] 
+          
+          return {
+            name: item.name,
+            value: item.value,
+            itemStyle: { 
+              // 应用新的渐变
+              color: getGlassGradient(color) 
+            }
+          }
+        })
       }
     ]
   }

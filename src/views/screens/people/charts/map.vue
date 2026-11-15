@@ -59,10 +59,8 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item',
+     textStyle: { fontSize: 40, color: '#ffffff' },
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: (p: any) => {
         const v = Number(p?.value)
         const valueText = Number.isFinite(v) ? v : '-'
@@ -75,11 +73,11 @@ const option = computed(() => {
       bottom: 10,
       textStyle: { color: '#fff', fontSize: 26 },
       pieces: [
-        { gte: 2000, label: '2000以上', color: '#ff4455' },
-        { gte: 1000, lte: 2000, label: '1000‑2000', color: '#ffdd44' },
-        { gte: 500, lte: 1000, label: '500‑1000', color: '#36e8c2' },
-        { gte: 300, lte: 500, label: '300‑500', color: '#ff9922' },
-        { lt: 300, label: '300以下', color: '#88ff99' }
+        { gte: 2000, label: '2000以上', color: '#ff4d6d' },
+        { gte: 1000, lte: 2000, label: '1000‑2000', color: '#ff8822' },
+        { gte: 500, lte: 1000, label: '500‑1000', color: '#ffd15c' },
+        { gte: 300, lte: 500, label: '300‑500', color: '#36e8ff' },
+        { lt: 300, label: '300以下', color: '#00ffb4' }
       ]
     },
     series: [
@@ -91,11 +89,11 @@ const option = computed(() => {
         zoom: 1.05,
         // 伪3D下沉阴影效果
         itemStyle: {
-          shadowColor: '#0066bb',
+          shadowColor: '#0b4c9e',
           shadowOffsetX: 4,
           shadowOffsetY: 6,
           shadowBlur: 8,
-          borderColor: '#2288dd',
+          borderColor: '#36e8ff',
           borderWidth: 1
         },
         label: {
@@ -110,8 +108,8 @@ const option = computed(() => {
         },
         emphasis: {
           itemStyle: {
-            areaColor: '#2077bb',
-            borderColor: '#70ddff',
+            areaColor: '#1f6fd0',
+            borderColor: '#5dffcb',
             borderWidth: 2
           },
           label: { show: true, color: '#fff' }

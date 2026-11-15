@@ -76,11 +76,11 @@ const option = computed(() => {
         symbol: 'circle',
         symbolSize: 10,
         lineStyle: {
-          color: '#94ccff',
+          color: '#b14cff',
           width: 3
         },
         itemStyle: {
-          color: '#94ccff'
+          color: '#b14cff'
         },
         data: seriesData
       }

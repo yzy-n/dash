@@ -109,7 +109,7 @@ const chartOption = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'
@@ -128,7 +128,7 @@ const chartOption = computed(() => {
     },
     grid: {
       left: '6%',
-      right: '10%',
+      right: '6%',
       bottom: '12%',
       top: '18%',
       containLabel: true

@@ -47,8 +47,8 @@ const option = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,24,53,0.75)',
-      borderColor: '#26c9dd',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
       textStyle: { color: '#ffffff', fontSize: 40 },
       formatter: (params: any) => {
         let result = params[0].axisValue
@@ -76,7 +76,8 @@ const option = computed(() => {
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.6)',
         fontSize: 28,
-        rotate: 35
+        rotate: 35,
+        margin: 30
       },
       axisLine: {
         lineStyle: { color: 'rgba(120, 200, 255, 0.4)' }
@@ -107,7 +108,7 @@ const option = computed(() => {
       {
         name: '面积',
         type: 'bar',
-        barWidth: '32%',
+        barWidth: '50',
         data: levelData,
         itemStyle: {
           color: {
@@ -117,8 +118,8 @@ const option = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: '#26e2dd' },
-              { offset: 1, color: '#086c94' }
+              { offset: 0, color: '#5dffcb' },
+              { offset: 1, color: '#0f9e76' }
             ]
           }
         }
@@ -131,11 +132,11 @@ const option = computed(() => {
         symbol: 'circle',
         symbolSize: 10,
         lineStyle: {
-          color: '#ff6677',
+          color: '#ffb13d',
           width: 3
         },
         itemStyle: {
-          color: '#ff6677'
+          color: '#ffb13d'
         },
         data: growthData
       }

@@ -22,7 +22,7 @@ const renderChart = () => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(6, 18, 48, 0.9)',
-      borderColor: 'rgba(89, 194, 255, 0.12)',
+      borderColor: '#fff',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: '{b}<br/>数量 : {c}'
     },
@@ -40,7 +40,8 @@ const renderChart = () => {
       axisLabel: {
         color: 'rgba(214, 238, 255, 0.7)',
         rotate: 15,
-        fontSize: 28
+        fontSize: 28,
+        margin: 50
       }
     },
     yAxis: {

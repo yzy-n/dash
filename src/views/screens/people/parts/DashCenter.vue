@@ -389,11 +389,14 @@ const ageOption = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item',
+      confine: true, // 👈 核心修复：限制提示框只在图表容器内显示，防止超出被切
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.22)',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 24 },
-      formatter: '{b}: {c} ({d}%)'
+      padding: [12, 20], // 👈 稍微加大内边距，让文字不贴边
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
+      formatter: '{b}: {c} ({d}%)',
+      extraCssText: 'white-space: nowrap; z-index: 9999;' //
     },
     legend: {
       orient: 'vertical',
@@ -565,12 +568,10 @@ const moveOption = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
-      borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
-    grid: { left: 90, right: 18, top: 22, bottom: 62 },
+    grid: { left: 90, right: 18, top: 62, bottom: 62 },
     xAxis: {
       type: 'category',
       data: x,
@@ -610,7 +611,7 @@ const moveOption = computed(() => {
           show: true,
           position: 'top',
           color: 'rgba(240, 251, 255, 0.9)',
-          fontSize: 20,
+          fontSize: 28,
           fontWeight: 800
         }
       }

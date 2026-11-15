@@ -142,7 +142,7 @@ const ORG_LIST_HEIGHT =
   (ORG_VISIBLE_COUNT - 1) * ORG_ITEM_GAP
 
 const layout = {
-  orgTitle: { left: 140, top: 182 },
+  orgTitle: { left: 140, top: 188 },
   orgTotal: { left: 1018, top: 200 },
   cityTab: { left: 308, top: 306, width: 296, height: 66 },
   districtTab: { left: 692, top: 306, width: 296, height: 66 },

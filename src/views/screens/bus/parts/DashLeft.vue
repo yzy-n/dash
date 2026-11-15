@@ -352,6 +352,7 @@ const currentParkingChart = computed(() => {
   height: 252px;
   line-height: 252px;
   margin-left: 20px;
+  padding-left: 20px;
   font-size: 52px;
   border-left: 14px solid #00a8ff;
   font-weight: bold;

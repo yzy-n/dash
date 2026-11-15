@@ -268,7 +268,6 @@ const parkNameHeader = computed(() => (activeParkTab.value === 'garden' ? 'å»ºè®
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;
   color: #f8fbff;

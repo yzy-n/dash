@@ -21,7 +21,7 @@
             <div class="metric-value">{{ marketTotals.domestic }} <span class="unit">户</span></div>
           </div>
           <div class="metric-item">
-            <div class="metric-label">个体工商户</div>
+            <div class="metric-label">个体户</div>
             <div class="metric-value">
               {{ marketTotals.individual }} <span class="unit">户</span>
             </div>
@@ -311,8 +311,8 @@ const barOption = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(4,24,48,0.85)',
-      borderColor: '#26c9dd',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any) => `${params[0].axisValue}<br/>内资企业：${params[0].value}户`
     },
@@ -354,8 +354,8 @@ const barOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: '#26e2dd' },
-              { offset: 1, color: '#086c94' }
+              { offset: 0, color: '#ffd15c' },
+              { offset: 1, color: '#c98a10' }
             ]
           }
         }
@@ -826,8 +826,8 @@ const serviceBarOption = computed(() => {
             x2: 1,
             y2: 0,
             colorStops: [
-              { offset: 0, color: '#086c94' },
-              { offset: 1, color: '#26e2dd' }
+              { offset: 0, color: '#5a1fbf' },
+              { offset: 1, color: '#b14cff' }
             ]
           }
         }
@@ -988,7 +988,6 @@ onMounted(() => {
 }
 .panel-title {
   font-size: 60px;
-  transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;
   margin-left: 26px;

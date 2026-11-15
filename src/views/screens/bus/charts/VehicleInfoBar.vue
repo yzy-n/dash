@@ -52,30 +52,6 @@ const buildCylinderSeries = () => {
       },
       data: item.data
     })
-    // 顶部椭圆顶盖
-    seriesArr.push({
-      name: item.name + '顶盖',
-      type: 'pictorialBar',
-      symbol: 'ellipse',
-      symbolSize: [30, 11],
-      symbolOffset: [0, -5],
-      silent: true,
-      z: 99,
-      itemStyle: { color: 'rgba(255,255,255,0.35)' },
-      data: item.data
-    })
-    // 底部椭圆底座
-    seriesArr.push({
-      name: item.name + '底盖',
-      type: 'pictorialBar',
-      symbol: 'ellipse',
-      symbolSize: [30, 11],
-      symbolOffset: [0, 5],
-      silent: true,
-      z: 99,
-      itemStyle: { color: 'rgba(255,255,255,0.15)' },
-      data: xAxisData.value.map(() => 0)
-    })
   })
   return seriesArr
 }
@@ -101,7 +77,7 @@ const chartOption = computed(() => {
         },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any[]) => {
         let str = params[0].axisValue + '<br/>'

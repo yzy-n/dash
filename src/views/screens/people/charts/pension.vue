@@ -86,8 +86,8 @@ const option = computed<EChartsOption>(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(206, 255, 106, 0.95)' },
-              { offset: 1, color: 'rgba(118, 216, 86, 0.85)' }
+              { offset: 0, color: 'rgba(54, 232, 255, 0.95)' },
+              { offset: 1, color: 'rgba(22, 104, 255, 0.85)' }
             ]
           }
         },
@@ -106,8 +106,8 @@ const option = computed<EChartsOption>(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(255, 192, 90, 0.95)' },
-              { offset: 1, color: 'rgba(255, 122, 44, 0.85)' }
+              { offset: 0, color: 'rgba(255, 209, 92, 0.95)' },
+              { offset: 1, color: 'rgba(255, 145, 20, 0.85)' }
             ]
           }
         },

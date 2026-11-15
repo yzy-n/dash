@@ -102,7 +102,7 @@ const chartOption = computed(() => {
         },
     tooltip: {
       trigger: 'item',
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter: (params: any) =>
         `${params.name}：${params.value} ${props.unit}（${params.percent}%）`
@@ -110,8 +110,8 @@ const chartOption = computed(() => {
     series: [
       {
         type: 'pie',
-        // 环形内外半径，留出中心空白放置数据也可以
-        radius: ['38%', '68%'],
+        // 👇 把半径改小了一点，给外围文字留出更多空间，防止文字被容器切断
+        radius: ['30%', '55%'], 
         center: ['50%', '50%'],
         // 数值不按比例，按数据顺序排列，视觉更均匀
         sort: 'none',
@@ -135,8 +135,8 @@ const chartOption = computed(() => {
         },
         labelLine: {
           show: true,
-          length: 14,
-          length2: 12,
+          length: 35, // 👈 第一段斜线（拉长）
+          length2: 60, // 👈 第二段横线（拉长，文字离饼图更远）
           lineStyle: {
             color: '#70e0ff',
             width: 1

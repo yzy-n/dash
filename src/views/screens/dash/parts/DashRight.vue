@@ -180,7 +180,6 @@ const props = defineProps<{
   margin-top: -10px;
   margin-left: 30px;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  transform: skewX(-10deg);
   font-weight: bold;
   letter-spacing: 2px;
   color: #f8fbff;
@@ -228,7 +227,6 @@ const props = defineProps<{
   opacity: 0.72;
   filter: saturate(0.85);
   font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  font-style: italic;
   color: #ffffff;
   text-shadow:
     0 0 6px #fff,

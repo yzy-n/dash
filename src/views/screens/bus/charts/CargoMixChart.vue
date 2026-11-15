@@ -69,30 +69,7 @@ function createCylinderSeries(list: any[]) {
       barGap: '20%',
       data: item.data
     })
-    // 顶部椭圆顶盖
-    series.push({
-      name: item.name + 'top',
-      type: 'pictorialBar',
-      yAxisIndex: 0,
-      symbol: 'ellipse',
-      symbolSize: [26, 10],
-      symbolOffset: [0, -5],
-      silent: true,
-      itemStyle: { color: 'rgba(255,255,255,0.3)' },
-      data: item.data
-    })
-    // 底部椭圆底座
-    series.push({
-      name: item.name + 'bottom',
-      type: 'pictorialBar',
-      yAxisIndex: 0,
-      symbol: 'ellipse',
-      symbolSize: [26, 10],
-      symbolOffset: [0, 5],
-      silent: true,
-      itemStyle: { color: 'rgba(255,255,255,0.12)' },
-      data: xAxisData.value.map(() => 0)
-    })
+  
   })
   return series
 }
@@ -125,7 +102,7 @@ const chartOption = computed(() => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(0,0,0,0.75)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
       textStyle: { color: '#fff', fontSize: 40 },
       formatter(params: any[]) {
         let res = params[0].axisValue + '<br/>'
@@ -146,7 +123,7 @@ const chartOption = computed(() => {
     },
     grid: {
       left: '6%',
-      right: '10%',
+      right: '6%',
       top: '18%',
       bottom: '12%',
       containLabel: true

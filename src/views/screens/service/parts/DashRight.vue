@@ -660,7 +660,7 @@ const aedOption = computed(() => {
       backgroundColor: 'rgba(6, 27, 72, 0.92)',
       borderColor: 'rgba(84, 188, 255, 0.4)',
       borderWidth: 1,
-      textStyle: { color: '#eaf4ff', fontSize: 14 },
+      textStyle: { color: '#eaf4ff', fontSize: 40 },
       formatter: (params: any) => {
         const d = params.data
         if (!d) return ''
@@ -762,11 +762,10 @@ onMounted(() => {
 
 .panel-title {
   font-size: 60px;
-  transform: skewX(-10deg);
   font-weight: 800;
   letter-spacing: 2px;
-  margin-left: 26px;
-  margin-top: -10px;
+  margin-left: 20px;
+  margin-top: -15px;
   color: #f8fbff;
   text-shadow:
     -2px -2px 3px rgba(255, 255, 255, 0.7),
@@ -1081,7 +1080,7 @@ onMounted(() => {
 }
 
 .tower-legend-rate {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 900;
   color: rgba(255, 226, 74, 0.9);
   text-shadow: 0 0 12px rgba(255, 226, 74, 0.14);
