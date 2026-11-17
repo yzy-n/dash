@@ -18,10 +18,10 @@ const chartOption = computed(() => {
       // ① 饼图必须用 item
       trigger: 'item',
       formatter: '{b}<br/>{c}',
-      textStyle: { fontSize: 40, color: '#ffffff' },
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.5)',
+      borderColor: '#fff',
       borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       padding: [12, 20],
       confine: true // 防止贴近边缘时被容器裁掉
     },

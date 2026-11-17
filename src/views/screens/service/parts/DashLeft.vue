@@ -192,7 +192,13 @@
           <div v-for="(item, idx) in projectPieItems" :key="item.name" class="project-table-row">
             <span
               class="project-dot"
-              :class="idx === 0 ? 'project-dot--done' : (idx === 1 ? 'project-dot--todo' : 'project-dot--other')"
+              :class="
+                idx === 0
+                  ? 'project-dot--done'
+                  : idx === 1
+                    ? 'project-dot--todo'
+                    : 'project-dot--other'
+              "
             ></span>
             <span class="project-name">{{ item.name }}</span>
             <div class="project-stat">
@@ -260,15 +266,33 @@ import {
 
 // 用电情况
 const electricDateOptions = [
-  '2023-03', '2023-04', '2023-05', '2023-06', '2023-07',
-  '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
 ]
 const dateElectric = ref(electricDateOptions[0])
 
 // 用电容量情况
 const capacityDateOptions = [
-  '2023-03', '2023-04', '2023-05', '2023-06', '2023-07',
-  '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
 ]
 const dateCapacity = ref(capacityDateOptions[0])
 
@@ -278,13 +302,24 @@ const datePile = ref<string>('2022年统计数据')
 
 // 重点项目报装情况
 const projectDateOptions = ref<string[]>([
-  '2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12'
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12'
 ])
 const dateProject = ref<string>(projectDateOptions.value[0])
 
 // 能源装机情况
 const energyDateOptions = ref<string[]>([
-  '2023-07', '2023-08', '2023-09', '2023-10', '2023-11', '2023-12', '2024'
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
 ])
 const dateEnergy = ref<string>(energyDateOptions.value[0])
 
@@ -330,7 +365,9 @@ const electricMetrics = computed(() => {
       : '0'
   const avgRing =
     list.length > 0
-      ? (list.reduce((acc, item) => acc + (Number(item.ringRatio) || 0), 0) / list.length).toFixed(2)
+      ? (list.reduce((acc, item) => acc + (Number(item.ringRatio) || 0), 0) / list.length).toFixed(
+          2
+        )
       : '0'
 
   return [
@@ -397,7 +434,19 @@ const electricPieOption = computed(() => {
         data
       }
     ],
-    color: ['#37d5ff', '#ffe24a', '#ffb84a', '#7c5cff', '#40f3b8', '#ff7c7c', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83']
+    color: [
+      '#37d5ff',
+      '#ffe24a',
+      '#ffb84a',
+      '#7c5cff',
+      '#40f3b8',
+      '#ff7c7c',
+      '#2f4554',
+      '#61a0a8',
+      '#d48265',
+      '#91c7ae',
+      '#749f83'
+    ]
   }
 })
 
@@ -453,7 +502,15 @@ const capacityRingOption = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
+      formatter: (params: any) =>
+        `${params.name}：${params.value} ${props.unit}（${params.percent}%）`
+    },
     legend: {
       orient: 'vertical',
       right: 6,
@@ -492,7 +549,12 @@ const capacityRingOption = computed(() => {
         labelLine: { show: false },
         data: [
           { value: val, name: item.label, itemStyle: { color: colors[idx % colors.length] } },
-          { value: rest, name: '', itemStyle: { color: 'rgba(89, 194, 255, 0.08)' }, label: { show: false } }
+          {
+            value: rest,
+            name: '',
+            itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
+            label: { show: false }
+          }
         ]
       }
     })
@@ -539,8 +601,10 @@ const pileOption = computed(() => {
   return {
     backgroundColor: 'transparent',
     tooltip: {
-      textStyle: { fontSize: 40, color: '#ffffff' },
-      backgroundColor: 'rgba(6, 18, 48, 0.92)'
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },
     grid: { left: 70, right: 26, top: 26, bottom: 94 },
     legend: {
@@ -573,7 +637,11 @@ const pileOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(51, 213, 255, 0.95)' },
               { offset: 1, color: 'rgba(51, 213, 255, 0.15)' }
@@ -589,7 +657,11 @@ const pileOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(255, 226, 74, 0.95)' },
               { offset: 1, color: 'rgba(255, 226, 74, 0.15)' }
@@ -697,13 +769,13 @@ const projectPieOption = computed(() => {
       }
     },
     legend: {
-      show: false 
+      show: false
     },
     series: [
       {
         type: 'pie',
-        radius: ['45%', '70%'],
-        center: ['50%', '50%'],
+        radius: ['45%', '50%'],
+        center: ['50%', '30%'],
         avoidLabelOverlap: true,
         itemStyle: {
           borderWidth: 2,
@@ -738,7 +810,7 @@ const projectPieOption = computed(() => {
       {
         type: 'pie',
         radius: ['38%', '40%'],
-        center: ['50%', '50%'],
+        center: ['50%', '30%'],
         silent: true,
         label: { show: false },
         data: [{ value: 1, itemStyle: { color: 'rgba(51, 213, 255, 0.15)' } }]
@@ -864,7 +936,11 @@ const energyOption = computed(() => {
         itemStyle: {
           borderRadius: [0, 10, 10, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
             colorStops: [
               { offset: 0, color: 'rgba(255, 120, 120, 0.25)' },
               { offset: 1, color: 'rgba(255, 120, 120, 0.95)' }
@@ -1017,8 +1093,12 @@ onMounted(() => {
   pointer-events: auto;
 }
 
-.panel-tabs--center { justify-content: center; }
-.panel-tabs--right { justify-content: center; }
+.panel-tabs--center {
+  justify-content: center;
+}
+.panel-tabs--right {
+  justify-content: center;
+}
 
 .tab {
   position: relative;
@@ -1368,26 +1448,31 @@ onMounted(() => {
   min-height: 280px;
 }
 
+/* 👇 重点修复部分：改为固定高度与 border-bottom 做分割 */
 .project-table {
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
   background: rgba(6, 18, 48, 0.42);
   overflow: hidden;
   min-height: 0;
+  margin-top: -160px;
+  margin-bottom: 1 00px;
+  box-sizing: border-box;
 }
 
 .project-table-row {
-  height: 64px;
+  height: 64px; /* 直接固定行高，不依赖外层 grid */
   display: grid;
   grid-template-columns: 22px 140px 1fr 1fr;
   align-items: center;
   padding: 0 14px;
   box-sizing: border-box;
-  border-top: 1px solid rgba(89, 194, 255, 0.12);
+  border-bottom: 1px solid rgba(89, 194, 255, 0.12); /* 使用 border-bottom 画线 */
 }
 
-.project-table-row:first-child {
-  border-top: none;
+/* 最后一行去掉底边框，避免与外壳 border 叠加 */
+.project-table-row:last-child {
+  border-bottom: none;
 }
 
 .project-dot {

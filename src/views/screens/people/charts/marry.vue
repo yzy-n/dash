@@ -76,28 +76,28 @@ const option = computed<EChartsOption>(() => {
       {
         name: '初婚',
         type: 'bar',
-        barWidth: '50',
+        barWidth: '20',
         data: rows.value.map((i) => i.firstMarry),
         itemStyle: { color: '#b14cff' }
       },
       {
         name: '再婚',
         type: 'bar',
-        barWidth: '50',
+        barWidth: '20',
         data: rows.value.map((i) => i.remarry),
         itemStyle: { color: '#5dffcb' }
       },
       {
         name: '复婚',
         type: 'bar',
-        barWidth: '50',
+        barWidth: '20',
         data: rows.value.map((i) => i.remarryRestore),
         itemStyle: { color: '#ffd15c' }
       },
       {
         name: '准许登记结婚',
         type: 'bar',
-        barWidth: '50',
+        barWidth: '20',
         data: rows.value.map((i) => i.permitMarry),
         itemStyle: { color: '#2f7dff' }
       },
@@ -105,7 +105,7 @@ const option = computed<EChartsOption>(() => {
         name: '离婚率',
         type: 'line',
         yAxisIndex: 1,
-        barWidth: '50',
+        barWidth: '20',
         smooth: true,
         data: rows.value.map((i) => i.divorceRate),
         itemStyle: { color: '#ff6b8a' },

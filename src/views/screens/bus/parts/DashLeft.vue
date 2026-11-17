@@ -128,7 +128,7 @@ const currentParkingChart = computed(() => {
 
     <!-- 左下：拥堵分析 -->
     <div class="panel panel-congestion">
-      <div class="panel-title">拥堵分析</div>
+      <div class="panel-title panel-title--congestion">拥堵分析</div>
       <!-- 拥堵统计 -->
       <div class="stat-row">
         <div class="stat-item">
@@ -236,6 +236,10 @@ const currentParkingChart = computed(() => {
 .panel-congestion {
   grid-row: 2 / 3;
   grid-column: 1 / 3;
+  /* 这张图是按卡片实际尺寸导出的，直接铺满卡片；不再叠加/拉伸原 leftBg */
+  background:
+    url('@/assets/img/busCongestionBg.png') center center / 100% 100% no-repeat,
+    linear-gradient(180deg, #071c3a 0%, #041124 100%);
 }
 
 /* 面板标题 复用你原有样式 */
@@ -258,7 +262,9 @@ const currentParkingChart = computed(() => {
     0 0 8px rgba(120, 220, 255, 0.85),
     0 0 18px rgba(0, 164, 255, 0.55);
 }
-
+.panel-title--congestion {
+  left: -80px;
+}
 /* Tab标签样式 完全复用左侧 */
 .tabs {
   width: 100%;

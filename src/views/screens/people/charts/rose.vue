@@ -22,9 +22,9 @@ const option = computed<EChartsOption>(() => {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.92)', fontSize: 40 },
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: '{b}<br/>数值：{c}'
     },
     legend: {

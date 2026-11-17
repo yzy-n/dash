@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'greenland-metric-change', type: 1 | 2 | 3): void
+  (e: 'greenland-metric-change', type: 1 | 2 | 4): void
   (e: 'greenland-trend-change', type: 1 | 2): void
   (e: 'sanitation-type-change', type: 1 | 2 | 3): void
 }>()
@@ -43,7 +43,14 @@ const activeTrendTab = ref<TrendKey>('cover')
 const activeSanitationTab = ref<MetricKey>('cover')
 const activeParkTab = ref<MetricKey>('cover')
 
-const metricToGreenlandType: Record<MetricKey, 1 | 2 | 3> = {
+// 👈 修复：拆分为两套 Type 映射
+const greeningTypeMap: Record<MetricKey, 1 | 2 | 4> = {
+  cover: 1,
+  garden: 2,
+  park: 4
+}
+
+const sanitationTypeMap: Record<MetricKey, 1 | 2 | 3> = {
   cover: 1,
   garden: 2,
   park: 3
@@ -56,7 +63,7 @@ const trendMetricToGreenlandType: Record<TrendKey, 1 | 2> = {
 
 const handleGreeningTabClick = (key: MetricKey) => {
   activeGreeningTab.value = key
-  emit('greenland-metric-change', metricToGreenlandType[key])
+  emit('greenland-metric-change', greeningTypeMap[key])
 }
 
 const handleTrendTabClick = (key: TrendKey) => {
@@ -66,7 +73,7 @@ const handleTrendTabClick = (key: TrendKey) => {
 
 const handleSanitationTabClick = (key: MetricKey) => {
   activeSanitationTab.value = key
-  emit('sanitation-type-change', metricToGreenlandType[key])
+  emit('sanitation-type-change', sanitationTypeMap[key]) // 👈 使用环卫专属的 3
 }
 
 const parkRows = computed(() =>

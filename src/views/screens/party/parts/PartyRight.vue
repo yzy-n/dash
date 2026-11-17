@@ -360,11 +360,10 @@ const getPie3DOption = (rows: any[]) => {
     backgroundColor: 'transparent',
     tooltip: {
       show: true,
-      backgroundColor: 'rgba(20, 10, 10, 0.85)',
-      borderColor: 'rgba(255, 210, 120, 0.8)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
       borderWidth: 1,
-      padding: 0,
-      textStyle: { color: '#fff' },
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       extraCssText: 'box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6); border-radius: 8px;',
       formatter: (params: any) => {
         if (params.seriesName === 'pie2d' || params.seriesName === 'mouseoutSeries') return ''
@@ -704,9 +703,10 @@ const volOption = computed(() => {
       show: true,
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
-      borderWidth: 0,
-      backgroundColor: 'rgba(0,0,0,0.65)',
-      textStyle: { color: '#fff', fontSize: 180 }
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },
     grid: { left: 106, right: 26, top: 36, bottom: 66, containLabel: false },
     xAxis: {
@@ -724,7 +724,7 @@ const volOption = computed(() => {
       axisLabel: { color: 'rgba(255, 238, 206, 0.78)', fontSize: 28 },
       axisTick: { show: false },
       axisLine: { show: false },
-      splitLine: { show: true, lineStyle: { color: 'rgba(255, 210, 140, 0.18)',fontSize:28 } }
+      splitLine: { show: true, lineStyle: { color: 'rgba(255, 210, 140, 0.18)', fontSize: 28 } }
     },
     series: [
       {

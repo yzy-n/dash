@@ -303,7 +303,12 @@ const genderOption = computed(() => {
   const femaleRate = total ? Math.round((d.female / total) * 10000) / 100 : 0
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: false },
+    tooltip: {
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
+    },
     grid: { left: 84, right: 118, top: 18, bottom: 18 },
     xAxis: { type: 'value', show: false },
     yAxis: {
@@ -391,10 +396,10 @@ const ageOption = computed(() => {
       trigger: 'item',
       confine: true, // 👈 核心修复：限制提示框只在图表容器内显示，防止超出被切
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      padding: [12, 20], // 👈 稍微加大内边距，让文字不贴边
       textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
+      padding: [12, 20], // 👈 稍微加大内边距，让文字不贴边
       formatter: '{b}: {c} ({d}%)',
       extraCssText: 'white-space: nowrap; z-index: 9999;' //
     },
@@ -479,7 +484,7 @@ const birthOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
     },

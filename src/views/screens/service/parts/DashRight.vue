@@ -378,7 +378,12 @@ const waterOption = computed(() => {
 
   return {
     backgroundColor: 'transparent',
-    tooltip: { show: true },
+    tooltip: {
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 }
+    },
     grid: { left: 90, right: 26, top: 66, bottom: 40 },
     xAxis: {
       type: 'category',
@@ -468,10 +473,10 @@ const towerOption = computed(() => {
     tooltip: {
       trigger: 'item',
       axisPointer: { type: 'shadow' },
-      backgroundColor: 'rgba(6, 18, 48, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.22)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 34 }
+      textStyle: { fontSize: 40, color: '#ffffff' },
+      backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     series: [
       {
@@ -657,10 +662,10 @@ const aedOption = computed(() => {
     grid: { left: 30, right: 30, top: 20, bottom: 20 },
     tooltip: {
       trigger: 'item',
-      backgroundColor: 'rgba(6, 27, 72, 0.92)',
-      borderColor: 'rgba(84, 188, 255, 0.4)',
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
       borderWidth: 1,
-      textStyle: { color: '#eaf4ff', fontSize: 40 },
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: (params: any) => {
         const d = params.data
         if (!d) return ''

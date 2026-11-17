@@ -216,17 +216,53 @@ const gdpDateOptions = ref<string[]>([...DEFAULT_GDP_YEARS])
 const dateGdp = ref('2024')
 
 const capacityDateOptions = [
-  '1', '2022.01~12', '2023.01~03', '2023.01~06', '2023.01~09', '2023.1-12',
-  '2023.12', '2024.01-06', '2024.01-09', '2024.01-12', '2024.1-3', '2025.01-03', '222'
+  '1',
+  '2022.01~12',
+  '2023.01~03',
+  '2023.01~06',
+  '2023.01~09',
+  '2023.1-12',
+  '2023.12',
+  '2024.01-06',
+  '2024.01-09',
+  '2024.01-12',
+  '2024.1-3',
+  '2025.01-03',
+  '222'
 ]
 const dateCapacity = ref('222')
 
 const investDateOptions = [
-  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
-  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01~10', '2023.01~11',
-  '2023.1-12', '2023.12', '2024.01~02', '2024.01-03', '2024.01-04', '2024.01-05',
-  '2024.01-06', '2024.01-07', '2024.01-08', '2024.01-09', '2024.01-10', '2024.01-11',
-  '2024.01-12', '2025.01-02', '2025.01-03', '2025.01-04', '2025.01-06', '2025.01-2025.02'
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01~10',
+  '2023.01~11',
+  '2023.1-12',
+  '2023.12',
+  '2024.01~02',
+  '2024.01-03',
+  '2024.01-04',
+  '2024.01-05',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-09',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2025.01-02',
+  '2025.01-03',
+  '2025.01-04',
+  '2025.01-06',
+  '2025.01-2025.02'
 ]
 const dateInvestFixed = ref('2025.01-2025.02')
 
@@ -234,18 +270,54 @@ const parkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.1-9']
 const dateInvestPark = ref('2023.1-9')
 
 const pileDistrictDateOptions = [
-  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
-  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01-10', '2023.01~10',
-  '2023.01~11', '2023.1-12', '2024.01~02', '2024.01-04', '2024.01-05', '2024.01-06',
-  '2024.01-07', '2024.01-08', '2024.01-09', '2024.01-10', '2024.01-11', '2024.01-12',
-  '2024.1-3', '2025.01-02', '2025.01-03', '2025.01-04', '2025.01-06', '2025.01-2025.02'
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01-10',
+  '2023.01~10',
+  '2023.01~11',
+  '2023.1-12',
+  '2024.01~02',
+  '2024.01-04',
+  '2024.01-05',
+  '2024.01-06',
+  '2024.01-07',
+  '2024.01-08',
+  '2024.01-09',
+  '2024.01-10',
+  '2024.01-11',
+  '2024.01-12',
+  '2024.1-3',
+  '2025.01-02',
+  '2025.01-03',
+  '2025.01-04',
+  '2025.01-06',
+  '2025.01-2025.02'
 ]
 const datePileDistrict = ref('2025.01-2025.02')
 
 const pileIndustryDateOptions = [
-  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~04', '2023.01~05',
-  '2023.01~06', '2023.01~07', '2023.01~08', '2023.01~09', '2023.01~10', '2023.01~11',
-  '2023-1~2023-12', '2024.01~02'
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~04',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~09',
+  '2023.01~10',
+  '2023.01~11',
+  '2023-1~2023-12',
+  '2024.01~02'
 ]
 const datePileIndustry = ref('2024.01~02')
 
@@ -253,8 +325,17 @@ const pileParkDateOptions = ['1', '2022.01~12', '2023.01~06', '2023.01~11']
 const datePilePark = ref('2023.01~11')
 
 const benefitDateOptions = ref<string[]>([
-  '1', '2022.01~12', '2023.01~02', '2023.01~03', '2023.01~05', '2023.01~06',
-  '2023.01~07', '2023.01~08', '2023.01~10', '2023-01~2023-11', '2023.1-12'
+  '1',
+  '2022.01~12',
+  '2023.01~02',
+  '2023.01~03',
+  '2023.01~05',
+  '2023.01~06',
+  '2023.01~07',
+  '2023.01~08',
+  '2023.01~10',
+  '2023-01~2023-11',
+  '2023.1-12'
 ])
 const dateBenefit = ref('2023.1-12')
 
@@ -482,7 +563,11 @@ const regionGdpOption = computed(() => {
         itemStyle: {
           borderRadius: [10, 10, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(54, 232, 255, 0.85)' },
               { offset: 1, color: 'rgba(54, 232, 255, 0.12)' }
@@ -595,9 +680,25 @@ const capacityPieOption = computed(() => {
             return `{name|${item.name}}\n{val|增加值: ${item.value} 亿元}\n{rate|占比: ${item.rate}%}`
           },
           rich: {
-            name: { fontSize: 32, fontWeight: 'bold', color: '#fff', lineHeight: 42, align: 'center' },
-            val: { fontSize: 26, color: 'rgba(214, 238, 255, 0.8)', lineHeight: 36, align: 'center' },
-            rate: { fontSize: 26, color: 'rgba(214, 238, 255, 0.8)', lineHeight: 36, align: 'center' }
+            name: {
+              fontSize: 32,
+              fontWeight: 'bold',
+              color: '#fff',
+              lineHeight: 42,
+              align: 'center'
+            },
+            val: {
+              fontSize: 26,
+              color: 'rgba(214, 238, 255, 0.8)',
+              lineHeight: 36,
+              align: 'center'
+            },
+            rate: {
+              fontSize: 26,
+              color: 'rgba(214, 238, 255, 0.8)',
+              lineHeight: 36,
+              align: 'center'
+            }
           }
         },
         labelLine: {
@@ -710,12 +811,12 @@ const investOption = computed(() => {
     xAxis: {
       type: 'category',
       data: names,
-      axisLabel: { 
-        color: 'rgba(214, 238, 255, 0.6)', 
-        fontSize: 24, 
+      axisLabel: {
+        color: 'rgba(214, 238, 255, 0.6)',
+        fontSize: 24,
         rotate: 25, // 👇 稍微减小角度，减少垂直高度
-        interval: 0, 
-        margin: 12 
+        interval: 0,
+        margin: 12
       },
       axisLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.16)' } },
       axisTick: { show: false }
@@ -723,10 +824,10 @@ const investOption = computed(() => {
     yAxis: {
       type: 'value',
       name: '单位：%',
-      nameTextStyle: { 
-        color: 'rgba(214, 238, 255, 0.55)', 
+      nameTextStyle: {
+        color: 'rgba(214, 238, 255, 0.55)',
         fontSize: 24,
-        padding: [0, 0, 10, 10] 
+        padding: [0, 0, 10, 10]
       },
       axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 24 },
       splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)' } },
@@ -741,7 +842,11 @@ const investOption = computed(() => {
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: '#b14cff' },
               { offset: 1, color: '#5a1fbf' }
@@ -837,7 +942,10 @@ type FourChangeMetrics = {
 const FOUR_CHANGES_DATE = '2024.01-03'
 
 const fourChangesData = ref<FourChangeMetrics>({
-  amount: '0', yearOnYearGrowth: '0', accountingGrowth: '0', periodLastYear: '0'
+  amount: '0',
+  yearOnYearGrowth: '0',
+  accountingGrowth: '0',
+  periodLastYear: '0'
 })
 
 const fetchFourChanges = async () => {
@@ -885,7 +993,10 @@ type BenefitTotals = {
 
 const benefitList = ref<BenefitRow[]>([])
 const benefitTotals = ref<BenefitTotals>({
-  income: '0', workers: '0', tax: '0', profit: '0'
+  income: '0',
+  workers: '0',
+  tax: '0',
+  profit: '0'
 })
 const benefitLoading = ref(false)
 
@@ -971,7 +1082,7 @@ const investOption2 = computed(() => {
       name: '单位：亿元',
       nameTextStyle: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
       axisLabel: { color: 'rgba(214, 238, 255, 0.55)', fontSize: 28 },
-      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)',fontSize:28 } },
+      splitLine: { lineStyle: { color: 'rgba(120, 220, 255, 0.12)', fontSize: 28 } },
       axisLine: { show: false },
       axisTick: { show: false }
     },
@@ -979,12 +1090,16 @@ const investOption2 = computed(() => {
       {
         name: '营业收入',
         type: 'bar',
-        barWidth: 50,
+        barWidth: 20,
         data: benefitList.value.map((r) => r.taking),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: '#36e8ff' },
               { offset: 1, color: '#1668ff' }
@@ -995,12 +1110,16 @@ const investOption2 = computed(() => {
       {
         name: '税金总额',
         type: 'bar',
-        barWidth: 50,
+        barWidth: 20,
         data: benefitList.value.map((r) => r.amount),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: '#ffd15c' },
               { offset: 1, color: 'rgba(201, 138, 0, 0.4)' }
@@ -1011,12 +1130,16 @@ const investOption2 = computed(() => {
       {
         name: '利润总额',
         type: 'bar',
-        barWidth: 50,
+        barWidth: 20,
         data: benefitList.value.map((r) => r.profit),
         itemStyle: {
           borderRadius: [4, 4, 0, 0],
           color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: '#b14cff' },
               { offset: 1, color: 'rgba(106, 31, 208, 0.4)' }
@@ -1032,12 +1155,42 @@ const investOption2 = computed(() => {
    8. 钢价走势（接口驱动）
    ========================================================= */
 const steelDateOptions = [
-  '2023.02', '2023.03', '2023.03.21', '2023.03.22', '2023.03.27', '2023.04.20',
-  '2023.05.05', '2023.05.18', '2023.05.26', '2023.06.02', '2023.06.09', '2023.06.16',
-  '2023.06.21', '2023.06.29', '2023.07.07', '2023.07.14', '2023.07.21', '2023.07.28',
-  '2023.08', '2023.08.04', '2023.08.11', '2023.08.18', '2023.08.25', '2023.09.01',
-  '2023.09.08', '2023.09.15', '2023.09.21', '2023.09.26', '2023.10.09', '2023.10.17',
-  '2023.11.29', '2024.03.13', '2024.05', '2024.07', '2024.12', '2025.06'
+  '2023.02',
+  '2023.03',
+  '2023.03.21',
+  '2023.03.22',
+  '2023.03.27',
+  '2023.04.20',
+  '2023.05.05',
+  '2023.05.18',
+  '2023.05.26',
+  '2023.06.02',
+  '2023.06.09',
+  '2023.06.16',
+  '2023.06.21',
+  '2023.06.29',
+  '2023.07.07',
+  '2023.07.14',
+  '2023.07.21',
+  '2023.07.28',
+  '2023.08',
+  '2023.08.04',
+  '2023.08.11',
+  '2023.08.18',
+  '2023.08.25',
+  '2023.09.01',
+  '2023.09.08',
+  '2023.09.15',
+  '2023.09.21',
+  '2023.09.26',
+  '2023.10.09',
+  '2023.10.17',
+  '2023.11.29',
+  '2024.03.13',
+  '2024.05',
+  '2024.07',
+  '2024.12',
+  '2025.06'
 ]
 
 const dateSteel = ref('2025.06')
@@ -1181,7 +1334,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   gap: 14px;
-  z-index: 99; 
+  z-index: 99;
 }
 .panel-tabs--center {
   justify-content: center;
@@ -1218,7 +1371,7 @@ onMounted(() => {
 .capacity-chart {
   height: 100%;
   min-height: 0;
-  padding: 10px 0; 
+  padding: 10px 0;
   box-sizing: border-box;
 }
 .gdp-wrap {
@@ -1266,10 +1419,10 @@ onMounted(() => {
   display: grid;
   grid-template-rows: 1fr auto;
   gap: 14px;
-  margin-top: 30px; 
+  margin-top: 30px;
 }
 .resume-invest-chart {
-  min-height: 0; 
+  min-height: 0;
   padding-bottom: 5px; /* 👈 加一点底边距，防止底部的文字贴边被切 */
   box-sizing: border-box;
 }

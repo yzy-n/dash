@@ -128,40 +128,6 @@ const buildTimeMetric = (source: unknown, fallbackName: string, unit?: string): 
   }
 }
 
-const buildGreenlandMetric = (source: unknown, fallbackName: string, unit?: string) => {
-  if (Array.isArray(source)) return buildTimeMetric(source, fallbackName, unit)
-  if (isRecord(source)) {
-    const years = Array.isArray(source.years)
-      ? source.years
-      : Array.isArray(source.xAxis)
-        ? source.xAxis
-        : Array.isArray(source.dateList)
-          ? source.dateList
-          : []
-    const values = Array.isArray(source.values)
-      ? source.values
-      : Array.isArray(source.data)
-        ? source.data
-        : Array.isArray(source.countList)
-          ? source.countList
-          : []
-    if (years.length && values.length && years.length === values.length) {
-      return {
-        name: toStringValue(source.name || source.title) || fallbackName,
-        years: years.map((item) => String(item)),
-        data: values.map((item) => toNumber(item) ?? 0),
-        unit: toStringValue(source.unit) || unit
-      }
-    }
-  }
-  return {
-    name: fallbackName,
-    years: [],
-    data: [],
-    unit
-  }
-}
-
 const buildTrend = (source: unknown) => {
   const trendSource = isRecord(source)
     ? (isRecord(source.trend) && source.trend) ||
@@ -343,19 +309,23 @@ const formatDate = (value: unknown) => {
   return toStringValue(value)
 }
 
-const greenlandTypeToMetricKey = (type: 1 | 2 | 3 | 4 | 5) => {
-  if (type === 2 || type === 5) return 'garden'
-  if (type === 3) return 'park'
+const greenlandTypeToMetricKey = (type: number) => {
+  if (type === 2) return 'garden'
+  if (type === 3 || type === 4) return 'park' // 👈 修复：4映射为park
   return 'cover'
 }
 
-const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
-  const payload = await getCityBigscreenGreenland2<UnknownRecord>({ type })
+const loadGreenlandMetric = async (type: 1 | 2 | 3 | 4 = 1) => {
+  const res = await getCityBigscreenGreenland2<UnknownRecord>({ type })
+  // 👈 修复：兼容 { code, data: { summary } } 结构
+  const payload = isRecord(res?.data) ? res.data : res
+
   const summary = isRecord(payload.summary) ? payload.summary : undefined
   const listSource =
     (summary && Array.isArray(summary.list) && summary.list) ||
     (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
     getDataList(payload)
+
   const key = greenlandTypeToMetricKey(type)
   const rows = preferPublishedRows(Array.isArray(listSource) ? listSource : []).filter(
     (item) => isRecord(item) && toStringValue(item.type) === String(type)
@@ -369,13 +339,16 @@ const loadGreenlandMetric = async (type: 1 | 2 | 3 = 1) => {
 }
 
 const loadGreenlandTrend = async (type: 1 | 2 = 1) => {
-  const payload = await getCityBigscreenGreenland<UnknownRecord>({ type })
+  const res = await getCityBigscreenGreenland<UnknownRecord>({ type })
+  const payload = isRecord(res?.data) ? res.data : res // 👈 修复：兼容 data 外壳
+
   const key = greenlandTypeToMetricKey(type)
   const summary = isRecord(payload.summary) ? payload.summary : undefined
   const listSource =
     (summary && Array.isArray(summary.list) && summary.list) ||
     (summary && Array.isArray((summary as any).dataList) && (summary as any).dataList) ||
     getDataList(payload)
+
   const rows = preferPublishedRows(Array.isArray(listSource) ? listSource : [])
     .filter((item) => isRecord(item) && toStringValue(item.type) === String(type))
     .filter((item) => toStringValue(item.year))
@@ -403,7 +376,9 @@ const loadGreenlandTrend = async (type: 1 | 2 = 1) => {
 }
 
 const loadSanitationMetric = async (type: 1 | 2 | 3 = 1) => {
-  const payload = await getCityBigscreenSanitation<UnknownRecord>({ type })
+  const res = await getCityBigscreenSanitation<UnknownRecord>({ type })
+  const payload = isRecord(res?.data) ? res.data : res // 👈 修复：兼容 data 外壳
+
   const key = greenlandTypeToMetricKey(type)
   const rows = preferPublishedRows(getDataList(payload)).filter(
     (item) => isRecord(item) && (!item.type || toStringValue(item.type) === String(type))
@@ -647,7 +622,8 @@ const loadDashScreen = async () => {
   }
 }
 
-const handleGreenlandMetricTypeChange = async (type: 1 | 2 | 3) => {
+// 👈 修复：扩展 type 类型，支持 4
+const handleGreenlandMetricTypeChange = async (type: 1 | 2 | 3 | 4) => {
   try {
     await loadGreenlandMetric(type)
   } catch {}

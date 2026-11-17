@@ -154,6 +154,10 @@ function getPie3DOption(
 
   const option = {
     tooltip: {
+      backgroundColor: 'rgba(6, 18, 48, 0.92)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter(params: any) {
         if (params.seriesName !== 'mouseoutSeries') {
           return `${params.seriesName}<br/><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${params.color};"></span>${option.series[params.seriesIndex].pieData.value}`
