@@ -264,8 +264,10 @@ import {
   getInstalledcapacity
 } from '@/api/service'
 
+// ============================================================
 // 用电情况
-const electricDateOptions = [
+// ============================================================
+const electricDateOptions = ref<string[]>([
   '2023-03',
   '2023-04',
   '2023-05',
@@ -277,55 +279,9 @@ const electricDateOptions = [
   '2023-11',
   '2023-12',
   '2024'
-]
-const dateElectric = ref(electricDateOptions[0])
-
-// 用电容量情况
-const capacityDateOptions = [
-  '2023-03',
-  '2023-04',
-  '2023-05',
-  '2023-06',
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
-]
-const dateCapacity = ref(capacityDateOptions[0])
-
-// 充电桩建设情况
-const pileDateOptions = ref<string[]>(['2022年统计数据'])
-const datePile = ref<string>('2022年统计数据')
-
-// 重点项目报装情况
-const projectDateOptions = ref<string[]>([
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12'
 ])
-const dateProject = ref<string>(projectDateOptions.value[0])
+const dateElectric = ref(electricDateOptions.value[0])
 
-// 能源装机情况
-const energyDateOptions = ref<string[]>([
-  '2023-07',
-  '2023-08',
-  '2023-09',
-  '2023-10',
-  '2023-11',
-  '2023-12',
-  '2024'
-])
-const dateEnergy = ref<string>(energyDateOptions.value[0])
-
-// ============================================================
-// 用电情况
-// ============================================================
 const electricTabs = [
   { type: 1, label: '全社会用电量' },
   { type: 2, label: '全行业实际用电量' }
@@ -343,9 +299,18 @@ const handleElectricTabClick = async (type: 1 | 2) => {
 
 const fetchElectricData = async (type: 1 | 2) => {
   try {
-    const res = await getPowervolume({ type, date: dateElectric.value })
-    electricList.value = res?.dataList ?? []
-    electricSummary.value = res?.summary ?? {}
+    const res: any = await getPowervolume({ type, date: dateElectric.value })
+    const data = res?.data ?? res ?? {}
+    electricList.value = data.dataList ?? []
+    electricSummary.value = data.summary ?? {}
+
+    const options: string[] = data.summary?.timeOptions ?? []
+    if (options.length) {
+      electricDateOptions.value = options
+      if (!options.includes(dateElectric.value)) {
+        dateElectric.value = data.summary?.souseDate ?? options[0]
+      }
+    }
   } catch (e) {
     console.error('用电情况查询失败', e)
   }
@@ -381,7 +346,7 @@ const electricMetrics = computed(() => {
 const electricPieOption = computed(() => {
   const data = electricList.value.map((item: any) => ({
     name: item.label,
-    value: Number(item.capacityNum) || 0
+    value: Number(item.powerNum) || 0
   }))
   const total = data.reduce((acc, item) => acc + item.value, 0)
 
@@ -453,6 +418,21 @@ const electricPieOption = computed(() => {
 // ============================================================
 // 用电容量情况
 // ============================================================
+const capacityDateOptions = ref<string[]>([
+  '2023-03',
+  '2023-04',
+  '2023-05',
+  '2023-06',
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+])
+const dateCapacity = ref(capacityDateOptions.value[0])
+
 const capacityTabs = [
   { type: 1, label: '全社会用电容量' },
   { type: 2, label: '全行业实际用电容量' }
@@ -470,9 +450,18 @@ const handleCapacityTabClick = async (type: 1 | 2) => {
 
 const fetchCapacityData = async (type: 1 | 2) => {
   try {
-    const res = await getPowertype({ type, date: dateCapacity.value })
-    capacityList.value = res?.dataList ?? []
-    capacitySummary.value = res?.summary ?? {}
+    const res: any = await getPowertype({ type, date: dateCapacity.value })
+    const data = res?.data ?? res ?? {}
+    capacityList.value = data.dataList ?? []
+    capacitySummary.value = data.summary ?? {}
+
+    const options: string[] = data.summary?.timeOptions ?? []
+    if (options.length) {
+      capacityDateOptions.value = options
+      if (!options.includes(dateCapacity.value)) {
+        dateCapacity.value = data.summary?.souseDate ?? options[0]
+      }
+    }
   } catch (e) {
     console.error('用电容量查询失败', e)
   }
@@ -485,8 +474,9 @@ watch(dateCapacity, () => {
 const capacityMetrics = computed(() => {
   const s = capacitySummary.value
   const list = capacityList.value
-  const totalVolume = Number(s?.totalVolume) || 0
-  const totalNum = Number(s?.totalNum) || 0
+
+  const totalVolume = Number(s?.totalVolume) || Number(s?.totalPower) || 0
+  const totalNum = Number(s?.totalNum) || list.length || 0
 
   return [
     { label: '用电容量', value: totalVolume ? totalVolume.toFixed(2) : '-', unit: '万千瓦' },
@@ -498,7 +488,10 @@ const capacityMetrics = computed(() => {
 const capacityRingOption = computed(() => {
   const list = capacityList.value
   const colors = ['#33d5ff', '#ffe24a', '#40f3b8', '#ffb84a', '#8b5cff']
-  const total = list.reduce((acc: number, item: any) => acc + (Number(item.volume) || 0), 0)
+  const total = list.reduce(
+    (acc: number, item: any) => acc + (Number(item.powerNum || item.volume) || 0),
+    0
+  )
 
   return {
     backgroundColor: 'transparent',
@@ -509,42 +502,21 @@ const capacityRingOption = computed(() => {
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
       formatter: (params: any) =>
-        `${params.name}：${params.value} ${props.unit}（${params.percent}%）`
+        `${params.marker} ${params.name}<br/>容量：${params.value} 万千瓦<br/>占比：${params.percent}%`
     },
     legend: {
-      orient: 'vertical',
-      right: 6,
-      top: 'middle',
-      itemWidth: 10,
-      itemHeight: 10,
-      itemGap: 14,
-      icon: 'circle',
-      data: list.map((item: any, idx: number) => ({
-        name: item.label,
-        itemStyle: { color: colors[idx % colors.length] }
-      })),
-      formatter: (name: string) => {
-        const item = list.find((i: any) => i.label === name)
-        return `{n|${name}}  {v|${item?.volume ?? ''}}`
-      },
-      textStyle: {
-        rich: {
-          n: { color: 'rgba(214, 238, 255, 0.82)', fontSize: 13, verticalAlign: 'middle' },
-          v: { color: '#fff', fontSize: 13, fontWeight: 800, verticalAlign: 'middle' }
-        }
-      }
+      show: false
     },
     series: list.map((item: any, idx: number) => {
       const outer = 82 - idx * 15
       const inner = outer - 12
-      const val = Number(item.volume) || 0
+      const val = Number(item.powerNum || item.volume) || 0
       const rest = Math.max(total - val, 0)
       return {
         type: 'pie',
         radius: [`${inner}%`, `${outer}%`],
-        center: ['36%', '50%'],
+        center: ['50%', '50%'],
         startAngle: 90,
-        silent: true,
         label: { show: false },
         labelLine: { show: false },
         data: [
@@ -553,7 +525,8 @@ const capacityRingOption = computed(() => {
             value: rest,
             name: '',
             itemStyle: { color: 'rgba(89, 194, 255, 0.08)' },
-            label: { show: false }
+            label: { show: false },
+            tooltip: { show: false }
           }
         ]
       }
@@ -564,6 +537,8 @@ const capacityRingOption = computed(() => {
 // ============================================================
 // 充电桩建设情况
 // ============================================================
+const pileDateOptions = ref<string[]>(['2022年统计数据'])
+const datePile = ref<string>('2022年统计数据')
 const pileSummary = ref<Record<string, any>>({})
 const pileList = ref<any[]>([])
 
@@ -676,6 +651,16 @@ const pileOption = computed(() => {
 // ============================================================
 // 重点项目报装情况
 // ============================================================
+const projectDateOptions = ref<string[]>([
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12'
+])
+const dateProject = ref<string>(projectDateOptions.value[0])
+
 const projectTabs = [
   { type: 1, label: '项目报装情况' },
   { type: 2, label: '已报装项目详情' }
@@ -746,11 +731,9 @@ const projectPieTotal = computed(() =>
   projectPieItems.value.reduce((acc, item) => acc + item.value, 0)
 )
 
-// 👇 使用普通 2D 环形饼图
 const projectPieOption = computed(() => {
   const data = projectPieItems.value
   const total = projectPieTotal.value
-  // 多色配置池
   const colors = ['#33d5ff', '#ffe24a', '#8b5cff', '#40f3b8', '#ff9f43']
 
   if (!data.length || total === 0) return {}
@@ -774,9 +757,31 @@ const projectPieOption = computed(() => {
     series: [
       {
         type: 'pie',
-        radius: ['45%', '50%'],
+        radius: ['45%', '55%'],
         center: ['50%', '30%'],
         avoidLabelOverlap: true,
+        // 👇 修复关键点：同时修改 labelLinePoints 保证引导线紧密连接
+        labelLayout: (params: any) => {
+          const { labelLinePoints } = params
+          const points = labelLinePoints ? labelLinePoints.map((p: number[]) => [...p]) : null
+
+          if (params.text && params.text.includes('现场施工')) {
+            const dx = -40
+            if (points && points.length >= 3) {
+              points[points.length - 1][0] += dx // 终点跟着文字走
+              points[points.length - 2][0] += dx / 2 // 拐点走一半，使线形成自然折角
+            }
+            return { dx, labelLinePoints: points }
+          }
+          if (params.text && params.text.includes('开展设计')) {
+            const dy = 45
+            if (points && points.length >= 3) {
+              points[points.length - 1][1] += dy
+              points[points.length - 2][1] += dy / 2
+            }
+            return { dy, labelLinePoints: points }
+          }
+        },
         itemStyle: {
           borderWidth: 2,
           borderColor: 'rgba(2, 10, 30, 0.92)'
@@ -792,7 +797,7 @@ const projectPieOption = computed(() => {
         labelLine: {
           show: true,
           length: 20,
-          length2: 30,
+          length2: 40, // 稍微加长水平段，给文字偏移留出余量
           lineStyle: {
             color: 'rgba(89, 194, 255, 0.4)',
             width: 2
@@ -806,7 +811,6 @@ const projectPieOption = computed(() => {
           }
         }))
       },
-      // 内环装饰圈
       {
         type: 'pie',
         radius: ['38%', '40%'],
@@ -822,6 +826,17 @@ const projectPieOption = computed(() => {
 // ============================================================
 // 能源装机情况
 // ============================================================
+const energyDateOptions = ref<string[]>([
+  '2023-07',
+  '2023-08',
+  '2023-09',
+  '2023-10',
+  '2023-11',
+  '2023-12',
+  '2024'
+])
+const dateEnergy = ref<string>(energyDateOptions.value[0])
+
 const energyTabs = [
   { type: 1, label: '能源发电量' },
   { type: 2, label: '能源分布情况' }
@@ -1448,7 +1463,6 @@ onMounted(() => {
   min-height: 280px;
 }
 
-/* 👇 重点修复部分：改为固定高度与 border-bottom 做分割 */
 .project-table {
   border-radius: 12px;
   border: 1px solid rgba(89, 194, 255, 0.12);
@@ -1456,21 +1470,20 @@ onMounted(() => {
   overflow: hidden;
   min-height: 0;
   margin-top: -160px;
-  margin-bottom: 1 00px;
+  margin-bottom: 150px;
   box-sizing: border-box;
 }
 
 .project-table-row {
-  height: 64px; /* 直接固定行高，不依赖外层 grid */
+  height: 64px;
   display: grid;
   grid-template-columns: 22px 140px 1fr 1fr;
   align-items: center;
   padding: 0 14px;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(89, 194, 255, 0.12); /* 使用 border-bottom 画线 */
+  border-bottom: 1px solid rgba(89, 194, 255, 0.12);
 }
 
-/* 最后一行去掉底边框，避免与外壳 border 叠加 */
 .project-table-row:last-child {
   border-bottom: none;
 }

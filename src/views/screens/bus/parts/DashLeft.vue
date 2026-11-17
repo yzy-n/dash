@@ -451,7 +451,7 @@ const currentParkingChart = computed(() => {
   gap: 10px;
   min-height: 0;
   overflow: auto;
-  max-height: 260px;
+  max-height: 590px;
 }
 .table-row {
   display: grid;

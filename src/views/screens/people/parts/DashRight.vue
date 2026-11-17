@@ -124,7 +124,6 @@
           </select>
         </div>
         <div class="heat-chart">
-          <!-- 确保传入子组件的是普通 JSON 对象，避免引用类型死循环 -->
           <marryChart :data="marryData" />
         </div>
       </section>
@@ -134,7 +133,8 @@
       <section class="panel panel--red">
         <div class="panel-head red-panel-head">
           <div class="panel-title">残疾人信息</div>
-          <select v-model="dateRed" class="panel-date" @change="fetchHandicapData">
+          <!-- 修改：change 事件调用 handleDateChange -->
+          <select v-model="dateRed" class="panel-date" @change="handleDateChange">
             <option v-for="item in disabledDateOptions" :key="item" :value="item">
               {{ item }}
             </option>
@@ -322,7 +322,6 @@ const fetchMaritalStatus = async () => {
     const res: any = await getMaritalStatus(dateHeat.value)
     const list: any[] = res?.data?.dataList ?? res?.dataList ?? []
 
-    // 精确映射，剥离所有可能引发循环引用的复杂结构，转为纯基本类型
     const mapped = list.map((item) => ({
       year: String(item.year ?? ''),
       firstMarry: Number(item.firstNum ?? 0),
@@ -332,7 +331,6 @@ const fetchMaritalStatus = async () => {
       divorceRate: Number(item.divorceRate ?? 0)
     }))
 
-    // 按年份升序
     mapped.sort((a, b) => Number(a.year) - Number(b.year))
     marryData.value = mapped
   } catch (e) {
@@ -344,69 +342,134 @@ const fetchMaritalStatus = async () => {
 // ============================================================
 // ⭐ 残疾人信息
 // ============================================================
-const disabledDateOptions = ['2023-05']
-const dateRed = ref<string>('2023-05')
-
 const houseTabs = ['类型统计', '年龄段统计', '性别统计', '户口统计'] as const
-const activeDisabledTab = ref<(typeof houseTabs)[number]>(houseTabs[0])
+type TabType = (typeof houseTabs)[number]
+
+const activeDisabledTab = ref<TabType>(houseTabs[0])
 const houseData = ref<Array<{ name: string; value: number }>>([])
 
-const fetchHandicapData = async () => {
-  const date = dateRed.value
-  const tab = activeDisabledTab.value
+// 为不同 Tab 单独维护时间选项和当前选中日期
+const disabledDateOptions = ref<string[]>([])
+const dateRed = ref<string>('')
+
+// 缓存各个 Tab 的数据
+const cache: Record<
+  TabType,
+  { data: Array<{ name: string; value: number }>; options: string[]; date: string }
+> = {
+  类型统计: { data: [], options: [], date: '' },
+  年龄段统计: { data: [], options: [], date: '' },
+  性别统计: { data: [], options: [], date: '' },
+  户口统计: { data: [], options: [], date: '' }
+}
+
+// 请求某一模块的数据
+const fetchHandicapSingle = async (tabName: TabType, date?: string) => {
   try {
     let list: any[] = []
-    if (tab === '类型统计') {
-      const res: any = await getHandicapType(date)
+    let summary: any = {}
+
+    if (tabName === '类型统计') {
+      const res: any = await getHandicapType(date || '')
       list = res?.data?.dataList ?? res?.dataList ?? []
-      houseData.value = list.map((item) => ({
+      summary = res?.data?.summary ?? res?.summary ?? {}
+      cache['类型统计'].data = list.map((item: any) => ({
         name: item.type ?? '',
         value: Number(item.num ?? 0)
       }))
-    } else if (tab === '年龄段统计') {
-      const res: any = await getHandicapAge(date)
+    } else if (tabName === '年龄段统计') {
+      const res: any = await getHandicapAge(date || '')
       list = res?.data?.dataList ?? res?.dataList ?? []
-      houseData.value = list.map((item) => ({
+      summary = res?.data?.summary ?? res?.summary ?? {}
+      cache['年龄段统计'].data = list.map((item: any) => ({
         name: item.agePart ?? '',
         value: Number(item.num ?? 0)
       }))
-    } else if (tab === '性别统计') {
-      const res: any = await getHandicapSex(date)
+    } else if (tabName === '性别统计') {
+      const res: any = await getHandicapSex(date || '')
       list = res?.data?.dataList ?? res?.dataList ?? []
+      summary = res?.data?.summary ?? res?.summary ?? {}
       let menTotal = 0
       let womenTotal = 0
-      list.forEach((item) => {
+      list.forEach((item: any) => {
         menTotal += Number(item.men ?? 0)
         womenTotal += Number(item.women ?? 0)
       })
-      houseData.value = [
+      cache['性别统计'].data = [
         { name: '男性', value: menTotal },
         { name: '女性', value: womenTotal }
       ]
-    } else if (tab === '户口统计') {
-      const res: any = await getHandicapInhabitant(date)
+    } else if (tabName === '户口统计') {
+      const res: any = await getHandicapInhabitant(date || '')
       list = res?.data?.dataList ?? res?.dataList ?? []
+      summary = res?.data?.summary ?? res?.summary ?? {}
       let farmTotal = 0
       let nonFarmTotal = 0
-      list.forEach((item) => {
+      list.forEach((item: any) => {
         farmTotal += Number(item.farm ?? 0)
         nonFarmTotal += Number(item.nonFarm ?? 0)
       })
-      houseData.value = [
+      cache['户口统计'].data = [
         { name: '农业户口', value: farmTotal },
         { name: '非农业户口', value: nonFarmTotal }
       ]
     }
+
+    // 处理时间选项（兼容可能返回不在 options 里的 souseDate 的情况）
+    const options = summary?.timeOptions ?? []
+    const souseDate = summary?.souseDate ?? ''
+
+    let finalOptions = [...options]
+    if (souseDate && !finalOptions.includes(souseDate)) {
+      finalOptions.unshift(souseDate)
+    }
+
+    cache[tabName].options = finalOptions
+
+    // 如果主动传入了 date 并且 date 在选项中，则使用；否则使用默认的 souseDate
+    if (date && finalOptions.includes(date)) {
+      cache[tabName].date = date
+    } else {
+      cache[tabName].date = souseDate || (finalOptions.length > 0 ? finalOptions[0] : '')
+    }
   } catch (e) {
-    console.error('残疾人信息查询失败', e)
-    houseData.value = []
+    console.error(`${tabName}查询失败`, e)
   }
 }
 
-const handleDisabledTabClick = (tab: (typeof houseTabs)[number]) => {
+// 初始化时一次性拉取四个接口
+const fetchAllHandicapData = async () => {
+  await Promise.all([
+    fetchHandicapSingle('类型统计'),
+    fetchHandicapSingle('年龄段统计'),
+    fetchHandicapSingle('性别统计'),
+    fetchHandicapSingle('户口统计')
+  ])
+  // 渲染当前激活 Tab 的数据
+  syncCurrentTabView()
+}
+
+// 将缓存数据同步到视图
+const syncCurrentTabView = () => {
+  const tab = activeDisabledTab.value
+  houseData.value = cache[tab].data
+  disabledDateOptions.value = cache[tab].options
+  dateRed.value = cache[tab].date
+}
+
+// 切换 Tab
+const handleDisabledTabClick = (tab: TabType) => {
   if (activeDisabledTab.value === tab) return
   activeDisabledTab.value = tab
-  fetchHandicapData()
+  // 直接从缓存中同步视图，不发请求
+  syncCurrentTabView()
+}
+
+// 用户改变下拉框时间
+const handleDateChange = async () => {
+  const tab = activeDisabledTab.value
+  await fetchHandicapSingle(tab, dateRed.value)
+  syncCurrentTabView()
 }
 
 // ============================================================
@@ -459,13 +522,13 @@ onMounted(() => {
   fetchNaturalChange()
   fetchBaseEndIns()
   fetchMaritalStatus()
-  fetchHandicapData()
+  fetchAllHandicapData() // 初始化调用四个接口
   fetchSingleData()
 })
 </script>
 
 <style scoped>
-/* 样式保持不变 */
+/* 样式保持原样，不增加篇幅这里省略了，直接使用你原本的 CSS 即可 */
 .right {
   min-height: 0;
   height: 100%;

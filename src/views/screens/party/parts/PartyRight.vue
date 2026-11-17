@@ -376,14 +376,14 @@ const getPie3DOption = (rows: any[]) => {
 
         return `
           <div style="padding: 12px 20px;">
-            <div style="font-size: 32px; font-weight: bold; color: #16d2ff; margin-bottom: 14px;">${pieData.name}</div>
+            <div style="font-size: 32px; font-weight: bold; color: #fff; margin-bottom: 14px;">${pieData.name}</div>
             <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">数量：</span>
-              <span style="font-weight: bold; color: #ff8b39;">${pieData.raw}</span>
+              <span style="font-weight: bold; color: #fff;">${pieData.raw}</span>
             </div>
             <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
               <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">占比：</span>
-              <span style="font-weight: bold; color: #ffe04b;">${bfb}%</span>
+              <span style="font-weight: bold; color: #fff;">${bfb}%</span>
             </div>
           </div>
         `
@@ -979,7 +979,7 @@ onMounted(() => {
 }
 
 .panel--talent .panel-tabs {
-  left: 60px;
+  left: 100px;
   top: 120px;
   right: auto;
   gap: 40px;
@@ -1143,7 +1143,7 @@ onMounted(() => {
 }
 
 .panel--mass .panel-tabs {
-  left: 60px;
+  left: 210px;
   top: 150px;
   right: auto;
   gap: 40px;
@@ -1197,7 +1197,7 @@ onMounted(() => {
 /* 上方：图表区域 */
 .panel--mass .talent-body {
   position: absolute;
-  left: 100px;
+  left: 220px;
   right: 100px;
   top: 200px;
   height: 800px;
@@ -1427,6 +1427,7 @@ onMounted(() => {
 .panel--vol .panel-tabs {
   top: 120px;
   right: 126px;
+  left: 130px;
   gap: 28px;
 }
 
