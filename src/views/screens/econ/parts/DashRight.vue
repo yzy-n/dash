@@ -76,21 +76,25 @@
             <div
               v-for="(row, idx) in priceTableData"
               :key="`${row.name}-${idx}`"
-              class="price-table-row"
+              class="price-row-wrap"
             >
-              <div class="price-cell">{{ row.name }}</div>
-              <div class="price-cell">{{ row.lastWeek }}</div>
-              <div class="price-cell">{{ row.thisWeek }}</div>
-              <div
-                class="price-cell"
-                :class="{
-                  'price-up': row.diff > 0,
-                  'price-down': row.diff < 0,
-                  'price-zero': row.diff === 0
-                }"
-              >
-                {{ row.diff > 0 ? '+' : '' }}{{ row.diff }}
+              <span class="arrow arrow-left"></span>
+              <div class="price-table-row">
+                <div class="price-cell">{{ row.name }}</div>
+                <div class="price-cell">{{ row.lastWeek }}</div>
+                <div class="price-cell">{{ row.thisWeek }}</div>
+                <div
+                  class="price-cell"
+                  :class="{
+                    'price-up': row.diff > 0,
+                    'price-down': row.diff < 0,
+                    'price-zero': row.diff === 0
+                  }"
+                >
+                  {{ row.diff > 0 ? '+' : '' }}{{ row.diff }}
+                </div>
               </div>
+              <span class="arrow arrow-right"></span>
             </div>
           </div>
         </div>
@@ -250,7 +254,6 @@ type MarketRow = {
 const marketList = ref<MarketRow[]>([])
 const marketLoading = ref(false)
 
-/** 兼容多种解包层级 */
 const pickList = (res: any): any[] => {
   const body = res?.data ?? res
   if (Array.isArray(body?.datalist)) return body.datalist
@@ -838,10 +841,6 @@ const serviceBarOption = computed(() => {
 
 /* =========================================================
    商品房交易情况（接口驱动）
-   - 接口：/economicoperation/bigscreen/condo?souseDate=xxx&type=1|2
-   - 返回：{ data: { moduleName, datalist: [{ departmentName, type,
-             internalLevel, yoyGrowth }] } }
-   - Tab：新房 → type=1；二手房 → type=2
    ========================================================= */
 type HouseRow = {
   area: string
@@ -912,7 +911,6 @@ const fetchHouseData = async () => {
       dateHouse.value = souseDate
     }
 
-    // 注意：字段名是 datalist（小写 L）
     const list = pickList(res)
     houseData.value = list.map((it: any) => ({
       area: String(it?.departmentName ?? ''),
@@ -1080,35 +1078,87 @@ onMounted(() => {
   width: 100%;
   height: calc(100% - 180px);
 }
+
+/* ============ 价格监测卡片：自适应高度 ============ */
 .panel--tower {
   flex: 1;
   min-height: 0;
-  padding-top: 86px;
+  display: flex;
+  flex-direction: column; /* 改为纵向 flex 布局 */
 }
+
+/* 表格容器自动撑满剩余空间 */
 .price-table-wrap {
   width: 100%;
-  height: calc(100% - 70px);
+  flex: 1;
+  min-height: 0;
   display: flex;
-  margin-top: 150px;
   flex-direction: column;
+  margin-top: 170px; /* 刚好避开上方的标题和 Tabs */
+  margin-bottom: 10px;
   border: 1px solid rgba(84, 188, 255, 0.2);
   border-radius: 8px;
   overflow: hidden;
 }
+
+/* 表头吸顶 */
 .price-table-header {
   display: grid;
   grid-template-columns: 1fr 1.4fr 1.4fr 1fr;
-  background: linear-gradient(90deg, rgba(12, 70, 130, 0.7), rgba(8, 45, 90, 0.6));
+  background: #0b306b;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
+
+/* 滚动主体 */
 .price-table-body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  /* 滚动条美化 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(78, 184, 255, 0.55) rgba(10, 40, 90, 0.35);
 }
+.price-table-body::-webkit-scrollbar {
+  width: 8px;
+}
+.price-table-body::-webkit-scrollbar-track {
+  background: rgba(10, 40, 90, 0.35);
+  border-radius: 4px;
+}
+.price-table-body::-webkit-scrollbar-thumb {
+  background: rgba(78, 184, 255, 0.55);
+  border-radius: 4px;
+}
+.price-table-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(78, 184, 255, 0.85);
+}
+
+/* 行容器（包含左右菱形） */
+.price-row-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.price-row-wrap:first-child {
+  margin-top: 8px;
+}
+.price-row-wrap:last-child {
+  margin-bottom: 8px;
+}
+
+/* 行背景与网格 */
 .price-table-row {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1.4fr 1.4fr 1fr;
-  border-bottom: 1px solid rgba(84, 188, 255, 0.12);
+  background: linear-gradient(90deg, #0c3370, #15448c, #0c3370);
 }
+
+/* 单元格文字 */
 .price-cell {
   padding: 12px 10px;
   font-size: 30px;
@@ -1117,7 +1167,29 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-shadow: 0 0 6px #247ddd;
 }
+.price-table-header .price-cell {
+  text-shadow: 0 0 8px #2178dd;
+}
+
+/* 菱形装饰 */
+.arrow {
+  width: 14px;
+  height: 18px;
+  color: #ffcc44;
+  font-size: 20px;
+  text-shadow: 0 0 6px #ffbc2c;
+  flex-shrink: 0;
+}
+.arrow-left::before {
+  content: '◆';
+}
+.arrow-right::before {
+  content: '◆';
+}
+
+/* 红绿涨跌色 */
 .price-up {
   color: #ff5555;
   text-shadow: 0 0 6px rgba(255, 60, 60, 0.35);
@@ -1129,6 +1201,8 @@ onMounted(() => {
 .price-zero {
   color: #e6f4ff;
 }
+
+/* ========================================================= */
 .red-panel-head {
   justify-content: space-between;
 }

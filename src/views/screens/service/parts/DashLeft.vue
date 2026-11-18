@@ -760,7 +760,6 @@ const projectPieOption = computed(() => {
         radius: ['45%', '55%'],
         center: ['50%', '30%'],
         avoidLabelOverlap: true,
-        // 👇 修复关键点：同时修改 labelLinePoints 保证引导线紧密连接
         labelLayout: (params: any) => {
           const { labelLinePoints } = params
           const points = labelLinePoints ? labelLinePoints.map((p: number[]) => [...p]) : null
@@ -768,8 +767,8 @@ const projectPieOption = computed(() => {
           if (params.text && params.text.includes('现场施工')) {
             const dx = -40
             if (points && points.length >= 3) {
-              points[points.length - 1][0] += dx // 终点跟着文字走
-              points[points.length - 2][0] += dx / 2 // 拐点走一半，使线形成自然折角
+              points[points.length - 1][0] += dx
+              points[points.length - 2][0] += dx / 2
             }
             return { dx, labelLinePoints: points }
           }
@@ -797,7 +796,7 @@ const projectPieOption = computed(() => {
         labelLine: {
           show: true,
           length: 20,
-          length2: 40, // 稍微加长水平段，给文字偏移留出余量
+          length2: 40,
           lineStyle: {
             color: 'rgba(89, 194, 255, 0.4)',
             width: 2
@@ -1215,9 +1214,10 @@ onMounted(() => {
   gap: 14px;
 }
 
+/* ================= 重点修改部分 ================= */
 .pile-top {
   display: grid;
-  grid-template-columns: minmax(0, 4.5fr) minmax(0, 5.5fr);
+  grid-template-columns: 1fr 1fr; /* 改为左右均分 1:1 */
   gap: 14px;
   min-height: 0;
   height: 100%;
@@ -1309,10 +1309,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center; /* 文字居中 */
   gap: 12px;
   position: relative;
-  padding: 0 16px 0 32px;
+  padding: 0 16px; /* 去掉左侧多余 padding */
   box-sizing: border-box;
 }
 
@@ -1321,22 +1321,15 @@ onMounted(() => {
   box-shadow: inset 0 1px 0 rgba(54, 232, 255, 0.08);
 }
 
+/* 隐藏左侧装饰竖条，让整体居中更协调 */
 .pile-top-right-row::before {
-  content: '';
-  width: 4px;
-  height: 32px;
-  border-radius: 999px;
-  background: rgba(54, 232, 255, 0.35);
-  box-shadow: 0 0 12px rgba(54, 232, 255, 0.16);
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  display: none;
 }
 
 .pile-top-right-name {
   display: flex;
   align-items: baseline;
+  justify-content: center; /* 居中 */
   gap: 12px;
   white-space: nowrap;
 }
@@ -1356,7 +1349,7 @@ onMounted(() => {
 .pile-top-right-metrics {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center; /* 居中 */
   gap: 8px;
 }
 .pile-top-right-val,
@@ -1400,6 +1393,7 @@ onMounted(() => {
   color: rgba(214, 238, 255, 0.42);
   white-space: nowrap;
 }
+/* ================= 修改部分结束 ================= */
 
 .pile-chart {
   min-height: 0;

@@ -320,7 +320,7 @@ const props = defineProps<{
 }
 
 .table--appeal .table-row {
-  grid-template-columns: 1fr 2.2fr 1.2fr 0.9fr;
+  grid-template-columns: 1.5fr 1.2fr 1.2fr 0.9fr;
 }
 
 .table--3 .table-row {

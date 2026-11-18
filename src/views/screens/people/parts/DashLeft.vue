@@ -2,7 +2,7 @@
   <aside class="left">
     <section class="panel panel--electric">
       <div class="panel-head">
-        <div class="panel-title">进5年人口总数</div>
+        <div class="panel-title">=近5年人口总数</div>
         <select v-model="datePopu" class="panel-date" @change="getPopuList">
           <option v-for="item in popuDateOptions" :key="item" :value="item">
             {{ item }}

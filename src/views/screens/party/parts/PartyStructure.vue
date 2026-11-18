@@ -403,7 +403,7 @@ onMounted(() => {
 
 .dist-item {
   position: absolute;
-  width: 720px;
+  width: 650px;
   padding-left: 70px;
   box-sizing: border-box;
 }

@@ -46,9 +46,9 @@
             </div>
           </div>
           <div class="nature-col nature-col-center">
+            <!-- <div class="nature-hex-icon"></div>
             <div class="nature-hex-icon"></div>
-            <div class="nature-hex-icon"></div>
-            <div class="nature-hex-icon"></div>
+            <div class="nature-hex-icon"></div> -->
           </div>
           <div class="nature-col nature-col-right">
             <div class="nature-item">
@@ -891,7 +891,7 @@ onMounted(() => {
   height: 100%;
   min-height: 180px;
   border-radius: 12px;
-  border: 1px solid rgba(84, 188, 255, 0.24);
+  border: 1px solid rgba(84, 188, 255, 0.84);
   background: rgba(10, 30, 62, 0.4);
   display: flex;
   flex-direction: column;

@@ -1,7 +1,6 @@
 <template>
   <div class="dash-center">
     <div class="wrap">
-      <div class="space-grid"></div>
       <div class="top-metrics">
         <div class="top-metric">
           <div class="top-metric-label">总人口数</div>
@@ -32,7 +31,6 @@
           :activeName="activeRegion === '全市' ? undefined : activeRegion"
           @region-change="handleRegionChange"
         />
-        <div class="map-base-ring"></div>
         <div class="map-select-wrap">
           <el-select
             v-model="activeRegion"
@@ -639,16 +637,6 @@ const moveOption = computed(() => {
   align-items: center;
   justify-content: center;
 }
-.space-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0, 110, 220, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 110, 220, 0.06) 1px, transparent 1px);
-  background-size: 36px 36px;
-  pointer-events: none;
-  z-index: 1;
-}
 .top-metrics {
   position: absolute;
   left: 50%;
@@ -733,19 +721,6 @@ const moveOption = computed(() => {
   width: 2300px;
   height: 1580px;
   z-index: 5;
-}
-.map-base-ring {
-  position: absolute;
-  left: 50%;
-  bottom: 20px;
-  transform: translateX(-50%);
-  width: 1200px;
-  height: 320px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(30, 160, 255, 0.18), transparent 72%);
-  border-top: 3px solid rgba(78, 184, 255, 0.35);
-  z-index: 2;
-  pointer-events: none;
 }
 .corner-panel {
   position: absolute;

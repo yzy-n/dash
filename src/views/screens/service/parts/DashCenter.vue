@@ -217,9 +217,7 @@ onMounted(() => {
   overflow: hidden;
   border-radius: 18px;
   padding: 0;
-  background:
-    linear-gradient(180deg, rgba(6, 27, 72, 0.6), rgba(4, 16, 44, 0.6)),
-    url('@/assets/img/leftBg.png');
+
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;

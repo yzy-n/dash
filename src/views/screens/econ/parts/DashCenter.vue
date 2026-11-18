@@ -1,9 +1,6 @@
 <template>
   <div class="dash-center">
     <div class="wrap">
-      <!-- 背景空间线框 -->
-      <div class="space-grid"></div>
-
       <!-- 地图 -->
       <div ref="mapRef" class="anshan-map"></div>
 
@@ -72,9 +69,6 @@
         <div class="num">{{ ruralIncome.amount }} <span class="unit">元</span></div>
         <div class="rate red">{{ ruralIncome.yearOnYearGrowth }}%↑</div>
       </div>
-
-      <!-- 底部光晕 -->
-      <div class="base-ring"></div>
     </div>
   </div>
 </template>
@@ -336,7 +330,7 @@ const fetchFiscalRevenue = async () => {
   }
 }
 
-/** 生成科技感纹理（网格 + 星点） */
+/** 生成科技感纹理（网格 + 星点）—— 用于 3D 地图材质，非页面背景特效 */
 const createTechTexture = () => {
   const size = 512
   const canvas = document.createElement('canvas')
@@ -529,17 +523,6 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 
-.space-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0, 110, 220, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 110, 220, 0.06) 1px, transparent 1px);
-  background-size: 36px 36px;
-  pointer-events: none;
-  z-index: 1;
-}
-
 .anshan-map {
   position: absolute;
   left: 50%;
@@ -707,17 +690,6 @@ onBeforeUnmount(() => {
   top: 66%;
   right: 16%;
   animation-delay: 3.2s;
-}
-
-.base-ring {
-  position: absolute;
-  bottom: 90px;
-  width: 1200px;
-  height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(30, 160, 255, 0.18), transparent 72%);
-  border-top: 3px solid rgba(78, 184, 255, 0.35);
-  z-index: 2;
 }
 
 @keyframes float {

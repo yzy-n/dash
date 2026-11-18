@@ -1485,12 +1485,39 @@ onMounted(() => {
 .pile-chart {
   min-height: 0;
 }
+
+/* ============ 钢价走势：表头固定 + 内容滚动 ============ */
 .steel-body {
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  /* Firefox 滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(78, 184, 255, 0.55) rgba(10, 40, 90, 0.35);
 }
+/* WebKit 滚动条美化 */
+.steel-body::-webkit-scrollbar {
+  width: 8px;
+}
+.steel-body::-webkit-scrollbar-track {
+  background: rgba(10, 40, 90, 0.35);
+  border-radius: 4px;
+}
+.steel-body::-webkit-scrollbar-thumb {
+  background: rgba(78, 184, 255, 0.55);
+  border-radius: 4px;
+}
+.steel-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(78, 184, 255, 0.85);
+}
+
 .steel-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   width: 100%;
   background: #0b306b;
