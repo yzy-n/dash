@@ -346,7 +346,8 @@ const electricMetrics = computed(() => {
 const electricPieOption = computed(() => {
   const data = electricList.value.map((item: any) => ({
     name: item.label,
-    value: Number(item.powerNum) || 0
+    // 关键修复：接口返回的数值字段为 capacityNum，做兼容处理
+    value: Number(item.capacityNum) || Number(item.powerNum) || 0
   }))
   const total = data.reduce((acc, item) => acc + item.value, 0)
 
@@ -489,7 +490,8 @@ const capacityRingOption = computed(() => {
   const list = capacityList.value
   const colors = ['#33d5ff', '#ffe24a', '#40f3b8', '#ffb84a', '#8b5cff']
   const total = list.reduce(
-    (acc: number, item: any) => acc + (Number(item.powerNum || item.volume) || 0),
+    (acc: number, item: any) =>
+      acc + (Number(item.capacityNum) || Number(item.powerNum) || Number(item.volume) || 0),
     0
   )
 
@@ -510,7 +512,7 @@ const capacityRingOption = computed(() => {
     series: list.map((item: any, idx: number) => {
       const outer = 82 - idx * 15
       const inner = outer - 12
-      const val = Number(item.powerNum || item.volume) || 0
+      const val = Number(item.capacityNum) || Number(item.powerNum) || Number(item.volume) || 0
       const rest = Math.max(total - val, 0)
       return {
         type: 'pie',

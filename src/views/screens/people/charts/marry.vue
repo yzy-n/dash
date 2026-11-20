@@ -31,7 +31,7 @@ const option = computed<EChartsOption>(() => {
       backgroundColor: 'rgba(6, 18, 48, 0.92)'
     },
     legend: {
-      data: ['初婚', '再婚', '复婚', '准许登记结婚', '离婚率'],
+      data: ['初婚', '再婚', '复婚', '准许登记结婚', '离婚对'],
       top: 44,
       left: 'center',
       itemWidth: 10,
