@@ -62,27 +62,23 @@ const currentParkingChart = computed(() => {
         <!-- 左侧竖排文字需求 -->
         <div class="demand-title">需求</div>
         <div class="progress-list">
-          <!-- 理想水平 -->
-          <div class="progress-item">
+          <!-- 需求进度：数据来自 /parking 的 parkingLevelRates -->
+          <div
+            class="progress-item"
+            v-for="(item, index) in data.parkingDemandLevels"
+            :key="`${item.name}-${index}`"
+          >
             <div class="progress-text">
-              <div>理想水平</div>
-              <div>(1.2车位/车)</div>
+              <div>{{ item.name }}</div>
+              <div>({{ item.target }}车位/车)</div>
             </div>
             <div class="progress-bar">
-              <ProgressBarChart :percent="data.parkingDemandIdeal" color-type="green" />
+              <ProgressBarChart
+                :percent="item.percent"
+                :color-type="index === 0 ? 'green' : 'blue'"
+              />
             </div>
-            <div class="progress-percent">{{ data.parkingDemandIdeal }} %</div>
-          </div>
-          <!-- 2025目标 -->
-          <div class="progress-item">
-            <div class="progress-text">
-              <div>2025年目标</div>
-              <div>(0.6车位/车)</div>
-            </div>
-            <div class="progress-bar">
-              <ProgressBarChart :percent="data.parkingDemandTarget" color-type="blue" />
-            </div>
-            <div class="progress-percent">{{ data.parkingDemandTarget }} %</div>
+            <div class="progress-percent">{{ item.percent }} %</div>
           </div>
         </div>
       </div>
@@ -379,7 +375,7 @@ const currentParkingChart = computed(() => {
 /* 单行三栏布局：文字 + 进度条 + 百分比 */
 .progress-item {
   display: grid;
-  grid-template-columns: 230px 1fr 130px;
+  grid-template-columns: 230px 1fr 190px;
   align-items: center;
   gap: 24px;
 }
@@ -401,13 +397,14 @@ const currentParkingChart = computed(() => {
 
 /* 右侧百分比发光文字 */
 .progress-percent {
-  width: 120px;
+  width: 190px;
   font-size: 33px;
   font-weight: bold;
   color: #46e2f1;
   text-shadow: 0 0 14px rgba(70, 226, 241, 0.65);
   text-align: center;
   margin-right: 20px;
+  white-space: nowrap;
 }
 
 /* 顶部统计行 */

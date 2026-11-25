@@ -364,7 +364,6 @@ const getPie3DOption = (rows: any[]) => {
       borderColor: '#fff',
       borderWidth: 1,
       textStyle: { color: 'rgba(240, 251, 255, 0.9)', fontSize: 40 },
-      extraCssText: 'box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6); border-radius: 8px;',
       formatter: (params: any) => {
         if (params.seriesName === 'pie2d' || params.seriesName === 'mouseoutSeries') return ''
 
@@ -375,13 +374,13 @@ const getPie3DOption = (rows: any[]) => {
         const bfb = ((pieData.endRatio - pieData.startRatio) * 100).toFixed(2)
 
         return `
-          <div style="padding: 12px 20px;">
-            <div style="font-size: 32px; font-weight: bold; color: #fff; margin-bottom: 14px;">${pieData.name}</div>
-            <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="padding: 12px 12px;">
+            <div style="font-size: 40px; font-weight: bold; color: #fff; margin-bottom: 14px;">${pieData.name}</div>
+            <div style="font-size: 40px; color: #fff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">数量：</span>
               <span style="font-weight: bold; color: #fff;">${pieData.raw}</span>
             </div>
-            <div style="font-size: 28px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 40px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
               <span style="color: rgba(255,255,255,0.7); margin-right: 40px;">占比：</span>
               <span style="font-weight: bold; color: #fff;">${bfb}%</span>
             </div>
@@ -1432,7 +1431,7 @@ onMounted(() => {
 }
 
 .panel--vol .tab {
-  min-width: 250px;
+  min-width: 280px;
   height: 60px;
   line-height: 60px;
   font-size: 40px;

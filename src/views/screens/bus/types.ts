@@ -42,6 +42,15 @@ export type BusCongestionSummary = {
   light: number
 }
 
+/** 城区停车场现状分析-需求进度（数据源：/parking 的 parkingLevelRates） */
+export type BusParkingDemandLevel = {
+  name: string
+  /** 目标车位数/车 */
+  target: number
+  /** 完成百分比 0-100 */
+  percent: number
+}
+
 export type BusScreenData = {
   parkingRatioXData: string[]
   parkingRatioYData: number[]
@@ -120,8 +129,7 @@ export type BusScreenData = {
       cityRoadRate: number
     }>
   }
-  parkingDemandIdeal: number
-  parkingDemandTarget: number
+  parkingDemandLevels: BusParkingDemandLevel[]
   roadCloseSummary: BusStatSummary
   roadCloseList: BusRoadCloseRow[]
   congestionSummary: BusCongestionSummary
@@ -194,8 +202,11 @@ export const createEmptyBusData = (): BusScreenData => ({
     type1: [],
     type2: []
   },
-  parkingDemandIdeal: 0,
-  parkingDemandTarget: 0,
+  // 接口返回前的兜底占位，加载 parkingLevelRates 后整体替换
+  parkingDemandLevels: [
+    { name: '理想水平', target: 1.2, percent: 0 },
+    { name: '2025年期望', target: 0.6, percent: 0 }
+  ],
   roadCloseSummary: {
     pending: 0,
     processing: 0,

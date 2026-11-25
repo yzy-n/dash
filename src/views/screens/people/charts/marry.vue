@@ -102,7 +102,7 @@ const option = computed<EChartsOption>(() => {
         itemStyle: { color: '#2f7dff' }
       },
       {
-        name: '离婚率',
+        name: '离婚对',
         type: 'line',
         yAxisIndex: 1,
         barWidth: '20',

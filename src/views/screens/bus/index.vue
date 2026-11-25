@@ -36,7 +36,7 @@ import bgUrl from '@/assets/img/bg.jpg'
 import DashCenter from './parts/DashCenter.vue'
 import DashLeft from './parts/DashLeft.vue'
 import DashRight from './parts/DashRight.vue'
-import { createEmptyBusData, type BusScreenData } from './types'
+import { createEmptyBusData, type BusParkingDemandLevel, type BusScreenData } from './types'
 import {
   getCityTrafficCongestion,
   getCityTrafficParking,
@@ -180,6 +180,26 @@ const applyParkingSummary = (summary: any) => {
   if (planRows.length) {
     busData.parkingPlanXData = planRows.map((item) => item.label)
     busData.parkingPlanYData = planRows.map((item) => item.value)
+  }
+
+  // 需求进度条：直接使用接口的 parkingLevelRates（name / target / percent）
+  const rawLevels = Array.isArray(summary?.parkingLevelRates)
+    ? summary.parkingLevelRates
+    : Array.isArray(summary?.parkingLevels)
+      ? summary.parkingLevels
+      : []
+  const levelRows = preferPublishedRows(rawLevels)
+    .map((item: any) => {
+      const name = toStringValue(item?.name).trim()
+      if (!name) return null
+      const target = toNumber(item?.target) ?? 0
+      const percent = Math.min(Math.max(toNumber(item?.percent) ?? 0, 0), 100)
+      return { name, target, percent }
+    })
+    .filter(Boolean) as BusParkingDemandLevel[]
+
+  if (levelRows.length) {
+    busData.parkingDemandLevels = levelRows
   }
 }
 
